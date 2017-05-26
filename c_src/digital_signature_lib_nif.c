@@ -29,6 +29,8 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     return enif_make_tuple2(env, enif_make_atom(env, "error"), errorTerm);
   }
 
+  PUAC_SUBJECT_INFO subjectInfo = malloc(sizeof(UAC_SUBJECT_INFO));
+
   unsigned int p7DataLength;
   enif_get_list_length(env, argv[0], &p7DataLength);
   if (p7DataLength == 0) {
@@ -100,7 +102,6 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   UAC_SIGNED_DATA_INFO signedDataInfo = {};
   DWORD loadSignedDataResult = LoadSignedData(libHandler, signedData, &dataBlob, &signedDataInfo);
 
-  PUAC_SUBJECT_INFO subjectInfo = malloc(signedData.dataLen);
   bool checkResult = Check(libHandler, signedData, signedDataInfo, subjectInfo, certs);
   dlclose(libHandler);
 

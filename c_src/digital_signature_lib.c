@@ -317,7 +317,7 @@ bool Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDat
     if (getCertInfoResult != 0) {
       return false;
     }
-    memcpy(subjectInfo, &certInfo.subject, cert.dataLen);
+    memcpy(subjectInfo, &certInfo.subject, sizeof(UAC_SUBJECT_INFO));
     struct GeneralCert matchingCert = FindMatchingRootCertificate(libHandler, cert, certs.general);
     if (matchingCert.root.data == NULL) {
       return false;
