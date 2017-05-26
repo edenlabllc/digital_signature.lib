@@ -108,7 +108,7 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   ERL_NIF_TERM signer = enif_make_new_map(env);
   char* commonName = subjectInfo->commonName;
   int commonNameLength = strlen(commonName);
-  ErlNifBinary commonNameBin;
+  ErlNifBinary commonNameBin = {};
   if (commonNameLength < 64) {
     commonNameBin.size = commonNameLength;
     commonNameBin.data = commonName;
@@ -121,7 +121,7 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   enif_make_map_put(env, signer, enif_make_atom(env, "common_name"), commonNameTerm, &signer);
   char* countryName = subjectInfo->countryName;
   int countryNameLength = strlen(countryName);
-  ErlNifBinary countryNameBin;
+  ErlNifBinary countryNameBin = {};
   if (countryNameLength < 64) {
     countryNameBin.size = countryNameLength;
     countryNameBin.data = countryName;
@@ -134,7 +134,7 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   enif_make_map_put(env, signer, enif_make_atom(env, "country_name"), countryNameTerm, &signer);
   char* surname = subjectInfo->surname;
   int surnameLength = strlen(surname);
-  ErlNifBinary surnameBin;
+  ErlNifBinary surnameBin = {};
   if (surnameLength < 64) {
     surnameBin.size = surnameLength;
     surnameBin.data = surname;
@@ -147,7 +147,7 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   enif_make_map_put(env, signer, enif_make_atom(env, "surname"), surnameTerm, &signer);
   char* givenName = subjectInfo->givenName;
   int givenNameLength = strlen(givenName);
-  ErlNifBinary givenNameBin;
+  ErlNifBinary givenNameBin = {};
   if (givenNameLength < 64) {
     givenNameBin.size = givenNameLength;
     givenNameBin.data = givenName;
@@ -160,7 +160,7 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   enif_make_map_put(env, signer, enif_make_atom(env, "given_name"), givenNameTerm, &signer);
   char* organizationName = subjectInfo->organizationName;
   int organizationNameLength = strlen(organizationName);
-  ErlNifBinary organizationNameBin;
+  ErlNifBinary organizationNameBin = {};
   if (organizationNameLength < 64) {
     organizationNameBin.size = organizationNameLength;
     organizationNameBin.data = organizationName;
@@ -173,7 +173,7 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   enif_make_map_put(env, signer, enif_make_atom(env, "organization_name"), organizationNameTerm, &signer);
   char* stateOrProvinceName = subjectInfo->stateOrProvinceName;
   int stateOrProvinceNameLength = strlen(stateOrProvinceName);
-  ErlNifBinary stateOrProvinceNameBin;
+  ErlNifBinary stateOrProvinceNameBin = {};
   if (stateOrProvinceNameLength < 64) {
     stateOrProvinceNameBin.size = stateOrProvinceNameLength;
     stateOrProvinceNameBin.data = stateOrProvinceName;
@@ -186,7 +186,7 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   enif_make_map_put(env, signer, enif_make_atom(env, "state_or_province_name"), stateOrProvinceNameTerm, &signer);
   char* localityName = subjectInfo->localityName;
   int localityNameLength = strlen(localityName);
-  ErlNifBinary localityNameBin;
+  ErlNifBinary localityNameBin = {};
   if (localityNameLength < 64) {
     localityNameBin.size = localityNameLength;
     localityNameBin.data = localityName;
@@ -199,7 +199,7 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   enif_make_map_put(env, signer, enif_make_atom(env, "locality_name"), localityNameTerm, &signer);
   char* organizationalUnitName = subjectInfo->organizationalUnitName;
   int organizationalUnitNameLength = strlen(organizationalUnitName);
-  ErlNifBinary organizationalUnitNameBin;
+  ErlNifBinary organizationalUnitNameBin = {};
   if (organizationalUnitNameLength < 64) {
     organizationalUnitNameBin.size = organizationalUnitNameLength;
     organizationalUnitNameBin.data = organizationalUnitName;
@@ -212,7 +212,7 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   enif_make_map_put(env, signer, enif_make_atom(env, "organizational_unit_name"), organizationalUnitNameTerm, &signer);
   char* title = subjectInfo->title;
   int titleLength = strlen(title);
-  ErlNifBinary titleBin;
+  ErlNifBinary titleBin = {};
   if (titleLength < 64) {
     titleBin.size = titleLength;
     titleBin.data = title;
@@ -225,7 +225,7 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   enif_make_map_put(env, signer, enif_make_atom(env, "title"), titleTerm, &signer);
   char* edrpou = subjectInfo->edrpou;
   int edrpouLength = strlen(edrpou);
-  ErlNifBinary edrpouBin;
+  ErlNifBinary edrpouBin = {};
   if (edrpouLength < 64) {
     edrpouBin.size = edrpouLength;
     edrpouBin.data = edrpou;
@@ -238,7 +238,7 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   enif_make_map_put(env, signer, enif_make_atom(env, "edrpou"), edrpouTerm, &signer);
   char* drfo = subjectInfo->drfo;
   int drfoLength = strlen(drfo);
-  ErlNifBinary drfoBin;
+  ErlNifBinary drfoBin = {};
   if (drfoLength < 64) {
     drfoBin.size = drfoLength;
     drfoBin.data = drfo;
