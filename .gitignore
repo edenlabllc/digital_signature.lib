@@ -1,0 +1,4 @@
+ebin
+c_src/*.o
+priv/digital_signature_lib.so
+.eunit
