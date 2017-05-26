@@ -1,0 +1,7 @@
+{application, digital_signature_lib,
+  [
+    {description, "Erlang implementation of pkcs7 data processing that uses uaCrypto library (ICAO version) by using the NIF api"},
+    {vsn, "1.0"},
+    {applications, [kernel, stdlib]}
+  ]
+}.
