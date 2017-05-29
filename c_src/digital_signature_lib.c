@@ -177,9 +177,19 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
   UAC_BLOB emptyResult = {};
 
   char* host = malloc(strlen(url));
+  char* port = malloc(strlen(url));
   memcpy(host, url, strlen(url));
   host = strstr(host, "://") + 3;
-  host = strtok(host, "/");
+  port = strstr(host, ":") + 1;
+  int p = 80;
+  if (port != NULL + 1) {
+    port = strtok(port, "/");
+    p = atoi(port);
+    host = strtok(host, ":");
+  }
+  else {
+    host = strtok(host, "/");
+  }
 
   struct hostent* server;
   struct sockaddr_in serv_addr;
@@ -217,7 +227,7 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
 
   memset(&serv_addr, 0, sizeof(serv_addr));
   serv_addr.sin_family = AF_INET;
-  serv_addr.sin_port = htons(80);
+  serv_addr.sin_port = htons(p);
   memcpy(&serv_addr.sin_addr.s_addr, server->h_addr, server->h_length);
 
   if (connect(sockfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
