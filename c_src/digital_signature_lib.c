@@ -204,7 +204,8 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
   int messageLen = strlen(message);
 
   char* data = requestData.data;
-  for (int i = 0; i < requestData.dataLen; i++) {
+  int i;
+  for (i = 0; i < requestData.dataLen; i++) {
       message[messageLen + i] = data[i];
   }
 
@@ -316,7 +317,8 @@ bool Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDat
   }
   UAC_TIME timeStampDateTime = timeStampInfo.genTime;
   UAC_BLOB tspCert = FindMatchingTspCertificate(libHandler, timeStampInfo.signature.signerRef, certs.tsp);
-  for (int i = 0; i < signaturesCount; i++) {
+  int i;
+  for (i = 0; i < signaturesCount; i++) {
     UAC_BLOB cert = {malloc(signedData.dataLen), signedData.dataLen};
     DWORD getCertResult = GetCert(libHandler, signedData, i, &cert);
     if (getCertResult != 0) {
