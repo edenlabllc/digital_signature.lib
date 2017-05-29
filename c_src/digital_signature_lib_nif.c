@@ -11,13 +11,16 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   char libPath[50] = "";
   char* configuredPath = getenv("UACRYPTO_LIB_PATH");
   char* homePath = getenv("HOME");
-  char* libName = "/libUACryptoQ.so";
+  char* libName = "libUACryptoQ.so";
 
   if (configuredPath != NULL) {
     strcat(libPath, configuredPath);
   }
   else {
     strcat(libPath, homePath);
+    if (homePath[strlen(homePath) - 1] != '/') {
+      strcat(libPath, "/");
+    }
     strcat(libPath, libName);
   }
 
