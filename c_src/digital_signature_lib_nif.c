@@ -101,7 +101,8 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 
   certs.tsp[tspCertsLength] = emptyBlob;
 
-  UAC_BLOB dataBlob = {enif_alloc(signedData.dataLen), signedData.dataLen};
+  char dataBlobBuffer[signedData.dataLen];
+  UAC_BLOB dataBlob = {dataBlobBuffer, signedData.dataLen};
 
   UAC_SIGNED_DATA_INFO signedDataInfo = {};
   DWORD loadSignedDataResult = LoadSignedData(libHandler, signedData, &dataBlob, &signedDataInfo);
