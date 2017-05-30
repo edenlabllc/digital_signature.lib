@@ -332,7 +332,6 @@ bool Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDat
         if (getCertInfoResult != 0) {
             return false;
         }
-        memcpy(subjectInfo, &certInfo.subject, sizeof(UAC_SUBJECT_INFO));
         struct GeneralCert matchingCert = FindMatchingRootCertificate(libHandler, cert, certs.general);
         if (matchingCert.root.data == NULL) {
             return false;
@@ -347,6 +346,7 @@ bool Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDat
         if (getRootCertInfoResult != 0) {
             return false;
         }
+        memcpy(subjectInfo, &rootCertInfo.subject, sizeof(UAC_SUBJECT_INFO));
         bool isHighestLevel = IsHighestLevel(rootCertInfo);
         if (!isHighestLevel) {
             if (tspCert.data == NULL) {
