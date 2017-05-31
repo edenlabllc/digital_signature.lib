@@ -177,7 +177,9 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
     UAC_BLOB emptyResult = {};
 
     char* host = malloc(strlen(url));
+    memset(host, 0, strlen(url))
     char* port = malloc(strlen(url));
+    memset(port, 0, strlen(url))
     memcpy(host, url, strlen(url));
     host = strstr(host, "://") + 3;
     port = strstr(host, ":") + 1;
@@ -281,6 +283,7 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
 bool CheckOCSP(void* libHandler, UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB ocspCert, bool verify)
 {
     char ocspRequestBuf[cert.dataLen];
+    memset(ocspRequestBuf, 0, cert.dataLen);
     UAC_BLOB ocspRequest = {ocspRequestBuf, cert.dataLen};
     DWORD ocspRequestCreateResult = OcspRequestCreate(libHandler, cert, &ocspRequest);
     if (ocspRequestCreateResult != 0) {
@@ -307,6 +310,7 @@ bool Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDat
 {
     int signaturesCount = signedDataInfo.dwSignatureCount;
     char timeStampBuf[signedData.dataLen];
+    memset(timeStampBuf, 0, signedData.dataLen);
     UAC_BLOB timeStamp = {timeStampBuf, signedData.dataLen};
     DWORD getTimeStampResult = GetTimeStamp(libHandler, signedData, &timeStamp);
     if (getTimeStampResult != 0) {
@@ -322,6 +326,7 @@ bool Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDat
     int i;
     for (i = 0; i < signaturesCount; i++) {
         char certBuf[signedData.dataLen];
+        memset(certBuf, 0, signedData.dataLen);
         UAC_BLOB cert = {certBuf, signedData.dataLen};
         DWORD getCertResult = GetCert(libHandler, signedData, i, &cert);
         if (getCertResult != 0) {

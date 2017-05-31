@@ -33,6 +33,7 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   }
 
   PUAC_SUBJECT_INFO subjectInfo = malloc(sizeof(UAC_SUBJECT_INFO));
+  memset(subjectInfo, 0, sizeof(UAC_SUBJECT_INFO));
 
   unsigned int p7DataLength;
   enif_get_list_length(env, argv[0], &p7DataLength);
@@ -40,7 +41,8 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     ERL_NIF_TERM errorTerm = enif_make_string(env, "pkcs7 data is empty", ERL_NIF_LATIN1);
     return enif_make_tuple2(env, enif_make_atom(env, "error"), errorTerm);
   }
-  char* p7Data = malloc(p7DataLength);
+  char p7Data[p7DataLength];
+  memset(p7Data, 0, p7DataLength);
   enif_get_string(env, argv[0], p7Data, p7DataLength + 1, ERL_NIF_LATIN1);
   UAC_BLOB signedData = { p7Data, p7DataLength };
 
@@ -61,6 +63,7 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     unsigned int rootCertDataLength;
     enif_get_list_length(env, rootCertTerm, &rootCertDataLength);
     char* rootCertData = malloc(rootCertDataLength);
+    memset(rootCertData, 0, rootCertDataLength);
     enif_get_string(env, rootCertTerm, rootCertData, rootCertDataLength + 1, ERL_NIF_LATIN1);
     UAC_BLOB rootCert = { rootCertData, rootCertDataLength };
 
@@ -69,6 +72,7 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     unsigned int ocspCertDataLength;
     enif_get_list_length(env, ocspCertTerm, &ocspCertDataLength);
     char* ocspCertData = malloc(ocspCertDataLength);
+    memset(ocspCertData, 0, ocspCertDataLength);
     enif_get_string(env, ocspCertTerm, ocspCertData, ocspCertDataLength + 1, ERL_NIF_LATIN1);
     UAC_BLOB ocspCert = { ocspCertData, ocspCertDataLength };
 
@@ -92,6 +96,7 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     unsigned int tspCertDataLength;
     enif_get_list_length(env, firstItem, &tspCertDataLength);
     char* tspCertData = malloc(tspCertDataLength);
+    memset(tspCertData, 0, tspCertDataLength);
     enif_get_string(env, firstItem, tspCertData, tspCertDataLength + 1, ERL_NIF_LATIN1);
     UAC_BLOB tspCert = { tspCertData, tspCertDataLength };
 
@@ -102,6 +107,7 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   certs.tsp[tspCertsLength] = emptyBlob;
 
   char dataBlobBuffer[signedData.dataLen];
+  memset(dataBlobBuffer, 0, signedData.dataLen);
   UAC_BLOB dataBlob = {dataBlobBuffer, signedData.dataLen};
 
   UAC_SIGNED_DATA_INFO signedDataInfo = {};
