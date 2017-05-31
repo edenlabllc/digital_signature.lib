@@ -177,9 +177,9 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
     UAC_BLOB emptyResult = {};
 
     char* host = malloc(strlen(url));
-    memset(host, 0, strlen(url))
+    memset(host, 0, strlen(url));
     char* port = malloc(strlen(url));
-    memset(port, 0, strlen(url))
+    memset(port, 0, strlen(url));
     memcpy(host, url, strlen(url));
     host = strstr(host, "://") + 3;
     port = strstr(host, ":") + 1;
