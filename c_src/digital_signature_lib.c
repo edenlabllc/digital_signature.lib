@@ -365,11 +365,9 @@ bool Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDat
         if (!isCertNotExpired) {
             return false;
         }
-        if (matchingCert.ocsp.data != NULL) {
-            bool checkOSCP = CheckOCSP(libHandler, cert, certInfo, matchingCert.ocsp, !isHighestLevel);
-            if (!checkOSCP) {
-                return false;
-            }
+        bool checkOSCP = CheckOCSP(libHandler, cert, certInfo, matchingCert.ocsp, !isHighestLevel);
+        if (!checkOSCP) {
+            return false;
         }
         DWORD signedDataVerifyResult = SignedDataVerify(libHandler, signedData, cert);
         if (signedDataVerifyResult != 0) {
