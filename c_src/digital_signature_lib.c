@@ -117,6 +117,7 @@ DWORD OcspResponseLoad(void* libHandler, UAC_BLOB response, PUAC_OCSP_RESPONSE_I
 struct GeneralCert FindMatchingRootCertificate(void* libHandler, UAC_BLOB cert, struct GeneralCert generalCerts[100])
 {
     struct GeneralCert emptyResult;
+    memset(&emptyResult, 0, sizeof(emptyResult));
     UAC_CERT_REF issuerCertRef = {};
     DWORD certIssuerRefResult = CertIssuerRef(libHandler, cert, &issuerCertRef);
     if (certIssuerRefResult != 0) {
