@@ -55,7 +55,7 @@ result_data has the following structure:
     edrpou => edrpou,
     given_name => given_name,
     locality_name => locality_name,
-    organization_name: => organization_name,
+    organization_name => organization_name,
     organizational_unit_name => organizational_unit_name,
     surname => surname,
     title => title

@@ -113,7 +113,14 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   UAC_SIGNED_DATA_INFO signedDataInfo = {};
   DWORD loadSignedDataResult = LoadSignedData(libHandler, signedData, &dataBlob, &signedDataInfo);
 
-  bool checkResult = Check(libHandler, signedData, signedDataInfo, subjectInfo, certs);
+  bool checkResult = false;
+
+  unsigned int check;
+  enif_get_int(env, argv[2], &check);
+
+  if (check == 1) {
+    checkResult = Check(libHandler, signedData, signedDataInfo, subjectInfo, certs);
+  }
   dlclose(libHandler);
 
   ERL_NIF_TERM signer = enif_make_new_map(env);
@@ -267,12 +274,14 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   ERL_NIF_TERM result = enif_make_new_map(env);
   enif_make_map_put(env, result, enif_make_atom(env, "content"), content, &result);
   enif_make_map_put(env, result, enif_make_atom(env, "signer"), signer, &result);
-  enif_make_map_put(env, result, enif_make_atom(env, "is_valid"), enif_make_int(env, checkResult), &result);
+  if (check == 1) {
+    enif_make_map_put(env, result, enif_make_atom(env, "is_valid"), enif_make_int(env, checkResult), &result);
+  }
   return enif_make_tuple2(env, enif_make_atom(env, "ok"), result);
 }
 
 static ErlNifFunc nif_funcs[] = {
-  {"processPKCS7Data", 2, ProcessPKCS7Data}
+  {"processPKCS7Data", 3, ProcessPKCS7Data}
 };
 
 ERL_NIF_INIT(digital_signature_lib, nif_funcs, NULL, NULL, NULL, NULL);
