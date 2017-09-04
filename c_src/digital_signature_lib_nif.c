@@ -64,7 +64,7 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     enif_get_list_length(env, rootCertTerm, &rootCertDataLength);
     char* rootCertData = malloc(rootCertDataLength);
     memset(rootCertData, 0, rootCertDataLength);
-    enif_get_string(env, rootCertTerm, rootCertData, rootCertDataLength + 1, ERL_NIF_LATIN1);
+    enif_get_string(env, rootCertTerm, rootCertData, rootCertDataLength, ERL_NIF_LATIN1);
     UAC_BLOB rootCert = { rootCertData, rootCertDataLength };
 
     ERL_NIF_TERM ocspCertTerm;
@@ -73,7 +73,7 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     enif_get_list_length(env, ocspCertTerm, &ocspCertDataLength);
     char* ocspCertData = malloc(ocspCertDataLength);
     memset(ocspCertData, 0, ocspCertDataLength);
-    enif_get_string(env, ocspCertTerm, ocspCertData, ocspCertDataLength + 1, ERL_NIF_LATIN1);
+    enif_get_string(env, ocspCertTerm, ocspCertData, ocspCertDataLength, ERL_NIF_LATIN1);
     UAC_BLOB ocspCert = { ocspCertData, ocspCertDataLength };
 
     certs.general[i].root = rootCert;
@@ -97,7 +97,7 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     enif_get_list_length(env, firstItem, &tspCertDataLength);
     char* tspCertData = malloc(tspCertDataLength);
     memset(tspCertData, 0, tspCertDataLength);
-    enif_get_string(env, firstItem, tspCertData, tspCertDataLength + 1, ERL_NIF_LATIN1);
+    enif_get_string(env, firstItem, tspCertData, tspCertDataLength, ERL_NIF_LATIN1);
     UAC_BLOB tspCert = { tspCertData, tspCertDataLength };
 
     certs.tsp[i] = tspCert;
