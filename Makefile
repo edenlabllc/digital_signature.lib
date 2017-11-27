@@ -3,4 +3,4 @@ ERL_INCLUDE_PATH=$(shell erl -eval 'io:format("~s~n", [lists:concat([code:root_d
 all: priv/digital_signature_lib_nif.so
 
 priv/digital_signature_lib_nif.so: src/digital_signature_lib_nif.c
-	cc -fPIC -I$(ERL_INCLUDE_PATH) -dynamiclib -undefined dynamic_lookup -o priv/digital_signature_lib_nif.so src/digital_signature_lib_nif.c
+	cc -undefined dynamic_lookup -dynamiclib -fPIC -I$(ERL_INCLUDE_PATH) src/digital_signature_lib_nif.c -o priv/digital_signature_lib_nif.so
