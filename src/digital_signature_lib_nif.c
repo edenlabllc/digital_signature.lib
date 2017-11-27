@@ -48,7 +48,7 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   enif_get_map_value(env, argv[1], enif_make_atom(env, "general"), &generalCerts);
   unsigned int generalCertsLength;
   enif_get_list_length(env, generalCerts, &generalCertsLength);
-  int i;
+  unsigned int i;
   for (i = 0; i < generalCertsLength; i++) {
     ERL_NIF_TERM firstItem;
     ERL_NIF_TERM rest;

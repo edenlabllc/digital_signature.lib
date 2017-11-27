@@ -207,7 +207,7 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
     int messageLen = strlen(message);
 
     char* data = requestData.data;
-    int i;
+    unsigned int i;
     for (i = 0; i < requestData.dataLen; i++) {
         message[messageLen + i] = data[i];
     }
