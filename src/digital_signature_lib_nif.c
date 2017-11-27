@@ -284,4 +284,4 @@ static ErlNifFunc nif_funcs[] = {
   {"processPKCS7Data", 3, ProcessPKCS7Data}
 };
 
-ERL_NIF_INIT(digital_signature_lib, nif_funcs, NULL, NULL, NULL, NULL);
+ERL_NIF_INIT(Elixir.DigitalSignatureLib, nif_funcs, NULL, NULL, NULL, NULL);
