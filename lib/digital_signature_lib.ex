@@ -5,8 +5,9 @@ defmodule DigitalSignatureLib do
   """
 
   def init do
-    path = :filename.join(priv_dir(), 'digital_signature_lib_nif')
-    :ok = :erlang.load_nif(path, 0)
+    nif_path = :filename.join(priv_dir(), 'digital_signature_lib_nif')
+    lib_path = :filename.join(priv_dir(), 'libUACryptoQ.so')
+    :ok = :erlang.load_nif(nif_path, lib_path)
   end
 
   def priv_dir do

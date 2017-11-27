@@ -3,25 +3,21 @@
 #include "erl_nif.h"
 #include "digital_signature_lib.c"
 
+char LIB_PATH[250];
+
 static ERL_NIF_TERM
 ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
   void* libHandler;
 
-  char libPath[50] = "";
+  char* libPath;
   char* configuredPath = getenv("UACRYPTO_LIB_PATH");
-  char* homePath = getenv("HOME");
-  char* libName = "libUACryptoQ.so";
 
   if (configuredPath != NULL) {
-    strcat(libPath, configuredPath);
+    libPath = configuredPath;
   }
   else {
-    strcat(libPath, homePath);
-    if (homePath[strlen(homePath) - 1] != '/') {
-      strcat(libPath, "/");
-    }
-    strcat(libPath, libName);
+    libPath = LIB_PATH;
   }
 
   libHandler = dlopen(libPath, RTLD_LAZY);
@@ -284,4 +280,10 @@ static ErlNifFunc nif_funcs[] = {
   {"processPKCS7Data", 3, ProcessPKCS7Data}
 };
 
-ERL_NIF_INIT(Elixir.DigitalSignatureLib, nif_funcs, NULL, NULL, NULL, NULL);
+int load(ErlNifEnv* env, void** priv_data, ERL_NIF_TERM load_info) {
+  enif_get_string(env, load_info, LIB_PATH, 250, ERL_NIF_LATIN1);
+
+  return 0;
+}
+
+ERL_NIF_INIT(Elixir.DigitalSignatureLib, nif_funcs, load, NULL, NULL, NULL);
