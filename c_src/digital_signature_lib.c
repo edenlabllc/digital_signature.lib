@@ -214,9 +214,9 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
 
     messageLen += requestData.dataLen;
 
-    message[messageLen] = "\r";
+    message[messageLen] = '\r';
     messageLen++;
-    message[messageLen] = "\n";
+    message[messageLen] = '\n';
     messageLen++;
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);

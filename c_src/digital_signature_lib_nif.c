@@ -26,8 +26,8 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 
   libHandler = dlopen(libPath, RTLD_LAZY);
   if (!libHandler) {
-    char* error = dlerror();
-    ErlNifBinary errorBin = {strlen(error), error};
+    const char* error =  dlerror();
+    ErlNifBinary errorBin = {strlen(error), (unsigned char*) error};
     ERL_NIF_TERM errorTerm = enif_make_binary(env, &errorBin);
     return enif_make_tuple2(env, enif_make_atom(env, "error"), errorTerm);
   }
@@ -110,12 +110,12 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   memset(dataBlobBuffer, 0, signedData.dataLen);
   UAC_BLOB dataBlob = {dataBlobBuffer, signedData.dataLen};
 
-  UAC_SIGNED_DATA_INFO signedDataInfo = {};
-  DWORD loadSignedDataResult = LoadSignedData(libHandler, signedData, &dataBlob, &signedDataInfo);
+  UAC_SIGNED_DATA_INFO signedDataInfo;
+  LoadSignedData(libHandler, signedData, &dataBlob, &signedDataInfo);
 
   bool checkResult = false;
 
-  unsigned int check;
+  int check;
   enif_get_int(env, argv[2], &check);
 
   if (check == 1) {
@@ -124,152 +124,152 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   dlclose(libHandler);
 
   ERL_NIF_TERM signer = enif_make_new_map(env);
-  char* commonName = subjectInfo->commonName;
+  const char* commonName = subjectInfo->commonName;
   int commonNameLength = strlen(commonName);
   ErlNifBinary commonNameBin = {};
   if (commonNameLength < 64) {
     commonNameBin.size = commonNameLength;
-    commonNameBin.data = commonName;
+    commonNameBin.data = (unsigned char *)commonName;
   }
   else {
     commonNameBin.size = 0;
-    commonNameBin.data = "";
+    commonNameBin.data = (unsigned char *)"";
   }
   ERL_NIF_TERM commonNameTerm = enif_make_binary(env, &commonNameBin);
   enif_make_map_put(env, signer, enif_make_atom(env, "common_name"), commonNameTerm, &signer);
-  char* countryName = subjectInfo->countryName;
+  const char* countryName = subjectInfo->countryName;
   int countryNameLength = strlen(countryName);
   ErlNifBinary countryNameBin = {};
   if (countryNameLength < 64) {
     countryNameBin.size = countryNameLength;
-    countryNameBin.data = countryName;
+    countryNameBin.data = (unsigned char *)countryName;
   }
   else {
     countryNameBin.size = 0;
-    countryNameBin.data = "";
+    countryNameBin.data = (unsigned char *)"";
   }
   ERL_NIF_TERM countryNameTerm = enif_make_binary(env, &countryNameBin);
   enif_make_map_put(env, signer, enif_make_atom(env, "country_name"), countryNameTerm, &signer);
-  char* surname = subjectInfo->surname;
+  const char* surname = subjectInfo->surname;
   int surnameLength = strlen(surname);
   ErlNifBinary surnameBin = {};
   if (surnameLength < 64) {
     surnameBin.size = surnameLength;
-    surnameBin.data = surname;
+    surnameBin.data = (unsigned char *)surname;
   }
   else {
     surnameBin.size = 0;
-    surnameBin.data = "";
+    surnameBin.data = (unsigned char *)"";
   }
   ERL_NIF_TERM surnameTerm = enif_make_binary(env, &surnameBin);
   enif_make_map_put(env, signer, enif_make_atom(env, "surname"), surnameTerm, &signer);
-  char* givenName = subjectInfo->givenName;
+  const char* givenName = subjectInfo->givenName;
   int givenNameLength = strlen(givenName);
   ErlNifBinary givenNameBin = {};
   if (givenNameLength < 64) {
     givenNameBin.size = givenNameLength;
-    givenNameBin.data = givenName;
+    givenNameBin.data = (unsigned char *)givenName;
   }
   else {
     givenNameBin.size = 0;
-    givenNameBin.size = "";
+    givenNameBin.data = (unsigned char *)"";
   }
   ERL_NIF_TERM givenNameTerm = enif_make_binary(env, &givenNameBin);
   enif_make_map_put(env, signer, enif_make_atom(env, "given_name"), givenNameTerm, &signer);
-  char* organizationName = subjectInfo->organizationName;
+  const char* organizationName = subjectInfo->organizationName;
   int organizationNameLength = strlen(organizationName);
   ErlNifBinary organizationNameBin = {};
   if (organizationNameLength < 64) {
     organizationNameBin.size = organizationNameLength;
-    organizationNameBin.data = organizationName;
+    organizationNameBin.data = (unsigned char *)organizationName;
   }
   else {
     organizationNameBin.size = 0;
-    organizationNameBin.data = "";
+    organizationNameBin.data = (unsigned char *)"";
   }
   ERL_NIF_TERM organizationNameTerm = enif_make_binary(env, &organizationNameBin);
   enif_make_map_put(env, signer, enif_make_atom(env, "organization_name"), organizationNameTerm, &signer);
-  char* stateOrProvinceName = subjectInfo->stateOrProvinceName;
+  const char* stateOrProvinceName = subjectInfo->stateOrProvinceName;
   int stateOrProvinceNameLength = strlen(stateOrProvinceName);
   ErlNifBinary stateOrProvinceNameBin = {};
   if (stateOrProvinceNameLength < 64) {
     stateOrProvinceNameBin.size = stateOrProvinceNameLength;
-    stateOrProvinceNameBin.data = stateOrProvinceName;
+    stateOrProvinceNameBin.data = (unsigned char *)stateOrProvinceName;
   }
   else {
     stateOrProvinceNameBin.size = 0;
-    stateOrProvinceNameBin.data = "";
+    stateOrProvinceNameBin.data = (unsigned char *)"";
   }
   ERL_NIF_TERM stateOrProvinceNameTerm = enif_make_binary(env, &stateOrProvinceNameBin);
   enif_make_map_put(env, signer, enif_make_atom(env, "state_or_province_name"), stateOrProvinceNameTerm, &signer);
-  char* localityName = subjectInfo->localityName;
+  const char* localityName = subjectInfo->localityName;
   int localityNameLength = strlen(localityName);
   ErlNifBinary localityNameBin = {};
   if (localityNameLength < 64) {
     localityNameBin.size = localityNameLength;
-    localityNameBin.data = localityName;
+    localityNameBin.data = (unsigned char *)localityName;
   }
   else {
     localityNameBin.size = 0;
-    localityNameBin.data = "";
+    localityNameBin.data = (unsigned char *)"";
   }
   ERL_NIF_TERM localityNameTerm = enif_make_binary(env, &localityNameBin);
   enif_make_map_put(env, signer, enif_make_atom(env, "locality_name"), localityNameTerm, &signer);
-  char* organizationalUnitName = subjectInfo->organizationalUnitName;
+  const char* organizationalUnitName = subjectInfo->organizationalUnitName;
   int organizationalUnitNameLength = strlen(organizationalUnitName);
   ErlNifBinary organizationalUnitNameBin = {};
   if (organizationalUnitNameLength < 64) {
     organizationalUnitNameBin.size = organizationalUnitNameLength;
-    organizationalUnitNameBin.data = organizationalUnitName;
+    organizationalUnitNameBin.data = (unsigned char *)organizationalUnitName;
   }
   else {
     organizationalUnitNameBin.size = 0;
-    organizationalUnitNameBin.data = "";
+    organizationalUnitNameBin.data = (unsigned char *)"";
   }
   ERL_NIF_TERM organizationalUnitNameTerm = enif_make_binary(env, &organizationalUnitNameBin);
   enif_make_map_put(env, signer, enif_make_atom(env, "organizational_unit_name"), organizationalUnitNameTerm, &signer);
-  char* title = subjectInfo->title;
+  const char* title = subjectInfo->title;
   int titleLength = strlen(title);
   ErlNifBinary titleBin = {};
   if (titleLength < 64) {
     titleBin.size = titleLength;
-    titleBin.data = title;
+    titleBin.data = (unsigned char *)title;
   }
   else {
     titleBin.size = 0;
-    titleBin.data = "";
+    titleBin.data = (unsigned char *)"";
   }
   ERL_NIF_TERM titleTerm = enif_make_binary(env, &titleBin);
   enif_make_map_put(env, signer, enif_make_atom(env, "title"), titleTerm, &signer);
-  char* edrpou = subjectInfo->edrpou;
+  const char* edrpou = subjectInfo->edrpou;
   int edrpouLength = strlen(edrpou);
   ErlNifBinary edrpouBin = {};
   if (edrpouLength < 64) {
     edrpouBin.size = edrpouLength;
-    edrpouBin.data = edrpou;
+    edrpouBin.data = (unsigned char *)edrpou;
   }
   else {
     edrpouBin.size = 0;
-    edrpouBin.data = "";
+    edrpouBin.data = (unsigned char *)"";
   }
   ERL_NIF_TERM edrpouTerm = enif_make_binary(env, &edrpouBin);
   enif_make_map_put(env, signer, enif_make_atom(env, "edrpou"), edrpouTerm, &signer);
-  char* drfo = subjectInfo->drfo;
+  const char* drfo = subjectInfo->drfo;
   int drfoLength = strlen(drfo);
   ErlNifBinary drfoBin = {};
   if (drfoLength < 64) {
     drfoBin.size = drfoLength;
-    drfoBin.data = drfo;
+    drfoBin.data = (unsigned char *)drfo;
   }
   else {
     drfoBin.size = 0;
-    drfoBin.data = "";
+    drfoBin.data = (unsigned char *)"";
   }
   ERL_NIF_TERM drfoTerm = enif_make_binary(env, &drfoBin);
   enif_make_map_put(env, signer, enif_make_atom(env, "drfo"), drfoTerm, &signer);
 
-  char* data = dataBlob.data;
-  ErlNifBinary dataBin = {strlen(data), data};
+  const char* data = dataBlob.data;
+  ErlNifBinary dataBin = {strlen(data), (unsigned char *)data};
   ERL_NIF_TERM content = enif_make_binary(env, &dataBin);
   ERL_NIF_TERM result = enif_make_new_map(env);
   enif_make_map_put(env, result, enif_make_atom(env, "content"), content, &result);
