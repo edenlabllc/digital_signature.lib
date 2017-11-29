@@ -23,5 +23,5 @@ defmodule DigitalSignatureLib do
     end
   end
 
-  def processPKCS7Data(_, _, _), do: exit(:nif_library_not_loaded)
+  def processPKCS7Data(_, _, _), do: exit(:nif_not_loaded)
 end
