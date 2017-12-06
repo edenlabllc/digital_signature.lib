@@ -1,15 +1,33 @@
-CFLAGS = -fPIC -Wall -Wextra -Wno-unused-parameter -Wl,-undefined -Wl,dynamic_lookup -shared
+CFLAGS = -g -O3 -Wall
 
-ERL_INCLUDE_PATH=$(shell erl -eval 'io:format("~s~n", [lists:concat([code:root_dir(), "/erts-", erlang:system_info(version), "/include"])])' -s init stop -noshell)
-CFLAGS += -I$(ERL_INCLUDE_PATH)
+ERLANG_PATH = $(shell erl -eval 'io:format("~s", [lists:concat([code:root_dir(), "/erts-", erlang:system_info(version), "/include"])])' -s init stop -noshell)
+CFLAGS += -I$(ERLANG_PATH)
 CFLAGS += -Ic_src
 
-.PHONY: all clean
+LIB_NAME = priv/digital_signature_lib_nif.so
+ifneq ($(CROSSCOMPILE),)
+    # crosscompiling
+    CFLAGS += -fPIC
+else
+    # not crosscompiling
+    ifneq ($(OS),Windows_NT)
+        CFLAGS += -fPIC
 
-all: priv/digital_signature_lib_nif.so
+        ifeq ($(shell uname),Darwin)
+            LDFLAGS += -dynamiclib -undefined dynamic_lookup
+        endif
+    endif
+endif
 
-priv/digital_signature_lib_nif.so: c_src/digital_signature_lib_nif.c
-	$(CC) $(CFLAGS) -o priv/digital_signature_lib_nif.so c_src/digital_signature_lib_nif.c
+NIF_SRC=c_src/digital_signature_lib_nif.c
+
+all: $(LIB_NAME)
+
+$(LIB_NAME): $(NIF_SRC)
+	mkdir -p priv
+	$(CC) $(CFLAGS) -shared $(LDFLAGS) $^ -o $@
 
 clean:
-	rm -f priv/digital_signature_lib_nif.so
+	rm -rf $(LIB_NAME)*
+
+.PHONY: all clean
