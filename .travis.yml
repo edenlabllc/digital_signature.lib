@@ -9,6 +9,6 @@ env:
 branches:
   except:
     - /[0-9]*\.[0-9]*\.[0-9]*/
-cript:
+script:
   # Run all tests except pending ones
-  - ./bin/mix_tests.sh || travis_terminate 1
+  - mix test || travis_terminate 1
