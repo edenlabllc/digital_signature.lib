@@ -9,7 +9,7 @@ CFLAGS += -Ic_src
 all: priv/digital_signature_lib_nif.so
 
 priv/digital_signature_lib_nif.so: c_src/digital_signature_lib_nif.c
-	cc $(CFLAGS) -o priv/digital_signature_lib_nif.so c_src/digital_signature_lib_nif.c
+	$(CC) $(CFLAGS) -o priv/digital_signature_lib_nif.so c_src/digital_signature_lib_nif.c
 
 clean:
 	rm -f priv/digital_signature_lib_nif.so

@@ -1,5 +1,4 @@
 language: elixir
-sudo: false
 elixir:
   - 1.5.2
 otp_release:
@@ -7,6 +6,7 @@ otp_release:
 env:
   global:
     - MIX_ENV=test
+    - CC=gcc
 branches:
   except:
     - /[0-9]*\.[0-9]*\.[0-9]*/
@@ -20,7 +20,6 @@ addons:
       - ragel
       - gnupg
       - openssl
-      - libssl
 script:
   - mix compile || travis_terminate 1
   - mix test || travis_terminate 1
