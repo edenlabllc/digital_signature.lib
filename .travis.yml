@@ -1,6 +1,5 @@
-dist: trusty
-sudo: false
 language: elixir
+sudo: false
 elixir:
   - 1.5.2
 otp_release:
@@ -11,7 +10,17 @@ env:
 branches:
   except:
     - /[0-9]*\.[0-9]*\.[0-9]*/
+addons:
+  apt:
+    packages:
+      - autoconf
+      - make
+      - gcc
+      - make
+      - ragel
+      - gnupg
+      - openssl
+      - libssl
 script:
-  # Run all tests except pending ones
   - mix compile || travis_terminate 1
   - mix test || travis_terminate 1
