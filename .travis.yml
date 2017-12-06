@@ -1,3 +1,5 @@
+dist: trusty
+sudo: false
 language: elixir
 elixir:
   - 1.5.2
@@ -6,9 +8,6 @@ otp_release:
 env:
   global:
     - MIX_ENV=test
-before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y gcc autoconf ragel make gnupg locales openssl libssl-dev
 branches:
   except:
     - /[0-9]*\.[0-9]*\.[0-9]*/
