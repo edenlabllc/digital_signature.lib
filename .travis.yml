@@ -1,7 +1,6 @@
 language: elixir
 cache:
   directories:
-    - _build
     - deps
 elixir:
   - 1.5.2

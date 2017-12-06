@@ -24,4 +24,4 @@ digital_signature-*.tar
 
 # cc artifacts
 c_src/*.o
-priv/digital_signature_lib_nif.so
+priv/digital_signature_lib_nif.so*
