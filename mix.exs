@@ -23,7 +23,7 @@ defmodule DigitalSignatureLib.MixProject do
   defp deps do
     [
       {:elixir_make, "~> 0.4", runtime: false},
-      {:poison, only: [:dev, :test]}
+      {:poison, "~> 3.1", only: [:dev, :test]}
     ]
   end
 end

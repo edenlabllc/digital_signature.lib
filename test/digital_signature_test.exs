@@ -15,8 +15,10 @@ defmodule DigitalSignatureLibTest do
     signed_content = get_signed_content(data)
 
     assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), 1)
-    result = Poison.decode!(result)
-    assert  result == data
+
+    assert result.is_valid == 1
+    assert decode_content(result) == data["content"]
+    assert result.signer == atomize_keys(data["signer"])
   end
 
   test "more real encoded data" do
@@ -24,8 +26,10 @@ defmodule DigitalSignatureLibTest do
     signed_content = get_signed_content(data)
 
     assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), 1)
-    result = Poison.decode!(result)
-    assert result == data
+
+    assert result.is_valid == 1
+    assert decode_content(result) == data["content"]
+    assert result.signer == atomize_keys(data["signer"])
   end
 
   defp get_data(json_file) do
@@ -59,5 +63,15 @@ defmodule DigitalSignatureLibTest do
   ]
 
     %{general: general, tsp: tsp}
+  end
+
+  defp decode_content(result) do
+    Poison.decode!(result.content)
+  end
+
+  defp atomize_keys(map) do
+    map
+    |> Enum.map(fn {k,v} -> {String.to_atom(k), v} end)
+    |> Enum.into(%{})
   end
 end
