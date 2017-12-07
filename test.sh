@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker build -t mixtest -f Dockerfile.test .
+docker build -t digital_signature_lib_test -f Dockerfile.test .
 
 docker run -d --rm \
 -it \

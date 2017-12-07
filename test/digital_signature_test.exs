@@ -10,6 +10,7 @@ defmodule DigitalSignatureLibTest do
     assert {:ok, %{}} = DigitalSignatureLib.processPKCS7Data([<<1>>], %{general: [], tsp: []}, 1)
   end
 
+  @tag :pending
   test "real encoded data" do
     data = get_data("test/fixtures/sign1.json")
     signed_content = get_signed_content(data)
@@ -21,6 +22,7 @@ defmodule DigitalSignatureLibTest do
     assert result.signer == atomize_keys(data["signer"])
   end
 
+  @tag :pending
   test "more real encoded data" do
     data = get_data("test/fixtures/sign2.json")
     signed_content = get_signed_content(data)
