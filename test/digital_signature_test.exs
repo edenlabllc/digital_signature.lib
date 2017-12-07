@@ -27,18 +27,18 @@ defmodule DigitalSignatureLibTest do
   defp get_certs do
     general = [
     %{
-      root: :erlang.binary_to_list(File.read!("test/Fixtures/CA-DFS.cer")),
-      ocsp: :erlang.binary_to_list(File.read!("test/Fixtures/CA-OCSP-DFS.cer"))
+      root: :erlang.binary_to_list(File.read!("test/fixtures/CA-DFS.cer")),
+      ocsp: :erlang.binary_to_list(File.read!("test/fixtures/CA-OCSP-DFS.cer"))
     },
     %{
-      root: :erlang.binary_to_list(File.read!("test/Fixtures/CA-Justice.cer")),
-      ocsp: :erlang.binary_to_list(File.read!("test/Fixtures/OCSP-Server Justice.cer"))
+      root: :erlang.binary_to_list(File.read!("test/fixtures/CA-Justice.cer")),
+      ocsp: :erlang.binary_to_list(File.read!("test/fixtures/OCSP-Server Justice.cer"))
     },
   ]
 
   tsp = [
-    :erlang.binary_to_list(File.read!("test/Fixtures/CA-TSP-DFS.cer")),
-    :erlang.binary_to_list(File.read!("test/Fixtures/TSP-Server Justice.cer"))
+    :erlang.binary_to_list(File.read!("test/fixtures/CA-TSP-DFS.cer")),
+    :erlang.binary_to_list(File.read!("test/fixtures/TSP-Server Justice.cer"))
   ]
 
     %{general: general, tsp: tsp}
