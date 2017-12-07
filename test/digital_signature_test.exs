@@ -21,7 +21,9 @@ defmodule DigitalSignatureLibTest do
     file = File.read!(json_file)
     json = Poison.decode!(file)
 
-    :binary.bin_to_list(json["data"]["signed_content"])
+    json["data"]["signed_content"]
+    |> Base.decode64!()
+    |> :binary.bin_to_list()
   end
 
   defp get_certs do
