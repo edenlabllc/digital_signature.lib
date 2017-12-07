@@ -15,8 +15,8 @@ defmodule DigitalSignatureLibTest do
     signed_content = get_signed_content(data)
 
     assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), 1)
-    assert result == data
-    IO.inspect(result)
+    result = Poison.decode!(result)
+    assert  result == data
   end
 
   test "more real encoded data" do
@@ -24,8 +24,8 @@ defmodule DigitalSignatureLibTest do
     signed_content = get_signed_content(data)
 
     assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), 1)
+    result = Poison.decode!(result)
     assert result == data
-    IO.inspect(result)
   end
 
   defp get_data(json_file) do
