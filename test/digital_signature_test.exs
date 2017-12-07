@@ -11,17 +11,32 @@ defmodule DigitalSignatureLibTest do
   end
 
   test "real encoded data" do
-    signed_content = get_signed_content("test/fixtures/sign1.json")
+    data = get_data("test/fixtures/sign1.json")
+    signed_content = get_signed_content(data)
 
-    assert {:ok, data} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), 1)
-    IO.inspect(data)
+    assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), 1)
+    assert result == data
+    IO.inspect(result)
   end
 
-  defp get_signed_content(json_file) do
+  test "more real encoded data" do
+    data = get_data("test/fixtures/sign2.json")
+    signed_content = get_signed_content(data)
+
+    assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), 1)
+    assert result == data
+    IO.inspect(result)
+  end
+
+  defp get_data(json_file) do
     file = File.read!(json_file)
     json = Poison.decode!(file)
 
-    json["data"]["signed_content"]
+    json["data"]
+  end
+
+  defp get_signed_content(data) do
+    data["signed_content"]
     |> Base.decode64!()
     |> :binary.bin_to_list()
   end
