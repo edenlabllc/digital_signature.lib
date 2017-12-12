@@ -3,7 +3,7 @@ defmodule DigitalSignatureLibTest do
   doctest DigitalSignatureLib
 
   test "fail" do
-    assert DigitalSignatureLib.processPKCS7Data([], %{general: [], tsp: []}, 1) == {:error, 'pkcs7 data is empty'}
+    assert DigitalSignatureLib.processPKCS7Data([], %{general: [], tsp: []}, 1) == {:error, "pkcs7 data is empty"}
   end
 
   test "ok" do
@@ -28,6 +28,8 @@ defmodule DigitalSignatureLibTest do
     signed_content = get_signed_content(data)
 
     assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), 1)
+
+    IO.inspect(result);
 
     assert result.is_valid == 1
     assert decode_content(result) == data["content"]

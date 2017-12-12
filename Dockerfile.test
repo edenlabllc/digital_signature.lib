@@ -2,9 +2,11 @@ FROM debian:latest
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
     gcc \
+    build-essential \
     make \
     wget \
     gnupg \
+    openssl \
     locales
 
 # Set UTF-8 locale
@@ -27,8 +29,12 @@ WORKDIR /home/digital_signature.lib
 
 ENV MIX_ENV=test
 
-RUN mix do \
+EXPOSE 80
+
+CMD mix do \
       local.hex --force, \
       local.rebar --force, \
       deps.get, \
-      test --trace
+      test test/digital_signature_test.exs:26 \
+      && /bin/bash
+
