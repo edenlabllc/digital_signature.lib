@@ -30,5 +30,6 @@ $(LIB_NAME): $(NIF_SRC)
 
 clean:
 	rm -f $(LIB_NAME)
+	rm -rf $(LIB_NAME)*
 
 .PHONY: all clean

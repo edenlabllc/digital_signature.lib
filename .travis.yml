@@ -9,12 +9,6 @@ otp_release:
 env:
   global:
     - MIX_ENV=test
-addons:
-  apt:
-    packages:
-    - gcc
-    - make
-    - gnupg
 branches:
   except:
     - /[0-9]*\.[0-9]*\.[0-9]*/
