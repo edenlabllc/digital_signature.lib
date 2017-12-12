@@ -10,7 +10,18 @@
 #include <netdb.h>
 #include <unistd.h>
 #include "h/UACryptoDef.h"
-#include "h/certs.h"
+
+struct GeneralCert
+{
+    UAC_BLOB root;
+    UAC_BLOB ocsp;
+};
+
+struct Certs
+{
+    struct GeneralCert general[100];
+    UAC_BLOB tsp[100];
+};
 
 DWORD GetTimeStamp(void* libHandler, UAC_BLOB signedData, PUAC_BLOB timeStamp)
 {
@@ -23,15 +34,14 @@ DWORD GetTimeStampInfo(void* libHandler, UAC_BLOB timeStamp, PUAC_TIME_STAMP_INF
 {
     DWORD (*getTimeStampInfo)(PUAC_BLOB, PUAC_TIME_STAMP_INFO);
     getTimeStampInfo = dlsym(libHandler, "UAC_TsResponseLoad");
-
     return (*getTimeStampInfo)(&timeStamp, timeStampInfo);
 }
 
-DWORD LoadSignedData(void* libHandler, PUAC_BLOB signedData, PUAC_BLOB data, PUAC_SIGNED_DATA_INFO signedDataInfo)
+DWORD LoadSignedData(void* libHandler, UAC_BLOB signedData, PUAC_BLOB data, PUAC_SIGNED_DATA_INFO signedDataInfo)
 {
     DWORD (*signedDataLoad)(PUAC_BLOB, PUAC_BLOB, PUAC_SIGNED_DATA_INFO);
     signedDataLoad = dlsym(libHandler, "UAC_SignedDataLoad");
-    return (*signedDataLoad)(signedData, data, signedDataInfo);
+    return (*signedDataLoad)(&signedData, data, signedDataInfo);
 }
 
 DWORD GetCert(void* libHandler, UAC_BLOB signedData, DWORD index, PUAC_BLOB cert)
@@ -104,26 +114,20 @@ DWORD OcspResponseLoad(void* libHandler, UAC_BLOB response, PUAC_OCSP_RESPONSE_I
     return (*ocspResponseLoad)(&response, ocspResponseInfo);
 }
 
-struct GeneralCert FindMatchingRootCertificate(void* libHandler, UAC_BLOB cert, struct GeneralCert* generalCerts)
+struct GeneralCert FindMatchingRootCertificate(void* libHandler, UAC_BLOB cert, struct GeneralCert generalCerts[100])
 {
-    struct GeneralCert emptyResult = {};
-    //memset(&emptyResult, 0, sizeof(emptyResult));
+    struct GeneralCert emptyResult;
+    memset(&emptyResult, 0, sizeof(emptyResult));
     UAC_CERT_REF issuerCertRef = {};
     DWORD certIssuerRefResult = CertIssuerRef(libHandler, cert, &issuerCertRef);
-
-    printf("certIssuerRefResult %d", certIssuerRefResult);
     if (certIssuerRefResult != 0) {
         return emptyResult;
     }
 
     int i = 0;
     UAC_BLOB rootCert = generalCerts[i].root;
-
-    printf("rootCert %s", rootCert.data);
     while (rootCert.data != NULL) {
         DWORD certMatchResult = CertMatch(libHandler, issuerCertRef, rootCert);
-
-        printf("certMatchResult %d", certMatchResult);
         if (certMatchResult == 0) {
             return generalCerts[i];
         }
@@ -203,16 +207,16 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
     int messageLen = strlen(message);
 
     char* data = requestData.data;
-    unsigned int i;
+    int i;
     for (i = 0; i < requestData.dataLen; i++) {
         message[messageLen + i] = data[i];
     }
 
     messageLen += requestData.dataLen;
 
-    message[messageLen] = '\r';
+    message[messageLen] = "\r";
     messageLen++;
-    message[messageLen] = '\n';
+    message[messageLen] = "\n";
     messageLen++;
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -228,7 +232,7 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
     memset(&serv_addr, 0, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(p);
-    memcpy(&serv_addr.sin_addr.s_addr, server->h_addr_list[0], server->h_length);
+    memcpy(&serv_addr.sin_addr.s_addr, server->h_addr, server->h_length);
 
     if (connect(sockfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
         return emptyResult;
@@ -303,67 +307,44 @@ bool CheckOCSP(void* libHandler, UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB
 }
 
 bool Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDataInfo, PUAC_SUBJECT_INFO subjectInfo,
-          struct Certs* certs)
+           struct Certs certs)
 {
     int signaturesCount = signedDataInfo.dwSignatureCount;
-
-    printf("signaturesCount: %d", signaturesCount);
-
     char timeStampBuf[signedData.dataLen];
     memset(timeStampBuf, 0, signedData.dataLen);
     UAC_BLOB timeStamp = {timeStampBuf, signedData.dataLen};
     DWORD getTimeStampResult = GetTimeStamp(libHandler, signedData, &timeStamp);
-
-    printf("getTimeStampResult %d", getTimeStampResult);
     if (getTimeStampResult != 0) {
         return false;
     }
     UAC_TIME_STAMP_INFO timeStampInfo = {};
     DWORD getTimeStampInfoResult = GetTimeStampInfo(libHandler, timeStamp, &timeStampInfo);
-
-    printf("getTimeStampInfoResult %d", getTimeStampInfoResult);
     if (getTimeStampInfoResult != 0) {
         return false;
     }
     UAC_TIME timeStampDateTime = timeStampInfo.genTime;
-    UAC_BLOB tspCert = FindMatchingTspCertificate(libHandler, timeStampInfo.signature.signerRef, certs->tsp);
-    printf("certs->tsp %s", (char *)certs->tsp[0].data);
-
+    UAC_BLOB tspCert = FindMatchingTspCertificate(libHandler, timeStampInfo.signature.signerRef, certs.tsp);
     int i;
-
     for (i = 0; i < signaturesCount; i++) {
-        char certBuf[10000];
-        //memset(certBuf, 0, signedData.dataLen);
-        UAC_BLOB cert ={certBuf, signedData.dataLen};
+        char certBuf[signedData.dataLen];
+        memset(certBuf, 0, signedData.dataLen);
+        UAC_BLOB cert = {certBuf, signedData.dataLen};
         DWORD getCertResult = GetCert(libHandler, signedData, i, &cert);
-
-        printf("getCertResult %d", getCertResult);
         if (getCertResult != 0) {
             return false;
         }
         UAC_CERT_INFO certInfo = {};
         DWORD getCertInfoResult = GetCertInfo(libHandler, cert, &certInfo);
-
-        printf("getCertInfoResult %d", getCertInfoResult);
         if (getCertInfoResult != 0) {
             return false;
         }
-
-
-
-        memcpy(subjectInfo, &certInfo.subject, sizeof(certInfo.subject));
-        struct GeneralCert matchingCert = FindMatchingRootCertificate(libHandler, cert, certs->general);
-
-        // printf("certs.general %s", (char *)certs->general[0].root.data);
-        // printf("aaaa: %s", matchingCert.root.data);
+        memcpy(subjectInfo, &certInfo.subject, sizeof(UAC_SUBJECT_INFO));
+        struct GeneralCert matchingCert = FindMatchingRootCertificate(libHandler, cert, certs.general);
         if (matchingCert.root.data == NULL) {
             return false;
         }
         UAC_BLOB rootCert = matchingCert.root;
         DWORD certVerifyResult = CertVerify(libHandler, cert, rootCert);
-
-        printf("certVerifyResult %d", certVerifyResult);
-
         if (certVerifyResult != 0) {
             return false;
         }
@@ -395,8 +376,6 @@ bool Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDat
             return false;
         }
         DWORD signedDataVerifyResult = SignedDataVerify(libHandler, signedData, cert);
-
-        printf("signedDataVerifyResult: %d", signedDataVerifyResult);
         if (signedDataVerifyResult != 0) {
             return false;
         }

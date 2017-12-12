@@ -1,19 +1,10 @@
 #define LINUX
 
 #include "erl_nif.h"
-#include <dlfcn.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <time.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <unistd.h>
-#include "h/UACryptoDef.h"
-#include "h/certs.h"
+#include "digital_signature_lib.c"
 
-static char LIB_PATH[256];
+#define LIB_PATH_LENGHT 256
+char LIB_PATH[LIB_PATH_LENGHT];
 
 static ERL_NIF_TERM CreateElixirString(ErlNifEnv* env, const char* str)
 {
@@ -35,7 +26,7 @@ static ERL_NIF_TERM CreateErrorTuppe(ErlNifEnv* env, const char* errMessage)
 }
 
 static ERL_NIF_TERM
-  ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
   void* libHandler;
 
@@ -44,26 +35,26 @@ static ERL_NIF_TERM
     return CreateErrorTuppe(env, dlerror());
   }
 
-  UAC_SUBJECT_INFO _subjectInfo = {};
-  PUAC_SUBJECT_INFO subjectInfo = &_subjectInfo;
+  PUAC_SUBJECT_INFO subjectInfo = malloc(sizeof(UAC_SUBJECT_INFO));
+  memset(subjectInfo, 0, sizeof(UAC_SUBJECT_INFO));
 
   unsigned int p7DataLength;
   enif_get_list_length(env, argv[0], &p7DataLength);
   if (p7DataLength == 0) {
     return CreateErrorTuppe(env, "pkcs7 data is empty");
   }
-
-  char p7Data[p7DataLength + 1];
+  char p7Data[p7DataLength];
+  memset(p7Data, 0, p7DataLength);
   enif_get_string(env, argv[0], p7Data, p7DataLength + 1, ERL_NIF_LATIN1);
-  UAC_BLOB signedData = { p7Data, p7DataLength};
+  UAC_BLOB signedData = { p7Data, p7DataLength };
 
-  struct Certs certs = {};
+  struct Certs certs;
 
   ERL_NIF_TERM generalCerts;
   enif_get_map_value(env, argv[1], enif_make_atom(env, "general"), &generalCerts);
   unsigned int generalCertsLength;
   enif_get_list_length(env, generalCerts, &generalCertsLength);
-  unsigned int i;
+  int i;
   for (i = 0; i < generalCertsLength; i++) {
     ERL_NIF_TERM firstItem;
     ERL_NIF_TERM rest;
@@ -71,19 +62,20 @@ static ERL_NIF_TERM
 
     ERL_NIF_TERM rootCertTerm;
     enif_get_map_value(env, firstItem, enif_make_atom(env, "root"), &rootCertTerm);
-
     unsigned int rootCertDataLength;
     enif_get_list_length(env, rootCertTerm, &rootCertDataLength);
-    char rootCertData[rootCertDataLength + 1];
-    enif_get_string(env, rootCertTerm, rootCertData, rootCertDataLength + 1, ERL_NIF_LATIN1);
+    char* rootCertData = malloc(rootCertDataLength);
+    memset(rootCertData, 0, rootCertDataLength);
+    enif_get_string(env, rootCertTerm, rootCertData, rootCertDataLength, ERL_NIF_LATIN1);
     UAC_BLOB rootCert = { rootCertData, rootCertDataLength };
 
     ERL_NIF_TERM ocspCertTerm;
     enif_get_map_value(env, firstItem, enif_make_atom(env, "ocsp"), &ocspCertTerm);
     unsigned int ocspCertDataLength;
     enif_get_list_length(env, ocspCertTerm, &ocspCertDataLength);
-    char ocspCertData[ocspCertDataLength + 1];
-    enif_get_string(env, ocspCertTerm, ocspCertData, ocspCertDataLength + 1, ERL_NIF_LATIN1);
+    char* ocspCertData = malloc(ocspCertDataLength);
+    memset(ocspCertData, 0, ocspCertDataLength);
+    enif_get_string(env, ocspCertTerm, ocspCertData, ocspCertDataLength, ERL_NIF_LATIN1);
     UAC_BLOB ocspCert = { ocspCertData, ocspCertDataLength };
 
     certs.general[i].root = rootCert;
@@ -105,8 +97,9 @@ static ERL_NIF_TERM
     enif_get_list_cell(env, tspCerts, &firstItem, &rest);
     unsigned int tspCertDataLength;
     enif_get_list_length(env, firstItem, &tspCertDataLength);
-    char tspCertData[tspCertDataLength + 1];
-    enif_get_string(env, firstItem, tspCertData, tspCertDataLength + 1, ERL_NIF_LATIN1);
+    char* tspCertData = malloc(tspCertDataLength);
+    memset(tspCertData, 0, tspCertDataLength);
+    enif_get_string(env, firstItem, tspCertData, tspCertDataLength, ERL_NIF_LATIN1);
     UAC_BLOB tspCert = { tspCertData, tspCertDataLength };
 
     certs.tsp[i] = tspCert;
@@ -115,162 +108,170 @@ static ERL_NIF_TERM
 
   certs.tsp[tspCertsLength] = emptyBlob;
 
- //-----------
-  char dataBlobBuffer[10000];
+  char dataBlobBuffer[signedData.dataLen];
+  memset(dataBlobBuffer, 0, signedData.dataLen);
   UAC_BLOB dataBlob = {dataBlobBuffer, signedData.dataLen};
 
-
-  UAC_SIGNED_DATA_INFO signedDataInfo;
-  LoadSignedData(libHandler, &signedData, &dataBlob, &signedDataInfo);
+  UAC_SIGNED_DATA_INFO signedDataInfo = {};
+  DWORD loadSignedDataResult = LoadSignedData(libHandler, signedData, &dataBlob, &signedDataInfo);
 
   bool checkResult = false;
 
-  int check;
+  unsigned int check;
   enif_get_int(env, argv[2], &check);
 
   if (check == 1) {
-    checkResult = Check(libHandler, signedData, signedDataInfo, subjectInfo, &certs);
+    checkResult = Check(libHandler, signedData, signedDataInfo, subjectInfo, certs);
   }
   dlclose(libHandler);
 
   ERL_NIF_TERM signer = enif_make_new_map(env);
-  ERL_NIF_TERM commonName = CreateElixirString(env, subjectInfo->commonName);
-
-
-  enif_make_map_put(env, signer, enif_make_atom(env, "common_name"), commonName, &signer);
-  const char* countryName = subjectInfo->countryName;
+  char* commonName = subjectInfo->commonName;
+  int commonNameLength = strlen(commonName);
+  ErlNifBinary commonNameBin = {};
+  if (commonNameLength < 64) {
+    commonNameBin.size = commonNameLength;
+    commonNameBin.data = commonName;
+  }
+  else {
+    commonNameBin.size = 0;
+    commonNameBin.data = "";
+  }
+  ERL_NIF_TERM commonNameTerm = enif_make_binary(env, &commonNameBin);
+  enif_make_map_put(env, signer, enif_make_atom(env, "common_name"), commonNameTerm, &signer);
+  char* countryName = subjectInfo->countryName;
   int countryNameLength = strlen(countryName);
   ErlNifBinary countryNameBin = {};
   if (countryNameLength < 64) {
     countryNameBin.size = countryNameLength;
-    countryNameBin.data = (unsigned char *)countryName;
+    countryNameBin.data = countryName;
   }
   else {
     countryNameBin.size = 0;
-    countryNameBin.data = (unsigned char *)"";
+    countryNameBin.data = "";
   }
   ERL_NIF_TERM countryNameTerm = enif_make_binary(env, &countryNameBin);
   enif_make_map_put(env, signer, enif_make_atom(env, "country_name"), countryNameTerm, &signer);
-  const char* surname = subjectInfo->surname;
+  char* surname = subjectInfo->surname;
   int surnameLength = strlen(surname);
   ErlNifBinary surnameBin = {};
   if (surnameLength < 64) {
     surnameBin.size = surnameLength;
-    surnameBin.data = (unsigned char *)surname;
+    surnameBin.data = surname;
   }
   else {
     surnameBin.size = 0;
-    surnameBin.data = (unsigned char *)"";
+    surnameBin.data = "";
   }
   ERL_NIF_TERM surnameTerm = enif_make_binary(env, &surnameBin);
   enif_make_map_put(env, signer, enif_make_atom(env, "surname"), surnameTerm, &signer);
-  const char* givenName = subjectInfo->givenName;
+  char* givenName = subjectInfo->givenName;
   int givenNameLength = strlen(givenName);
   ErlNifBinary givenNameBin = {};
   if (givenNameLength < 64) {
     givenNameBin.size = givenNameLength;
-    givenNameBin.data = (unsigned char *)givenName;
+    givenNameBin.data = givenName;
   }
   else {
     givenNameBin.size = 0;
-    givenNameBin.data = (unsigned char *)"";
+    givenNameBin.data = "";
   }
   ERL_NIF_TERM givenNameTerm = enif_make_binary(env, &givenNameBin);
   enif_make_map_put(env, signer, enif_make_atom(env, "given_name"), givenNameTerm, &signer);
-  const char* organizationName = subjectInfo->organizationName;
+  char* organizationName = subjectInfo->organizationName;
   int organizationNameLength = strlen(organizationName);
   ErlNifBinary organizationNameBin = {};
   if (organizationNameLength < 64) {
     organizationNameBin.size = organizationNameLength;
-    organizationNameBin.data = (unsigned char *)organizationName;
+    organizationNameBin.data = organizationName;
   }
   else {
     organizationNameBin.size = 0;
-    organizationNameBin.data = (unsigned char *)"";
+    organizationNameBin.data = "";
   }
   ERL_NIF_TERM organizationNameTerm = enif_make_binary(env, &organizationNameBin);
   enif_make_map_put(env, signer, enif_make_atom(env, "organization_name"), organizationNameTerm, &signer);
-  const char* stateOrProvinceName = subjectInfo->stateOrProvinceName;
+  char* stateOrProvinceName = subjectInfo->stateOrProvinceName;
   int stateOrProvinceNameLength = strlen(stateOrProvinceName);
   ErlNifBinary stateOrProvinceNameBin = {};
   if (stateOrProvinceNameLength < 64) {
     stateOrProvinceNameBin.size = stateOrProvinceNameLength;
-    stateOrProvinceNameBin.data = (unsigned char *)stateOrProvinceName;
+    stateOrProvinceNameBin.data = stateOrProvinceName;
   }
   else {
     stateOrProvinceNameBin.size = 0;
-    stateOrProvinceNameBin.data = (unsigned char *)"";
+    stateOrProvinceNameBin.data = "";
   }
   ERL_NIF_TERM stateOrProvinceNameTerm = enif_make_binary(env, &stateOrProvinceNameBin);
   enif_make_map_put(env, signer, enif_make_atom(env, "state_or_province_name"), stateOrProvinceNameTerm, &signer);
-  const char* localityName = subjectInfo->localityName;
+  char* localityName = subjectInfo->localityName;
   int localityNameLength = strlen(localityName);
   ErlNifBinary localityNameBin = {};
   if (localityNameLength < 64) {
     localityNameBin.size = localityNameLength;
-    localityNameBin.data = (unsigned char *)localityName;
+    localityNameBin.data = localityName;
   }
   else {
     localityNameBin.size = 0;
-    localityNameBin.data = (unsigned char *)"";
+    localityNameBin.data = "";
   }
   ERL_NIF_TERM localityNameTerm = enif_make_binary(env, &localityNameBin);
   enif_make_map_put(env, signer, enif_make_atom(env, "locality_name"), localityNameTerm, &signer);
-  const char* organizationalUnitName = subjectInfo->organizationalUnitName;
+  char* organizationalUnitName = subjectInfo->organizationalUnitName;
   int organizationalUnitNameLength = strlen(organizationalUnitName);
   ErlNifBinary organizationalUnitNameBin = {};
   if (organizationalUnitNameLength < 64) {
     organizationalUnitNameBin.size = organizationalUnitNameLength;
-    organizationalUnitNameBin.data = (unsigned char *)organizationalUnitName;
+    organizationalUnitNameBin.data = organizationalUnitName;
   }
   else {
     organizationalUnitNameBin.size = 0;
-    organizationalUnitNameBin.data = (unsigned char *)"";
+    organizationalUnitNameBin.data = "";
   }
   ERL_NIF_TERM organizationalUnitNameTerm = enif_make_binary(env, &organizationalUnitNameBin);
   enif_make_map_put(env, signer, enif_make_atom(env, "organizational_unit_name"), organizationalUnitNameTerm, &signer);
-  const char* title = subjectInfo->title;
+  char* title = subjectInfo->title;
   int titleLength = strlen(title);
   ErlNifBinary titleBin = {};
   if (titleLength < 64) {
     titleBin.size = titleLength;
-    titleBin.data = (unsigned char *)title;
+    titleBin.data = title;
   }
   else {
     titleBin.size = 0;
-    titleBin.data = (unsigned char *)"";
+    titleBin.data = "";
   }
   ERL_NIF_TERM titleTerm = enif_make_binary(env, &titleBin);
   enif_make_map_put(env, signer, enif_make_atom(env, "title"), titleTerm, &signer);
-  const char* edrpou = subjectInfo->edrpou;
+  char* edrpou = subjectInfo->edrpou;
   int edrpouLength = strlen(edrpou);
   ErlNifBinary edrpouBin = {};
   if (edrpouLength < 64) {
     edrpouBin.size = edrpouLength;
-    edrpouBin.data = (unsigned char *)edrpou;
+    edrpouBin.data = edrpou;
   }
   else {
     edrpouBin.size = 0;
-    edrpouBin.data = (unsigned char *)"";
+    edrpouBin.data = "";
   }
   ERL_NIF_TERM edrpouTerm = enif_make_binary(env, &edrpouBin);
   enif_make_map_put(env, signer, enif_make_atom(env, "edrpou"), edrpouTerm, &signer);
-  const char* drfo = subjectInfo->drfo;
+  char* drfo = subjectInfo->drfo;
   int drfoLength = strlen(drfo);
   ErlNifBinary drfoBin = {};
   if (drfoLength < 64) {
     drfoBin.size = drfoLength;
-    drfoBin.data = (unsigned char *)drfo;
+    drfoBin.data = drfo;
   }
   else {
     drfoBin.size = 0;
-    drfoBin.data = (unsigned char *)"";
+    drfoBin.data = "";
   }
   ERL_NIF_TERM drfoTerm = enif_make_binary(env, &drfoBin);
   enif_make_map_put(env, signer, enif_make_atom(env, "drfo"), drfoTerm, &signer);
 
-  const char* data = dataBlob.data;
-  ErlNifBinary dataBin = {strlen(data), (unsigned char *)data};
+  char* data = dataBlob.data;
+  ErlNifBinary dataBin = {strlen(data), data};
   ERL_NIF_TERM content = enif_make_binary(env, &dataBin);
   ERL_NIF_TERM result = enif_make_new_map(env);
   enif_make_map_put(env, result, enif_make_atom(env, "content"), content, &result);
@@ -282,11 +283,11 @@ static ERL_NIF_TERM
 }
 
 static ErlNifFunc nif_funcs[] = {
-  {"processPKCS7Data", 3, ProcessPKCS7Data}
+  {"processPKCS7Data", 3, ProcessPKCS7Data, ERL_NIF_DIRTY_JOB_CPU_BOUND}
 };
 
 int load(ErlNifEnv* env, void** priv_data, ERL_NIF_TERM load_info) {
-  enif_get_string(env, load_info, LIB_PATH, 256, ERL_NIF_LATIN1);
+  enif_get_string(env, load_info, LIB_PATH, LIB_PATH_LENGHT, ERL_NIF_LATIN1);
 
   return 0;
 }

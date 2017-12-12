@@ -5,6 +5,15 @@
     "string_view": "c",
     "vector": "c",
     "__locale": "c",
-    "iterator": "c"
+    "iterator": "c",
+    "__split_buffer": "c",
+    "hash_map": "c",
+    "list": "c",
+    "unordered_map": "c",
+    "__hash_table": "c",
+    "bitset": "c",
+    "initializer_list": "c",
+    "memory": "c",
+    "utility": "c"
   }
 }

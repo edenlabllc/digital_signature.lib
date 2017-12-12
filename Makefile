@@ -1,19 +1,34 @@
-CFLAGS = -g -Wall -fPIC -MMD -shared
+CFLAGS = -g -O3 -Wall -Wextra
 
 ERLANG_PATH = $(shell erl -eval 'io:format("~s", [lists:concat([code:root_dir(), "/erts-", erlang:system_info(version), "/include"])])' -s init stop -noshell)
 CFLAGS += -I$(ERLANG_PATH)
+CFLAGS += -Ic_src
 
 LIB_NAME = priv/digital_signature_lib_nif.so
+ifneq ($(CROSSCOMPILE),)
+    # crosscompiling
+    CFLAGS += -fPIC
+else
+    # not crosscompiling
+    ifneq ($(OS),Windows_NT)
+        CFLAGS += -fPIC
 
-NIF_SRC=c_src/digital_signature_lib_nif.c c_src/digital_signature_lib.c
+        ifeq ($(shell uname),Darwin)
+            LDFLAGS += -dynamiclib -undefined dynamic_lookup
+        endif
+    endif
+endif
 
-all: priv/digital_signature_lib_nif.so
+NIF_SRC=\
+	c_src/digital_signature_lib_nif.c
+
+all: $(LIB_NAME)
 
 $(LIB_NAME): $(NIF_SRC)
 	mkdir -p priv
-	cc $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) -shared $(LDFLAGS) $^ -o $@
 
 clean:
-	rm -rf $(LIB_NAME)*
+	rm -f $(LIB_NAME)
 
 .PHONY: all clean
