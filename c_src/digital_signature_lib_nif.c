@@ -3,33 +3,36 @@
 #include "erl_nif.h"
 #include "digital_signature_lib.c"
 
+#define LIB_PATH_LENGHT 256
+char LIB_PATH[LIB_PATH_LENGHT];
+
+static ERL_NIF_TERM CreateElixirString(ErlNifEnv* env, const char* str)
+{
+  int strLength = strlen(str);
+
+  ErlNifBinary elixirStr;
+  enif_alloc_binary(strLength, &elixirStr);
+
+  memset(elixirStr.data, '\0', strLength);
+  memcpy(elixirStr.data, str, strLength);
+
+  return enif_make_binary(env, &elixirStr);
+}
+
+static ERL_NIF_TERM CreateErrorTuppe(ErlNifEnv* env, const char* errMessage)
+{
+  ERL_NIF_TERM errorTerm = CreateElixirString(env, errMessage);
+  return enif_make_tuple2(env, enif_make_atom(env, "error"), errorTerm);
+}
+
 static ERL_NIF_TERM
 ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
   void* libHandler;
 
-  char libPath[50] = "";
-  char* configuredPath = getenv("UACRYPTO_LIB_PATH");
-  char* homePath = getenv("HOME");
-  char* libName = "libUACryptoQ.so";
-
-  if (configuredPath != NULL) {
-    strcat(libPath, configuredPath);
-  }
-  else {
-    strcat(libPath, homePath);
-    if (homePath[strlen(homePath) - 1] != '/') {
-      strcat(libPath, "/");
-    }
-    strcat(libPath, libName);
-  }
-
-  libHandler = dlopen(libPath, RTLD_LAZY);
+  libHandler = dlopen(LIB_PATH, RTLD_LAZY);
   if (!libHandler) {
-    char* error = dlerror();
-    ErlNifBinary errorBin = {strlen(error), error};
-    ERL_NIF_TERM errorTerm = enif_make_binary(env, &errorBin);
-    return enif_make_tuple2(env, enif_make_atom(env, "error"), errorTerm);
+    return CreateErrorTuppe(env, dlerror());
   }
 
   PUAC_SUBJECT_INFO subjectInfo = malloc(sizeof(UAC_SUBJECT_INFO));
@@ -38,8 +41,7 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   unsigned int p7DataLength;
   enif_get_list_length(env, argv[0], &p7DataLength);
   if (p7DataLength == 0) {
-    ERL_NIF_TERM errorTerm = enif_make_string(env, "pkcs7 data is empty", ERL_NIF_LATIN1);
-    return enif_make_tuple2(env, enif_make_atom(env, "error"), errorTerm);
+    return CreateErrorTuppe(env, "pkcs7 data is empty");
   }
   char p7Data[p7DataLength];
   memset(p7Data, 0, p7DataLength);
@@ -172,7 +174,7 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   }
   else {
     givenNameBin.size = 0;
-    givenNameBin.size = "";
+    givenNameBin.data = "";
   }
   ERL_NIF_TERM givenNameTerm = enif_make_binary(env, &givenNameBin);
   enif_make_map_put(env, signer, enif_make_atom(env, "given_name"), givenNameTerm, &signer);
@@ -281,7 +283,13 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ErlNifFunc nif_funcs[] = {
-  {"processPKCS7Data", 3, ProcessPKCS7Data}
+  {"processPKCS7Data", 3, ProcessPKCS7Data, ERL_NIF_DIRTY_JOB_CPU_BOUND}
 };
 
-ERL_NIF_INIT(digital_signature_lib, nif_funcs, NULL, NULL, NULL, NULL);
+int load(ErlNifEnv* env, void** priv_data, ERL_NIF_TERM load_info) {
+  enif_get_string(env, load_info, LIB_PATH, LIB_PATH_LENGHT, ERL_NIF_LATIN1);
+
+  return 0;
+}
+
+ERL_NIF_INIT(Elixir.DigitalSignatureLib, nif_funcs, load, NULL, NULL, NULL);

@@ -1,10 +1,10 @@
 ## About
 
-Erlang implementation of pkcs7 data processing that uses **uaCrypto library (ICAO version)** via the **NIF** api.
+Elixir implementation of pkcs7 data processing that uses **uaCrypto library (ICAO version)** via the **NIF** api.
 
 ## Compilation
 
-Run the **make** command to compile the library.
+Run the **mix deps.get** and **mix compile** command to compile the library.
 
 ## Settings
 
