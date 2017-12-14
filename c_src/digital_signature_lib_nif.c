@@ -268,8 +268,11 @@ static ERL_NIF_TERM
   ERL_NIF_TERM drfoTerm = enif_make_binary(env, &drfoBin);
   enif_make_map_put(env, signer, enif_make_atom(env, "drfo"), drfoTerm, &signer);
 
-  char* data = dataBlob.data;
-  ErlNifBinary dataBin = {strlen(data), data};
+  ErlNifBinary dataBin;
+  enif_alloc_binary(dataBlob.dataLen, &dataBin);
+  memcpy(dataBin.data, dataBlob.data, dataBlob.dataLen);
+  enif_make_binary(env, &dataBin);
+
   ERL_NIF_TERM content = enif_make_binary(env, &dataBin);
   ERL_NIF_TERM result = enif_make_new_map(env);
   enif_make_map_put(env, result, enif_make_atom(env, "content"), content, &result);
