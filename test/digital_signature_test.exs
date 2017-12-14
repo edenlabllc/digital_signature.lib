@@ -6,8 +6,8 @@ defmodule DigitalSignatureLibTest do
     assert DigitalSignatureLib.processPKCS7Data([], %{general: [], tsp: []}, 1) == {:error, "pkcs7 data is empty"}
   end
 
-  test "ok" do
-    assert {:ok, %{}} = DigitalSignatureLib.processPKCS7Data([<<1>>], %{general: [], tsp: []}, 1)
+  test "fail with incorrect signed data" do
+    assert DigitalSignatureLib.processPKCS7Data([<<1>>], %{general: [], tsp: []}, 1) == {:error, "error loading signed data"}
   end
 
   @tag :pending
@@ -32,6 +32,15 @@ defmodule DigitalSignatureLibTest do
     assert result.is_valid == 1
     assert decode_content(result) == data["content"]
     assert result.signer == atomize_keys(data["signer"])
+  end
+
+  @tag :pending
+  test "processign valid signed declaration" do
+    data = get_data("test/fixtures/signed_decl_req.json")
+    signed_content = get_signed_content(data)
+
+    assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), 1)
+    assert result.is_valid == 1
   end
 
   defp get_data(json_file) do

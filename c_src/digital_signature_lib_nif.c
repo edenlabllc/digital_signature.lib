@@ -25,8 +25,21 @@ static ERL_NIF_TERM CreateErrorTuppe(ErlNifEnv* env, const char* errMessage)
   return enif_make_tuple2(env, enif_make_atom(env, "error"), errorTerm);
 }
 
+char* GetStringFromErlang(ErlNifEnv* env, const ERL_NIF_TERM erlString)
+{
+  unsigned int len;
+  enif_get_list_length(env, erlString, &len);
+  len++;
+
+  char* data = calloc(len, sizeof(char));
+  //memset(data, 0, len);
+  enif_get_string(env, erlString, data, len, ERL_NIF_LATIN1);
+
+  return data;
+}
+
 static ERL_NIF_TERM
-ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+  ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
   void* libHandler;
 
@@ -36,16 +49,15 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   }
 
   PUAC_SUBJECT_INFO subjectInfo = malloc(sizeof(UAC_SUBJECT_INFO));
-  memset(subjectInfo, 0, sizeof(UAC_SUBJECT_INFO));
+  (subjectInfo, 0, sizeof(UAC_SUBJECT_INFO));
 
   unsigned int p7DataLength;
   enif_get_list_length(env, argv[0], &p7DataLength);
   if (p7DataLength == 0) {
     return CreateErrorTuppe(env, "pkcs7 data is empty");
   }
-  char p7Data[p7DataLength];
-  memset(p7Data, 0, p7DataLength);
-  enif_get_string(env, argv[0], p7Data, p7DataLength + 1, ERL_NIF_LATIN1);
+
+  char* p7Data = GetStringFromErlang(env, argv[0]);
   UAC_BLOB signedData = { p7Data, p7DataLength };
 
   struct Certs certs;
@@ -55,27 +67,28 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   unsigned int generalCertsLength;
   enif_get_list_length(env, generalCerts, &generalCertsLength);
   int i;
+
   for (i = 0; i < generalCertsLength; i++) {
     ERL_NIF_TERM firstItem;
     ERL_NIF_TERM rest;
     enif_get_list_cell(env, generalCerts, &firstItem, &rest);
 
+    // Root cert
     ERL_NIF_TERM rootCertTerm;
     enif_get_map_value(env, firstItem, enif_make_atom(env, "root"), &rootCertTerm);
+
     unsigned int rootCertDataLength;
     enif_get_list_length(env, rootCertTerm, &rootCertDataLength);
-    char* rootCertData = malloc(rootCertDataLength);
-    memset(rootCertData, 0, rootCertDataLength);
-    enif_get_string(env, rootCertTerm, rootCertData, rootCertDataLength, ERL_NIF_LATIN1);
+    char* rootCertData = GetStringFromErlang(env, rootCertTerm);
     UAC_BLOB rootCert = { rootCertData, rootCertDataLength };
 
+    // Oscp cert
     ERL_NIF_TERM ocspCertTerm;
     enif_get_map_value(env, firstItem, enif_make_atom(env, "ocsp"), &ocspCertTerm);
+
     unsigned int ocspCertDataLength;
     enif_get_list_length(env, ocspCertTerm, &ocspCertDataLength);
-    char* ocspCertData = malloc(ocspCertDataLength);
-    memset(ocspCertData, 0, ocspCertDataLength);
-    enif_get_string(env, ocspCertTerm, ocspCertData, ocspCertDataLength, ERL_NIF_LATIN1);
+    char* ocspCertData = GetStringFromErlang(env, ocspCertTerm);
     UAC_BLOB ocspCert = { ocspCertData, ocspCertDataLength };
 
     certs.general[i].root = rootCert;
@@ -95,11 +108,11 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     ERL_NIF_TERM firstItem;
     ERL_NIF_TERM rest;
     enif_get_list_cell(env, tspCerts, &firstItem, &rest);
+
     unsigned int tspCertDataLength;
     enif_get_list_length(env, firstItem, &tspCertDataLength);
-    char* tspCertData = malloc(tspCertDataLength);
-    memset(tspCertData, 0, tspCertDataLength);
-    enif_get_string(env, firstItem, tspCertData, tspCertDataLength, ERL_NIF_LATIN1);
+
+    char* tspCertData = GetStringFromErlang(env, firstItem);
     UAC_BLOB tspCert = { tspCertData, tspCertDataLength };
 
     certs.tsp[i] = tspCert;
@@ -108,12 +121,16 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 
   certs.tsp[tspCertsLength] = emptyBlob;
 
-  char dataBlobBuffer[signedData.dataLen];
-  memset(dataBlobBuffer, 0, signedData.dataLen);
-  UAC_BLOB dataBlob = {dataBlobBuffer, signedData.dataLen};
+  char* dataBlobBuffer = malloc(p7DataLength + 1);
+  //memset(dataBlobBuffer, 0, p7DataLength + 1);
+  UAC_BLOB dataBlob = {dataBlobBuffer, p7DataLength};
 
   UAC_SIGNED_DATA_INFO signedDataInfo = {};
   DWORD loadSignedDataResult = LoadSignedData(libHandler, signedData, &dataBlob, &signedDataInfo);
+  if(loadSignedDataResult != UAC_SUCCESS)
+  {
+    return CreateErrorTuppe(env, "error loading signed data");
+  }
 
   bool checkResult = false;
 
@@ -279,6 +296,7 @@ ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   if (check == 1) {
     enif_make_map_put(env, result, enif_make_atom(env, "is_valid"), enif_make_int(env, checkResult), &result);
   }
+
   return enif_make_tuple2(env, enif_make_atom(env, "ok"), result);
 }
 
