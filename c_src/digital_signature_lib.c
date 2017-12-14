@@ -310,8 +310,8 @@ bool Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDat
            struct Certs certs)
 {
     int signaturesCount = signedDataInfo.dwSignatureCount;
-    char timeStampBuf[signedData.dataLen];
-    memset(timeStampBuf, 0, signedData.dataLen);
+    char* timeStampBuf = malloc(signedData.dataLen);
+    //memset(timeStampBuf, 0, signedData.dataLen);
     UAC_BLOB timeStamp = {timeStampBuf, signedData.dataLen};
     DWORD getTimeStampResult = GetTimeStamp(libHandler, signedData, &timeStamp);
     if (getTimeStampResult != 0) {
@@ -326,8 +326,8 @@ bool Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDat
     UAC_BLOB tspCert = FindMatchingTspCertificate(libHandler, timeStampInfo.signature.signerRef, certs.tsp);
     int i;
     for (i = 0; i < signaturesCount; i++) {
-        char certBuf[signedData.dataLen];
-        memset(certBuf, 0, signedData.dataLen);
+        char* certBuf = malloc(signedData.dataLen);
+        // memset(certBuf, 0, signedData.dataLen);
         UAC_BLOB cert = {certBuf, signedData.dataLen};
         DWORD getCertResult = GetCert(libHandler, signedData, i, &cert);
         if (getCertResult != 0) {

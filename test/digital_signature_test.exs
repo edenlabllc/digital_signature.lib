@@ -2,15 +2,18 @@ defmodule DigitalSignatureLibTest do
   use ExUnit.Case
   doctest DigitalSignatureLib
 
-  test "fail" do
-    assert DigitalSignatureLib.processPKCS7Data([], %{general: [], tsp: []}, 1) == {:error, "pkcs7 data is empty"}
+  test "fail with incorrect data" do
+    assert DigitalSignatureLib.processPKCS7Data([], %{general: [], tsp: []}, 1) == {:error, "pkcs7 data is incorrect"}
   end
 
-  test "ok" do
-    assert {:ok, %{}} = DigitalSignatureLib.processPKCS7Data([<<1>>], %{general: [], tsp: []}, 1)
+  test "fail with empty data" do
+    assert DigitalSignatureLib.processPKCS7Data(<<>>, %{general: [], tsp: []}, 1) == {:error, "pkcs7 data is empty"}
   end
 
-  @tag :pending
+  test "fail with incorrect signed data" do
+    assert DigitalSignatureLib.processPKCS7Data(<<1>>, %{general: [], tsp: []}, 1) == {:error, "error loading signed data"}
+  end
+
   test "real encoded data" do
     data = get_data("test/fixtures/sign1.json")
     signed_content = get_signed_content(data)
@@ -22,7 +25,6 @@ defmodule DigitalSignatureLibTest do
     assert result.signer == atomize_keys(data["signer"])
   end
 
-  @tag :pending
   test "more real encoded data" do
     data = get_data("test/fixtures/sign2.json")
     signed_content = get_signed_content(data)
@@ -32,6 +34,14 @@ defmodule DigitalSignatureLibTest do
     assert result.is_valid == 1
     assert decode_content(result) == data["content"]
     assert result.signer == atomize_keys(data["signer"])
+  end
+
+  test "processign valid signed declaration" do
+    data = get_data("test/fixtures/signed_decl_req.json")
+    signed_content = get_signed_content(data)
+
+    assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), 1)
+    assert result.is_valid == 1
   end
 
   defp get_data(json_file) do
@@ -44,24 +54,23 @@ defmodule DigitalSignatureLibTest do
   defp get_signed_content(data) do
     data["signed_content"]
     |> Base.decode64!()
-    |> :binary.bin_to_list()
   end
 
   defp get_certs do
     general = [
     %{
-      root: :erlang.binary_to_list(File.read!("test/fixtures/CA-DFS.cer")),
-      ocsp: :erlang.binary_to_list(File.read!("test/fixtures/CA-OCSP-DFS.cer"))
+      root: File.read!("test/fixtures/CA-DFS.cer"),
+      ocsp: File.read!("test/fixtures/CA-OCSP-DFS.cer")
     },
     %{
-      root: :erlang.binary_to_list(File.read!("test/fixtures/CA-Justice.cer")),
-      ocsp: :erlang.binary_to_list(File.read!("test/fixtures/OCSP-Server Justice.cer"))
+      root: File.read!("test/fixtures/CA-Justice.cer"),
+      ocsp: File.read!("test/fixtures/OCSP-Server Justice.cer")
     },
   ]
 
   tsp = [
-    :erlang.binary_to_list(File.read!("test/fixtures/CA-TSP-DFS.cer")),
-    :erlang.binary_to_list(File.read!("test/fixtures/TSP-Server Justice.cer"))
+    File.read!("test/fixtures/CA-TSP-DFS.cer"),
+    File.read!("test/fixtures/TSP-Server Justice.cer")
   ]
 
     %{general: general, tsp: tsp}
