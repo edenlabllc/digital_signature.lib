@@ -12,8 +12,6 @@ static ERL_NIF_TERM CreateElixirString(ErlNifEnv* env, const char* str)
 
   ErlNifBinary elixirStr;
   enif_alloc_binary(strLength, &elixirStr);
-
-  memset(elixirStr.data, '\0', strLength);
   memcpy(elixirStr.data, str, strLength);
 
   return enif_make_binary(env, &elixirStr);
@@ -23,19 +21,6 @@ static ERL_NIF_TERM CreateErrorTuppe(ErlNifEnv* env, const char* errMessage)
 {
   ERL_NIF_TERM errorTerm = CreateElixirString(env, errMessage);
   return enif_make_tuple2(env, enif_make_atom(env, "error"), errorTerm);
-}
-
-char* GetStringFromErlang(ErlNifEnv* env, const ERL_NIF_TERM erlString)
-{
-  unsigned int len;
-  enif_get_list_length(env, erlString, &len);
-  len++;
-
-  char* data = calloc(len, sizeof(char));
-  //memset(data, 0, len);
-  enif_get_string(env, erlString, data, len, ERL_NIF_LATIN1);
-
-  return data;
 }
 
 static ERL_NIF_TERM
@@ -51,14 +36,15 @@ static ERL_NIF_TERM
   PUAC_SUBJECT_INFO subjectInfo = malloc(sizeof(UAC_SUBJECT_INFO));
   (subjectInfo, 0, sizeof(UAC_SUBJECT_INFO));
 
-  unsigned int p7DataLength;
-  enif_get_list_length(env, argv[0], &p7DataLength);
-  if (p7DataLength == 0) {
+  ErlNifBinary p7Data;
+  if (!enif_inspect_binary(env, argv[0], &p7Data)) {
+    return CreateErrorTuppe(env, "pkcs7 data is incorrect");
+  }
+  if(p7Data.size == 0) {
     return CreateErrorTuppe(env, "pkcs7 data is empty");
   }
 
-  char* p7Data = GetStringFromErlang(env, argv[0]);
-  UAC_BLOB signedData = { p7Data, p7DataLength };
+  UAC_BLOB signedData = { p7Data.data, p7Data.size };
 
   struct Certs certs;
 
@@ -77,19 +63,17 @@ static ERL_NIF_TERM
     ERL_NIF_TERM rootCertTerm;
     enif_get_map_value(env, firstItem, enif_make_atom(env, "root"), &rootCertTerm);
 
-    unsigned int rootCertDataLength;
-    enif_get_list_length(env, rootCertTerm, &rootCertDataLength);
-    char* rootCertData = GetStringFromErlang(env, rootCertTerm);
-    UAC_BLOB rootCert = { rootCertData, rootCertDataLength };
+    ErlNifBinary rootCertData;
+    enif_inspect_binary(env, rootCertTerm, &rootCertData);
+    UAC_BLOB rootCert = { rootCertData.data, rootCertData.size };
 
     // Oscp cert
     ERL_NIF_TERM ocspCertTerm;
     enif_get_map_value(env, firstItem, enif_make_atom(env, "ocsp"), &ocspCertTerm);
 
-    unsigned int ocspCertDataLength;
-    enif_get_list_length(env, ocspCertTerm, &ocspCertDataLength);
-    char* ocspCertData = GetStringFromErlang(env, ocspCertTerm);
-    UAC_BLOB ocspCert = { ocspCertData, ocspCertDataLength };
+    ErlNifBinary ocspCertData;
+    enif_inspect_binary(env, ocspCertTerm, &ocspCertData);
+    UAC_BLOB ocspCert = { ocspCertData.data, ocspCertData.size };
 
     certs.general[i].root = rootCert;
     certs.general[i].ocsp = ocspCert;
@@ -109,11 +93,9 @@ static ERL_NIF_TERM
     ERL_NIF_TERM rest;
     enif_get_list_cell(env, tspCerts, &firstItem, &rest);
 
-    unsigned int tspCertDataLength;
-    enif_get_list_length(env, firstItem, &tspCertDataLength);
-
-    char* tspCertData = GetStringFromErlang(env, firstItem);
-    UAC_BLOB tspCert = { tspCertData, tspCertDataLength };
+    ErlNifBinary tspCertData;
+    enif_inspect_binary(env, firstItem, &tspCertData);
+    UAC_BLOB tspCert = { tspCertData.data, tspCertData.size };
 
     certs.tsp[i] = tspCert;
     tspCerts = rest;
@@ -121,9 +103,8 @@ static ERL_NIF_TERM
 
   certs.tsp[tspCertsLength] = emptyBlob;
 
-  char* dataBlobBuffer = malloc(p7DataLength + 1);
-  //memset(dataBlobBuffer, 0, p7DataLength + 1);
-  UAC_BLOB dataBlob = {dataBlobBuffer, p7DataLength};
+  char* dataBlobBuffer = malloc(p7Data.size);
+  UAC_BLOB dataBlob = {dataBlobBuffer, p7Data.size};
 
   UAC_SIGNED_DATA_INFO signedDataInfo = {};
   DWORD loadSignedDataResult = LoadSignedData(libHandler, signedData, &dataBlob, &signedDataInfo);

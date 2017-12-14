@@ -311,7 +311,7 @@ bool Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDat
 {
     int signaturesCount = signedDataInfo.dwSignatureCount;
     char* timeStampBuf = malloc(signedData.dataLen);
-    // memset(timeStampBuf, 0, signedData.dataLen);
+    //memset(timeStampBuf, 0, signedData.dataLen);
     UAC_BLOB timeStamp = {timeStampBuf, signedData.dataLen};
     DWORD getTimeStampResult = GetTimeStamp(libHandler, signedData, &timeStamp);
     if (getTimeStampResult != 0) {
