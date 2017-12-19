@@ -3,24 +3,24 @@
 #include "UACrypto.h"
 
 
-/**	\addtogroup basetypes Базовые типы полей */
+/**	\addtogroup basetypes Р‘Р°Р·РѕРІС‹Рµ С‚РёРїС‹ РїРѕР»РµР№ */
 /** @{ */
-typedef CHAR								UAC_DATE_BCD[8+1];									///< символьная дата в формате BCD
+typedef CHAR								UAC_DATE_BCD[8+1];									///< СЃРёРјРІРѕР»СЊРЅР°СЏ РґР°С‚Р° РІ С„РѕСЂРјР°С‚Рµ BCD
 /** @} */
 
 #pragma pack (push,1)
 
-/** \addtogroup STRUCT_DG Структуры внешних данных пакета DG
+/** \addtogroup STRUCT_DG РЎС‚СЂСѓРєС‚СѓСЂС‹ РІРЅРµС€РЅРёС… РґР°РЅРЅС‹С… РїР°РєРµС‚Р° DG
 	@{
 */
 
-/// Информация о конверте с регистрационными данными пакета DG
+/// РРЅС„РѕСЂРјР°С†РёСЏ Рѕ РєРѕРЅРІРµСЂС‚Рµ СЃ СЂРµРіРёСЃС‚СЂР°С†РёРѕРЅРЅС‹РјРё РґР°РЅРЅС‹РјРё РїР°РєРµС‚Р° DG
 typedef struct _UAC_DG_REGISTRATION_INFO
 {
-	UAC_SIGNATURE_INFO	signature;						///< информация о подписе и подписчике
-	DWORD				textLength;						///< длина текстовой строки
-	UAC_DATE_BCD		date;							///< дата изменений. записывается в BCD кодировке
-	UAC_TEXT_SIZE256	text;							///< текстовая строка заполненая в формате согласно БЕН, в локальной кодировке
+	UAC_SIGNATURE_INFO	signature;						///< РёРЅС„РѕСЂРјР°С†РёСЏ Рѕ РїРѕРґРїРёСЃРµ Рё РїРѕРґРїРёСЃС‡РёРєРµ
+	DWORD				textLength;						///< РґР»РёРЅР° С‚РµРєСЃС‚РѕРІРѕР№ СЃС‚СЂРѕРєРё
+	UAC_DATE_BCD		date;							///< РґР°С‚Р° РёР·РјРµРЅРµРЅРёР№. Р·Р°РїРёСЃС‹РІР°РµС‚СЃСЏ РІ BCD РєРѕРґРёСЂРѕРІРєРµ
+	UAC_TEXT_SIZE256	text;							///< С‚РµРєСЃС‚РѕРІР°СЏ СЃС‚СЂРѕРєР° Р·Р°РїРѕР»РЅРµРЅР°СЏ РІ С„РѕСЂРјР°С‚Рµ СЃРѕРіР»Р°СЃРЅРѕ Р‘Р•Рќ, РІ Р»РѕРєР°Р»СЊРЅРѕР№ РєРѕРґРёСЂРѕРІРєРµ
 	DWORD				applicationCode;				///< 32/33
 } UAC_DG_REGISTRATION_INFO, *PUAC_DG_REGISTRATION_INFO;
 /**@}*/
@@ -31,19 +31,19 @@ typedef struct _UAC_DG_REGISTRATION_INFO
 #if defined( __cplusplus)
 extern "C" {
 #endif
-/** \addtogroup func Экспортируемые функции
+/** \addtogroup func Р­РєСЃРїРѕСЂС‚РёСЂСѓРµРјС‹Рµ С„СѓРЅРєС†РёРё
 	@{ */
-/** \name Функции пакета DG  */
+/** \name Р¤СѓРЅРєС†РёРё РїР°РєРµС‚Р° DG  */
 
 /**
-	\brief Загрузка информации о конверте с регистрационными данными пакета DG
-	\param[in] pSignedData		конверт с подписанными данными
-	\param[out] pData			дополнительный буфер для поля text из конверта или NULL
-	\param[out] pInfo			структура для информации о конверте или NULL
+	\brief Р—Р°РіСЂСѓР·РєР° РёРЅС„РѕСЂРјР°С†РёРё Рѕ РєРѕРЅРІРµСЂС‚Рµ СЃ СЂРµРіРёСЃС‚СЂР°С†РёРѕРЅРЅС‹РјРё РґР°РЅРЅС‹РјРё РїР°РєРµС‚Р° DG
+	\param[in] pSignedData		РєРѕРЅРІРµСЂС‚ СЃ РїРѕРґРїРёСЃР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё
+	\param[out] pData			РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Р№ Р±СѓС„РµСЂ РґР»СЏ РїРѕР»СЏ text РёР· РєРѕРЅРІРµСЂС‚Р° РёР»Рё NULL
+	\param[out] pInfo			СЃС‚СЂСѓРєС‚СѓСЂР° РґР»СЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ РєРѕРЅРІРµСЂС‚Рµ РёР»Рё NULL
 	
-	\note Хотя бы один из параметров pData или pInfo должен быть ненулевым
+	\note РҐРѕС‚СЏ Р±С‹ РѕРґРёРЅ РёР· РїР°СЂР°РјРµС‚СЂРѕРІ pData РёР»Рё pInfo РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РЅРµРЅСѓР»РµРІС‹Рј
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_DgRegistrationLoad (
 	UAC_IN	PUAC_BLOB pSignedData,
@@ -51,9 +51,9 @@ UAC_API(DWORD) UAC_DgRegistrationLoad (
 	UAC_OUT PUAC_DG_REGISTRATION_INFO pInfo );
 
 /**
-	\brief Проверка подписи данных для конкретного подписчика
-	\param[in] pSignedData		конверт с подписанными данными
-	\param[in] pSignerCert		сертификат подписчика
+	\brief РџСЂРѕРІРµСЂРєР° РїРѕРґРїРёСЃРё РґР°РЅРЅС‹С… РґР»СЏ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ РїРѕРґРїРёСЃС‡РёРєР°
+	\param[in] pSignedData		РєРѕРЅРІРµСЂС‚ СЃ РїРѕРґРїРёСЃР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё
+	\param[in] pSignerCert		СЃРµСЂС‚РёС„РёРєР°С‚ РїРѕРґРїРёСЃС‡РёРєР°
 */
 UAC_API(DWORD) UAC_DgRegistrationVerify (
 	UAC_IN PUAC_BLOB pSignedData,

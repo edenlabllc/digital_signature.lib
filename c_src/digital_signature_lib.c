@@ -26,6 +26,12 @@ struct Certs
     unsigned int tspLength;
 };
 
+struct ValidationResult
+{
+  bool isValid;
+  char* validationErrorMessage;
+};
+
 DWORD GetTimeStamp(void* libHandler, UAC_BLOB signedData, PUAC_BLOB timeStamp)
 {
     DWORD (*getTimeStamp)(PUAC_BLOB, DWORD, PUAC_BLOB);
@@ -312,81 +318,104 @@ bool CheckOCSP(void* libHandler, UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB
     return ocspResponseInfo.certStatus == 0;
 }
 
-bool Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDataInfo, PUAC_SUBJECT_INFO subjectInfo,
+struct ValidationResult Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDataInfo, PUAC_SUBJECT_INFO subjectInfo,
            struct Certs certs)
 {
+    struct ValidationResult validationResult = {false, "signed data validation failed"};
     int signaturesCount = signedDataInfo.dwSignatureCount;
 
     char* timeStampBuf = calloc(signedData.dataLen, sizeof(char));
     UAC_BLOB timeStamp = {timeStampBuf, signedData.dataLen};
-    DWORD getTimeStampResult = GetTimeStamp(libHandler, signedData, &timeStamp);
-    if (getTimeStampResult != 0) {
-        return false;
+    if (GetTimeStamp(libHandler, signedData, &timeStamp) != 0) {
+        validationResult.validationErrorMessage = "error processing signed data timestamp";
+        return validationResult;
     }
+
     UAC_TIME_STAMP_INFO timeStampInfo = {};
-    DWORD getTimeStampInfoResult = GetTimeStampInfo(libHandler, timeStamp, &timeStampInfo);
-    if (getTimeStampInfoResult != 0) {
-        return false;
+    if (GetTimeStampInfo(libHandler, timeStamp, &timeStampInfo) != 0) {
+        validationResult.validationErrorMessage = "error processing signed data timestamp";
+        return validationResult;
     }
+
     UAC_TIME timeStampDateTime = timeStampInfo.genTime;
     UAC_BLOB tspCert = FindMatchingTspCertificate(libHandler, timeStampInfo.signature.signerRef, certs.tsp,
       certs.tspLength);
+
+    if (tspCert.dataLen == 0) {
+      validationResult.validationErrorMessage = "matching TSP certificate not found";
+      return validationResult;
+    }
 
     int i;
     for (i = 0; i < signaturesCount; i++) {
         char* certBuf = calloc(signedData.dataLen, sizeof(char));
         UAC_BLOB cert = {certBuf, signedData.dataLen};
-        DWORD getCertResult = GetCert(libHandler, signedData, i, &cert);
-        if (getCertResult != 0) {
-            return false;
+        if (GetCert(libHandler, signedData, i, &cert) != 0) {
+            validationResult.validationErrorMessage = "error processing certificate from signed date";
+            return validationResult;
         }
+
         UAC_CERT_INFO certInfo = {};
-        DWORD getCertInfoResult = GetCertInfo(libHandler, cert, &certInfo);
-        if (getCertInfoResult != 0) {
-            return false;
+        if (GetCertInfo(libHandler, cert, &certInfo) != 0) {
+            validationResult.validationErrorMessage = "error processing certificate information from signed date";
+            return validationResult;
         }
+
         memcpy(subjectInfo, &certInfo.subject, sizeof(UAC_SUBJECT_INFO));
         struct GeneralCert matchingCert = FindMatchingRootCertificate(libHandler, cert, certs.general,
           certs.generalLength);
         if (matchingCert.root.data == NULL) {
-            return false;
+            validationResult.validationErrorMessage = "matching Root certificate not found";
+            return validationResult;
         }
+
         UAC_BLOB rootCert = matchingCert.root;
         DWORD certVerifyResult = CertVerify(libHandler, cert, rootCert);
         if (certVerifyResult != 0) {
-            return false;
+            validationResult.validationErrorMessage = "certificate verificaton failed";
+            return validationResult;
         }
         UAC_CERT_INFO rootCertInfo = {};
         DWORD getRootCertInfoResult = GetCertInfo(libHandler, rootCert, &rootCertInfo);
         if (getRootCertInfoResult != 0) {
-            return false;
+            validationResult.validationErrorMessage = "certificate verificaton failed";
+            return validationResult;
         }
         bool isHighestLevel = IsHighestLevel(rootCertInfo);
         if (!isHighestLevel) {
             if (tspCert.data == NULL) {
-                return false;
+                validationResult.validationErrorMessage = "certificate verificaton failed";
+            return validationResult;
             }
             bool isTimeStampCertValid = VerifyTimeStampCert(libHandler, timeStamp, tspCert);
             if (!isTimeStampCertValid) {
-                return false;
+                validationResult.validationErrorMessage = "certificate verificaton failed";
+            return validationResult;
             }
         }
         bool isTimeStampValid = CheckTimeStamp(certInfo, timeStampDateTime);
         if (!isTimeStampValid) {
-            return false;
+            validationResult.validationErrorMessage = "certificate verificaton failed";
+            return validationResult;
         }
         bool isCertNotExpired = CheckTimeStamp(certInfo, time(0));
         if (!isCertNotExpired) {
-            return false;
+            validationResult.validationErrorMessage = "certificate verificaton failed";
+            return validationResult;
         }
         bool checkOSCP = CheckOCSP(libHandler, cert, certInfo, matchingCert.ocsp, !isHighestLevel);
         if (!checkOSCP) {
-            return false;
+            validationResult.validationErrorMessage = "certificate verificaton failed";
+            return validationResult;
         }
         DWORD signedDataVerifyResult = SignedDataVerify(libHandler, signedData, cert);
         if (signedDataVerifyResult != 0) {
-            return false;
+            validationResult.validationErrorMessage = "certificate verificaton failed";
+            return validationResult;
         }
     }
-    return true;
+
+    validationResult.isValid = true;
+    validationResult.validationErrorMessage = "";
+    return validationResult;
 }

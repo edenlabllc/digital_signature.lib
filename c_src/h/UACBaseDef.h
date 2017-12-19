@@ -36,7 +36,7 @@ enum HASHType
 #define UACL_ERROR_NULL_PARAM			1
 #define UACL_ERROR_SMALL_BUFFER			3
 #define UACL_ERROR_DSTU_PARAM			10
-// ошибки криптографии
+// РѕС€РёР±РєРё РєСЂРёРїС‚РѕРіСЂР°С„РёРё
 #define UACL_ERROR_CONTEXT				11
 #define UACL_ERROR_PUBLICKEY			12
 #define UACL_ERROR_PRIVATEKEY			13

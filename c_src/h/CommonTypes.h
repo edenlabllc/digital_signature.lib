@@ -59,6 +59,7 @@ inline void memmove_s(void *dest, size_t sizeInBytes, const void *src, size_t co
 }
 #endif
 
+
 #elif defined(__GNUC__)
 #include  <direct.h>
 #include <windows.h>
