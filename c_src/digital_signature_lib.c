@@ -116,8 +116,7 @@ DWORD OcspResponseLoad(void* libHandler, UAC_BLOB response, PUAC_OCSP_RESPONSE_I
 
 struct GeneralCert FindMatchingRootCertificate(void* libHandler, UAC_BLOB cert, struct GeneralCert generalCerts[100])
 {
-    struct GeneralCert emptyResult;
-    memset(&emptyResult, 0, sizeof(emptyResult));
+    struct GeneralCert emptyResult = {};
     UAC_CERT_REF issuerCertRef = {};
     DWORD certIssuerRefResult = CertIssuerRef(libHandler, cert, &issuerCertRef);
     if (certIssuerRefResult != 0) {
@@ -151,8 +150,6 @@ UAC_BLOB FindMatchingTspCertificate(void* libHandler, UAC_CERT_REF signerRef, UA
         tspCert = certs[i];
     }
 
-    printf("\ni: %d\n", i);
-
     return emptyBlob;
 }
 
@@ -180,11 +177,10 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
 {
     UAC_BLOB emptyResult = {};
 
-    char* host = malloc(strlen(url));
-    memset(host, 0, strlen(url));
-    char* port = malloc(strlen(url));
-    memset(port, 0, strlen(url));
-    memcpy(host, url, strlen(url));
+    char* host = calloc(strlen(url), sizeof(char));
+    char* port = calloc(strlen(url), sizeof(char));
+    strcpy(host, url);
+
     host = strstr(host, "://") + 3;
     port = strstr(host, ":") + 1;
     int p = 80;
@@ -286,8 +282,8 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
 
 bool CheckOCSP(void* libHandler, UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB ocspCert, bool verify)
 {
-    char ocspRequestBuf[cert.dataLen];
-    memset(ocspRequestBuf, 0, cert.dataLen);
+    char* ocspRequestBuf = calloc(cert.dataLen, sizeof(char));
+
     UAC_BLOB ocspRequest = {ocspRequestBuf, cert.dataLen};
     DWORD ocspRequestCreateResult = OcspRequestCreate(libHandler, cert, &ocspRequest);
     if (ocspRequestCreateResult != 0) {
@@ -313,7 +309,6 @@ bool Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDat
            struct Certs certs)
 {
     int signaturesCount = signedDataInfo.dwSignatureCount;
-    printf("\nsignaturesCount: %d\n", signaturesCount);
 
     char* timeStampBuf = calloc(signedData.dataLen, sizeof(char));
     UAC_BLOB timeStamp = {timeStampBuf, signedData.dataLen};

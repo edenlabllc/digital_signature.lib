@@ -5,7 +5,8 @@ defmodule DigitalSignatureLibTest do
   @empty_certs  %{general: [], tsp: []}
 
   test "fail with incorrect data" do
-    assert DigitalSignatureLib.processPKCS7Data([], get_certs(), 1) == {:error, "pkcs7 data is incorrect"}
+    assert DigitalSignatureLib.processPKCS7Data([], get_certs(), 1)
+      == {:error, "PKCS7 data is in incorrect: must be Elixir string (binary)"}
   end
 
   test "fail with empty data" do

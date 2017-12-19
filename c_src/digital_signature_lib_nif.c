@@ -6,6 +6,8 @@
 #define LIB_PATH_LENGHT 256
 char LIB_PATH[LIB_PATH_LENGHT];
 
+// ----- Helper functions
+
 static ERL_NIF_TERM CreateElixirString(ErlNifEnv* env, const char* str)
 {
   int strLength = strlen(str);
@@ -23,23 +25,25 @@ static ERL_NIF_TERM CreateErrorTuppe(ErlNifEnv* env, const char* errMessage)
   return enif_make_tuple2(env, enif_make_atom(env, "error"), errorTerm);
 }
 
+// ----- Helper functions
+
 static ERL_NIF_TERM
   ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
   void* libHandler;
+  bool checkResult = false;
+  char checkMessage = "";
 
   libHandler = dlopen(LIB_PATH, RTLD_LAZY);
   if (!libHandler) {
     return CreateErrorTuppe(env, dlerror());
   }
 
-  PUAC_SUBJECT_INFO subjectInfo = malloc(sizeof(UAC_SUBJECT_INFO));
-  (subjectInfo, 0, sizeof(UAC_SUBJECT_INFO));
-
   ErlNifBinary p7Data;
   if (!enif_inspect_binary(env, argv[0], &p7Data)) {
-    return CreateErrorTuppe(env, "pkcs7 data is incorrect");
+    return CreateErrorTuppe(env, "PKCS7 data is in incorrect: must be Elixir string (binary)");
   }
+
   if(p7Data.size == 0) {
     return CreateErrorTuppe(env, "pkcs7 data is empty");
   }
@@ -113,21 +117,13 @@ static ERL_NIF_TERM
     return CreateErrorTuppe(env, "error loading signed data");
   }
 
-  bool checkResult = false;
-
   unsigned int check;
   enif_get_int(env, argv[2], &check);
 
-  printf("\ncheck: %d\n", check);
+  PUAC_SUBJECT_INFO subjectInfo = malloc(sizeof(UAC_SUBJECT_INFO));
 
   if (check == 1) {
     checkResult = Check(libHandler, signedData, signedDataInfo, subjectInfo, certs);
-
-    printf("\ncheckResult: %d\n",  checkResult);
-
-    if(checkResult == false) {
-      printf("\ncheckresult FALSE!\n");
-    }
   }
   dlclose(libHandler);
 
@@ -286,7 +282,8 @@ static ERL_NIF_TERM
   enif_make_map_put(env, result, enif_make_atom(env, "content"), content, &result);
   enif_make_map_put(env, result, enif_make_atom(env, "signer"), signer, &result);
   if (check == 1) {
-    enif_make_map_put(env, result, enif_make_atom(env, "is_valid"), enif_make_atom(env, checkResult ? "true" : "false"), &result);
+    char* validationResult = checkResult ? "true" : "false";
+    enif_make_map_put(env, result, enif_make_atom(env, "is_valid"), enif_make_atom(env, validationResult), &result);
   }
 
   return enif_make_tuple2(env, enif_make_atom(env, "ok"), result);
