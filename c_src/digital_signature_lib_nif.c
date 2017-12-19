@@ -25,38 +25,18 @@ static ERL_NIF_TERM CreateErrorTuppe(ErlNifEnv* env, const char* errMessage)
   return enif_make_tuple2(env, enif_make_atom(env, "error"), errorTerm);
 }
 
-// ----- Helper functions
-
-static ERL_NIF_TERM
-  ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+struct Certs GetCertsFromArg(ErlNifEnv* env, const ERL_NIF_TERM arg)
 {
-  void* libHandler;
-  bool checkResult = false;
-  char checkMessage = "";
-
-  libHandler = dlopen(LIB_PATH, RTLD_LAZY);
-  if (!libHandler) {
-    return CreateErrorTuppe(env, dlerror());
-  }
-
-  ErlNifBinary p7Data;
-  if (!enif_inspect_binary(env, argv[0], &p7Data)) {
-    return CreateErrorTuppe(env, "PKCS7 data is in incorrect: must be Elixir string (binary)");
-  }
-
-  if(p7Data.size == 0) {
-    return CreateErrorTuppe(env, "pkcs7 data is empty");
-  }
-
-  UAC_BLOB signedData = { p7Data.data, p7Data.size };
-
   struct Certs certs;
 
   ERL_NIF_TERM generalCerts;
-  enif_get_map_value(env, argv[1], enif_make_atom(env, "general"), &generalCerts);
+  enif_get_map_value(env, arg, enif_make_atom(env, "general"), &generalCerts);
   unsigned int generalCertsLength;
   enif_get_list_length(env, generalCerts, &generalCertsLength);
   int i;
+
+  certs.generalLength = generalCertsLength;
+  certs.general = malloc(generalCertsLength * sizeof(struct GeneralCert));
 
   for (i = 0; i < generalCertsLength; i++) {
     ERL_NIF_TERM firstItem;
@@ -84,14 +64,14 @@ static ERL_NIF_TERM
     generalCerts = rest;
   }
 
-  UAC_BLOB emptyBlob = {};
-  certs.general[generalCertsLength].root = emptyBlob;
-  certs.general[generalCertsLength].ocsp = emptyBlob;
-
   ERL_NIF_TERM tspCerts;
-  enif_get_map_value(env, argv[1], enif_make_atom(env, "tsp"), &tspCerts);
+  enif_get_map_value(env, arg, enif_make_atom(env, "tsp"), &tspCerts);
   unsigned int tspCertsLength;
   enif_get_list_length(env, tspCerts, &tspCertsLength);
+
+  certs.tspLength = tspCertsLength;
+  certs.tsp = malloc(tspCertsLength * sizeof(UAC_BLOB));
+
   for (i = 0; i < tspCertsLength; i++) {
     ERL_NIF_TERM firstItem;
     ERL_NIF_TERM rest;
@@ -105,8 +85,35 @@ static ERL_NIF_TERM
     tspCerts = rest;
   }
 
-  certs.tsp[tspCertsLength] = emptyBlob;
+  return certs;
+}
 
+// ----- Helper functions
+
+static ERL_NIF_TERM
+  ProcessPKCS7Data(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+  void* libHandler;
+  bool checkResult = false;
+  char checkMessage = "";
+
+  libHandler = dlopen(LIB_PATH, RTLD_LAZY);
+  if (!libHandler) {
+    return CreateErrorTuppe(env, dlerror());
+  }
+
+  ErlNifBinary p7Data;
+  if (!enif_inspect_binary(env, argv[0], &p7Data)) {
+    return CreateErrorTuppe(env, "PKCS7 data is in incorrect: must be Elixir string (binary)");
+  }
+
+  if(p7Data.size == 0) {
+    return CreateErrorTuppe(env, "pkcs7 data is empty");
+  }
+
+  UAC_BLOB signedData = { p7Data.data, p7Data.size };
+
+  struct Certs certs  = GetCertsFromArg(env, argv[1]);
   char* dataBlobBuffer = malloc(p7Data.size);
   UAC_BLOB dataBlob = {dataBlobBuffer, p7Data.size};
 

@@ -19,8 +19,11 @@ struct GeneralCert
 
 struct Certs
 {
-    struct GeneralCert general[100];
-    UAC_BLOB tsp[100];
+    struct GeneralCert* general;
+    unsigned int generalLength;
+
+    UAC_BLOB* tsp;
+    unsigned int tspLength;
 };
 
 DWORD GetTimeStamp(void* libHandler, UAC_BLOB signedData, PUAC_BLOB timeStamp)
@@ -114,7 +117,8 @@ DWORD OcspResponseLoad(void* libHandler, UAC_BLOB response, PUAC_OCSP_RESPONSE_I
     return (*ocspResponseLoad)(&response, ocspResponseInfo);
 }
 
-struct GeneralCert FindMatchingRootCertificate(void* libHandler, UAC_BLOB cert, struct GeneralCert generalCerts[100])
+struct GeneralCert FindMatchingRootCertificate(void* libHandler, UAC_BLOB cert, struct GeneralCert* generalCerts,
+  unsigned int generalLength)
 {
     struct GeneralCert emptyResult = {};
     UAC_CERT_REF issuerCertRef = {};
@@ -125,7 +129,7 @@ struct GeneralCert FindMatchingRootCertificate(void* libHandler, UAC_BLOB cert, 
 
     int i = 0;
     UAC_BLOB rootCert = generalCerts[i].root;
-    while (rootCert.data != NULL) {
+    while (i < generalLength) {
         DWORD certMatchResult = CertMatch(libHandler, issuerCertRef, rootCert);
         if (certMatchResult == 0) {
             return generalCerts[i];
@@ -133,21 +137,24 @@ struct GeneralCert FindMatchingRootCertificate(void* libHandler, UAC_BLOB cert, 
         i++;
         rootCert = generalCerts[i].root;
     }
+
     return emptyResult;
 }
 
-UAC_BLOB FindMatchingTspCertificate(void* libHandler, UAC_CERT_REF signerRef, UAC_BLOB* certs)
+UAC_BLOB FindMatchingTspCertificate(void* libHandler, UAC_CERT_REF signerRef, UAC_BLOB* tsp, unsigned int tspLength)
 {
     UAC_BLOB emptyBlob = {};
     int i = 0;
-    UAC_BLOB tspCert = certs[i];
-    while (tspCert.data != NULL) {
+    UAC_BLOB tspCert = tsp[i];
+
+    while (i < tspLength) {
         DWORD certMatchResult = CertMatch(libHandler, signerRef, tspCert);
         if (certMatchResult == 0) {
-            return certs[i];
+            return tsp[i];
         }
+
         i++;
-        tspCert = certs[i];
+        tspCert = tsp[i];
     }
 
     return emptyBlob;
@@ -322,7 +329,8 @@ bool Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDat
         return false;
     }
     UAC_TIME timeStampDateTime = timeStampInfo.genTime;
-    UAC_BLOB tspCert = FindMatchingTspCertificate(libHandler, timeStampInfo.signature.signerRef, certs.tsp);
+    UAC_BLOB tspCert = FindMatchingTspCertificate(libHandler, timeStampInfo.signature.signerRef, certs.tsp,
+      certs.tspLength);
 
     int i;
     for (i = 0; i < signaturesCount; i++) {
@@ -338,7 +346,8 @@ bool Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDat
             return false;
         }
         memcpy(subjectInfo, &certInfo.subject, sizeof(UAC_SUBJECT_INFO));
-        struct GeneralCert matchingCert = FindMatchingRootCertificate(libHandler, cert, certs.general);
+        struct GeneralCert matchingCert = FindMatchingRootCertificate(libHandler, cert, certs.general,
+          certs.generalLength);
         if (matchingCert.root.data == NULL) {
             return false;
         }
