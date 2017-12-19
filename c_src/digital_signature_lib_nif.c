@@ -118,8 +118,16 @@ static ERL_NIF_TERM
   unsigned int check;
   enif_get_int(env, argv[2], &check);
 
+  printf("\ncheck: %d\n", check);
+
   if (check == 1) {
     checkResult = Check(libHandler, signedData, signedDataInfo, subjectInfo, certs);
+
+    printf("\ncheckResult: %d\n",  checkResult);
+
+    if(checkResult == false) {
+      printf("\ncheckresult FALSE!\n");
+    }
   }
   dlclose(libHandler);
 
@@ -278,7 +286,7 @@ static ERL_NIF_TERM
   enif_make_map_put(env, result, enif_make_atom(env, "content"), content, &result);
   enif_make_map_put(env, result, enif_make_atom(env, "signer"), signer, &result);
   if (check == 1) {
-    enif_make_map_put(env, result, enif_make_atom(env, "is_valid"), enif_make_int(env, checkResult), &result);
+    enif_make_map_put(env, result, enif_make_atom(env, "is_valid"), enif_make_atom(env, checkResult ? "true" : "false"), &result);
   }
 
   return enif_make_tuple2(env, enif_make_atom(env, "ok"), result);

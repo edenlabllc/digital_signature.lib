@@ -137,7 +137,7 @@ struct GeneralCert FindMatchingRootCertificate(void* libHandler, UAC_BLOB cert, 
     return emptyResult;
 }
 
-UAC_BLOB FindMatchingTspCertificate(void* libHandler, UAC_CERT_REF signerRef, UAC_BLOB certs[100])
+UAC_BLOB FindMatchingTspCertificate(void* libHandler, UAC_CERT_REF signerRef, UAC_BLOB* certs)
 {
     UAC_BLOB emptyBlob = {};
     int i = 0;
@@ -150,6 +150,9 @@ UAC_BLOB FindMatchingTspCertificate(void* libHandler, UAC_CERT_REF signerRef, UA
         i++;
         tspCert = certs[i];
     }
+
+    printf("\ni: %d\n", i);
+
     return emptyBlob;
 }
 
@@ -310,8 +313,9 @@ bool Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDat
            struct Certs certs)
 {
     int signaturesCount = signedDataInfo.dwSignatureCount;
-    char* timeStampBuf = malloc(signedData.dataLen);
-    //memset(timeStampBuf, 0, signedData.dataLen);
+    printf("\nsignaturesCount: %d\n", signaturesCount);
+
+    char* timeStampBuf = calloc(signedData.dataLen, sizeof(char));
     UAC_BLOB timeStamp = {timeStampBuf, signedData.dataLen};
     DWORD getTimeStampResult = GetTimeStamp(libHandler, signedData, &timeStamp);
     if (getTimeStampResult != 0) {
@@ -324,10 +328,10 @@ bool Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDat
     }
     UAC_TIME timeStampDateTime = timeStampInfo.genTime;
     UAC_BLOB tspCert = FindMatchingTspCertificate(libHandler, timeStampInfo.signature.signerRef, certs.tsp);
+
     int i;
     for (i = 0; i < signaturesCount; i++) {
-        char* certBuf = malloc(signedData.dataLen);
-        // memset(certBuf, 0, signedData.dataLen);
+        char* certBuf = calloc(signedData.dataLen, sizeof(char));
         UAC_BLOB cert = {certBuf, signedData.dataLen};
         DWORD getCertResult = GetCert(libHandler, signedData, i, &cert);
         if (getCertResult != 0) {

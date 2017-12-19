@@ -2,16 +2,26 @@ defmodule DigitalSignatureLibTest do
   use ExUnit.Case
   doctest DigitalSignatureLib
 
+  @empty_certs  %{general: [], tsp: []}
+
   test "fail with incorrect data" do
-    assert DigitalSignatureLib.processPKCS7Data([], %{general: [], tsp: []}, 1) == {:error, "pkcs7 data is incorrect"}
+    assert DigitalSignatureLib.processPKCS7Data([], get_certs(), 1) == {:error, "pkcs7 data is incorrect"}
   end
 
   test "fail with empty data" do
-    assert DigitalSignatureLib.processPKCS7Data(<<>>, %{general: [], tsp: []}, 1) == {:error, "pkcs7 data is empty"}
+    assert DigitalSignatureLib.processPKCS7Data(<<>>, get_certs(), 1) == {:error, "pkcs7 data is empty"}
   end
 
   test "fail with incorrect signed data" do
-    assert DigitalSignatureLib.processPKCS7Data(<<1>>, %{general: [], tsp: []}, 1) == {:error, "error loading signed data"}
+    assert DigitalSignatureLib.processPKCS7Data(<<1>>, get_certs(), 1) == {:error, "error loading signed data"}
+  end
+
+  test "fails with correct signed data without certs" do
+    data = get_data("test/fixtures/sign1.json")
+    signed_content = get_signed_content(data)
+
+    assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content,  @empty_certs, 1)
+    assert result.is_valid == false
   end
 
   test "real encoded data" do
@@ -20,7 +30,7 @@ defmodule DigitalSignatureLibTest do
 
     assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), 1)
 
-    assert result.is_valid == 1
+    assert result.is_valid == true
     assert decode_content(result) == data["content"]
     assert result.signer == atomize_keys(data["signer"])
   end
@@ -31,7 +41,7 @@ defmodule DigitalSignatureLibTest do
 
     assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), 1)
 
-    assert result.is_valid == 1
+    assert result.is_valid == true
     assert decode_content(result) == data["content"]
     assert result.signer == atomize_keys(data["signer"])
   end
@@ -41,7 +51,7 @@ defmodule DigitalSignatureLibTest do
     signed_content = get_signed_content(data)
 
     assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), 1)
-    assert result.is_valid == 1
+    assert result.is_valid == true
   end
 
   defp get_data(json_file) do
