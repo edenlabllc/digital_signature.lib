@@ -10,18 +10,22 @@ defmodule DigitalSignatureLibTest do
   end
 
   test "fail with empty data" do
-    assert DigitalSignatureLib.processPKCS7Data(<<>>, get_certs(), 1) == {:error, "pkcs7 data is empty"}
+    assert {:ok, result} = DigitalSignatureLib.processPKCS7Data("", get_certs(), 1)
+    assert result.is_valid == false
+    assert result.validation_error_message == "error processing signed data"
   end
 
   test "fail with incorrect signed data" do
-    assert DigitalSignatureLib.processPKCS7Data(<<1>>, get_certs(), 1) == {:error, "error loading signed data"}
+    assert {:ok, result} = DigitalSignatureLib.processPKCS7Data("123", get_certs(), 1)
+    assert result.is_valid == false
+    assert result.validation_error_message == "error processing signed data"
   end
 
   test "fails with correct signed data without certs" do
     data = get_data("test/fixtures/sign1.json")
     signed_content = get_signed_content(data)
 
-    assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content,  @empty_certs, 1)
+    assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, @empty_certs, 1)
     assert result.is_valid == false
   end
 

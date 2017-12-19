@@ -33,7 +33,7 @@ struct Certs GetCertsFromArg(ErlNifEnv* env, const ERL_NIF_TERM arg)
   enif_get_map_value(env, arg, enif_make_atom(env, "general"), &generalCerts);
   unsigned int generalCertsLength;
   enif_get_list_length(env, generalCerts, &generalCertsLength);
-  int i;
+  unsigned int i;
 
   certs.generalLength = generalCertsLength;
   certs.general = malloc(generalCertsLength * sizeof(struct GeneralCert));
@@ -95,7 +95,7 @@ static ERL_NIF_TERM
 {
   void* libHandler;
   bool checkResult = false;
-  char checkMessage = "";
+  char* checkMessage = "";
 
   libHandler = dlopen(LIB_PATH, RTLD_LAZY);
   if (!libHandler) {
@@ -107,21 +107,16 @@ static ERL_NIF_TERM
     return CreateErrorTuppe(env, "PKCS7 data is in incorrect: must be Elixir string (binary)");
   }
 
-  if(p7Data.size == 0) {
-    return CreateErrorTuppe(env, "pkcs7 data is empty");
-  }
-
   UAC_BLOB signedData = { p7Data.data, p7Data.size };
 
   struct Certs certs  = GetCertsFromArg(env, argv[1]);
-  char* dataBlobBuffer = malloc(p7Data.size);
-  UAC_BLOB dataBlob = {dataBlobBuffer, p7Data.size};
+  UAC_BLOB dataBlob = {malloc(p7Data.size), p7Data.size};
 
   UAC_SIGNED_DATA_INFO signedDataInfo = {};
   DWORD loadSignedDataResult = LoadSignedData(libHandler, signedData, &dataBlob, &signedDataInfo);
   if(loadSignedDataResult != UAC_SUCCESS)
   {
-    return CreateErrorTuppe(env, "error loading signed data");
+    checkMessage = "error processing signed data";
   }
 
   unsigned int check;
@@ -129,7 +124,7 @@ static ERL_NIF_TERM
 
   PUAC_SUBJECT_INFO subjectInfo = malloc(sizeof(UAC_SUBJECT_INFO));
 
-  if (check == 1) {
+  if (checkMessage[0] == '\0' && check == 1) {
     checkResult = Check(libHandler, signedData, signedDataInfo, subjectInfo, certs);
   }
   dlclose(libHandler);
@@ -288,9 +283,13 @@ static ERL_NIF_TERM
   ERL_NIF_TERM result = enif_make_new_map(env);
   enif_make_map_put(env, result, enif_make_atom(env, "content"), content, &result);
   enif_make_map_put(env, result, enif_make_atom(env, "signer"), signer, &result);
+
   if (check == 1) {
     char* validationResult = checkResult ? "true" : "false";
     enif_make_map_put(env, result, enif_make_atom(env, "is_valid"), enif_make_atom(env, validationResult), &result);
+
+    ERL_NIF_TERM validationMessage = CreateElixirString(env, checkMessage);
+    enif_make_map_put(env, result, enif_make_atom(env, "validation_error_message"), validationMessage, &result);
   }
 
   return enif_make_tuple2(env, enif_make_atom(env, "ok"), result);

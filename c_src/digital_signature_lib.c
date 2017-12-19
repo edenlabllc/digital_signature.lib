@@ -127,7 +127,7 @@ struct GeneralCert FindMatchingRootCertificate(void* libHandler, UAC_BLOB cert, 
         return emptyResult;
     }
 
-    int i = 0;
+    unsigned int i = 0;
     UAC_BLOB rootCert = generalCerts[i].root;
     while (i < generalLength) {
         DWORD certMatchResult = CertMatch(libHandler, issuerCertRef, rootCert);
@@ -144,7 +144,7 @@ struct GeneralCert FindMatchingRootCertificate(void* libHandler, UAC_BLOB cert, 
 UAC_BLOB FindMatchingTspCertificate(void* libHandler, UAC_CERT_REF signerRef, UAC_BLOB* tsp, unsigned int tspLength)
 {
     UAC_BLOB emptyBlob = {};
-    int i = 0;
+    unsigned int i = 0;
     UAC_BLOB tspCert = tsp[i];
 
     while (i < tspLength) {
@@ -213,7 +213,7 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
     int messageLen = strlen(message);
 
     char* data = requestData.data;
-    int i;
+    unsigned int i;
     for (i = 0; i < requestData.dataLen; i++) {
         message[messageLen + i] = data[i];
     }
