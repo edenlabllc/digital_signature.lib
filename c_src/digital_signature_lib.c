@@ -384,7 +384,7 @@ struct ValidationResult Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_
             }
             bool isTimeStampCertValid = VerifyTimeStampCert(libHandler, timeStamp, tspCert);
             if (!isTimeStampCertValid) {
-                validationResult.validationErrorMessage = "checking the signcture of a response with a timestamp failed";
+                validationResult.validationErrorMessage = "checking the signature of a response with a timestamp failed";
             return validationResult;
             }
         }
