@@ -95,6 +95,7 @@ static ERL_NIF_TERM
 {
   void* libHandler;
   struct ValidationResult validationResult = {true, ""};
+  bool check;
 
   libHandler = dlopen(LIB_PATH, RTLD_LAZY);
   if (!libHandler) {
@@ -119,18 +120,19 @@ static ERL_NIF_TERM
     validationResult.validationErrorMessage = "error processing signed data";
   }
 
-  unsigned int check;
-  enif_get_int(env, argv[2], &check);
+  char checkValue[6];
+  enif_get_atom(env, argv[2], checkValue, sizeof(checkValue), ERL_NIF_LATIN1);
+  check = strcmp(checkValue, "false") == 0 ? false : true;
 
   PUAC_SUBJECT_INFO subjectInfo = malloc(sizeof(UAC_SUBJECT_INFO));
 
-  if (validationResult.isValid && check == 1) {
+  if (validationResult.isValid && check) {
     validationResult = Check(libHandler, signedData, signedDataInfo, subjectInfo, certs);
   }
   dlclose(libHandler);
 
-
   // Result
+
   ERL_NIF_TERM signer = enif_make_new_map(env);
 
   enif_make_map_put(env, signer, enif_make_atom(env, "common_name"), CreateElixirString(env, subjectInfo->commonName), &signer);
@@ -155,7 +157,7 @@ static ERL_NIF_TERM
   enif_make_map_put(env, result, enif_make_atom(env, "content"), content, &result);
   enif_make_map_put(env, result, enif_make_atom(env, "signer"), signer, &result);
 
-  if (check == 1) {
+  if (check) {
     char* valRes = validationResult.isValid ? "true" : "false";
     enif_make_map_put(env, result, enif_make_atom(env, "is_valid"), enif_make_atom(env, valRes), &result);
 
