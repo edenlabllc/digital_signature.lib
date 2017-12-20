@@ -2,8 +2,6 @@ defmodule DigitalSignatureLibTest do
   use ExUnit.Case
   doctest DigitalSignatureLib
 
-  @empty_certs  %{general: [], tsp: []}
-
   test "fail with incorrect data" do
     assert DigitalSignatureLib.processPKCS7Data([], get_certs(), true)
       == {:error, "signed data argument is of incorrect type: must be Elixir string (binary)"}
@@ -23,11 +21,35 @@ defmodule DigitalSignatureLibTest do
     assert result.validation_error_message == "error processing signed data"
   end
 
-  test "fails with correct signed data without certs" do
+  test "fails with correct signed data and without certs provided" do
     data = get_data("test/fixtures/sign1.json")
     signed_content = get_signed_content(data)
 
-    {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, @empty_certs, true)
+    {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, %{general: [], tsp: []}, true)
+
+    assert result.is_valid == false
+    assert result.validation_error_message == "matching ROOT certificate not found"
+  end
+
+  test "fails with correct signed data and only general certs provided" do
+    data = get_data("test/fixtures/sign1.json")
+    signed_content = get_signed_content(data)
+
+    %{general: general, tsp: _tsp} = get_certs()
+
+    {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, %{general: general, tsp: []}, true)
+
+    assert result.is_valid == false
+    assert result.validation_error_message == "matching TSP certificate not found"
+  end
+
+  test "fails with correct signed data and only tsp certs provided" do
+    data = get_data("test/fixtures/sign1.json")
+    signed_content = get_signed_content(data)
+
+    %{general: _general, tsp: tsp} = get_certs()
+
+    {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, %{general: [], tsp: tsp}, true)
 
     assert result.is_valid == false
     assert result.validation_error_message == "matching ROOT certificate not found"
