@@ -190,26 +190,43 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
 {
     UAC_BLOB emptyResult = {};
 
-    char* host = calloc(strlen(url), sizeof(char));
-    char* port = calloc(strlen(url), sizeof(char));
-    strcpy(host, url);
+    // ---- Parse URL ----
+    const char* schemaDelim = "://";
+    const char* portDelim = ":";
+    const char* pathDelim = "/";
 
-    host = strstr(host, "://") + 3;
-    port = strstr(host, ":") + 1;
-    int p = 80;
-    if (port != NULL + 1) {
-        port = strtok(port, "/");
-        p = atoi(port);
-        host = strtok(host, ":");
+    char* pHost = strstr(url, schemaDelim); // http :// WebReference.com:80/html/tutorial2
+    pHost += strlen(schemaDelim);
+    char* pPort = strstr(pHost, portDelim);  // WebReference.com : 80/html/tutorial2
+    char* pPath;
+
+    int port = 80;
+    if (pPort != NULL) {
+        pPort += strlen(portDelim);
+        pPath = strstr(pPort, pathDelim);            // 80 / html/tutorial2
+
+        int pLen = pPath - pPort;
+        char* portStr = calloc(pLen + 1, sizeof(char));
+        memcpy(portStr, pPort, pLen);
+
+        port = atoi(portStr);
+        free(portStr);
+
+        pPath = strstr(pHost, portDelim);            // WebReference.com : 80/html/tutorial2
+    } else {
+        pPath = strstr(pHost, pathDelim);            // WebReference.com / html/tutorial2
     }
-    else {
-        host = strtok(host, "/");
-    }
+    int hostLen = pPath - pHost;
+    char* host = calloc(hostLen + 1, sizeof(char));
+    memcpy(host, pHost, hostLen);
+
+    // ---- End of URL parsing ----
 
     struct hostent* server;
     struct sockaddr_in serv_addr;
     int sockfd, bytes, sent, received, total;
-    char message[40960], response[40960];
+    char message[40960];
+    char response[40960];
 
     sprintf(message, "POST %s HTTP/1.1\r\n", url);
     sprintf(message + strlen(message), "Host: %s\r\n", host);
@@ -243,7 +260,7 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
 
     memset(&serv_addr, 0, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(p);
+    serv_addr.sin_port = htons(port);
     memcpy(&serv_addr.sin_addr.s_addr, server->h_addr, server->h_length);
 
     if (connect(sockfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
@@ -290,6 +307,12 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
 
     UAC_BLOB result = {malloc(contentLength), contentLength};
     result.data = body;
+
+    // Free memory
+    if(host) free(host);
+    //if(message) free(message);
+    //if(response) free(response);
+
     return result;
 }
 

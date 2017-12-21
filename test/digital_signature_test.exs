@@ -15,15 +15,25 @@ defmodule DigitalSignatureLibTest do
       assert result.validation_error_message == "error processing signed data"
     end
 
-    test "fail with incorrect signed data" do
+    test "fails with incorrect signed data" do
       {:ok, result} = DigitalSignatureLib.processPKCS7Data("123", get_certs(), true)
 
       assert result.is_valid == false
       assert result.validation_error_message == "error processing signed data"
     end
 
-    test "real encoded data" do
-      data = get_data("test/fixtures/sign1.json")
+    test "fails with complex incorrect signed data" do
+      data = get_data("test/fixtures/incorrect_signed_data.json")
+      signed_content = get_signed_content(data)
+
+      assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), true)
+
+      assert result.is_valid == false
+      assert result.validation_error_message == "error processing signed data"
+    end
+
+    test "can process signed legal entity" do
+      data = get_data("test/fixtures/signed_le1.json")
       signed_content = get_signed_content(data)
 
       assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), true)
@@ -33,8 +43,8 @@ defmodule DigitalSignatureLibTest do
       assert result.signer == atomize_keys(data["signer"])
     end
 
-    test "more real encoded data" do
-      data = get_data("test/fixtures/sign2.json")
+    test "can process second signed legal entity" do
+      data = get_data("test/fixtures/signed_le2.json")
       signed_content = get_signed_content(data)
 
       assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), true)
@@ -55,7 +65,7 @@ defmodule DigitalSignatureLibTest do
 
   describe "Must process all data or fail correclty when certs no available or available partially" do
     test "fails with correct signed data and without certs provided" do
-      data = get_data("test/fixtures/sign1.json")
+      data = get_data("test/fixtures/signed_le1.json")
       signed_content = get_signed_content(data)
 
       {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, %{general: [], tsp: []}, true)
@@ -65,7 +75,7 @@ defmodule DigitalSignatureLibTest do
     end
 
     test "fails with correct signed data and only General certs provided" do
-      data = get_data("test/fixtures/sign1.json")
+      data = get_data("test/fixtures/signed_le1.json")
       signed_content = get_signed_content(data)
 
       %{general: general, tsp: _tsp} = get_certs()
@@ -77,7 +87,7 @@ defmodule DigitalSignatureLibTest do
     end
 
     test "fails with correct signed data and only TSP certs provided" do
-      data = get_data("test/fixtures/sign1.json")
+      data = get_data("test/fixtures/signed_le1.json")
       signed_content = get_signed_content(data)
 
       %{general: _general, tsp: tsp} = get_certs()
@@ -89,7 +99,7 @@ defmodule DigitalSignatureLibTest do
     end
 
     test "Validates signed data with only ROOT certs provided" do
-      data = get_data("test/fixtures/sign1.json")
+      data = get_data("test/fixtures/signed_le1.json")
       signed_content = get_signed_content(data)
 
       general = [

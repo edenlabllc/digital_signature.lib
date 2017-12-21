@@ -31,4 +31,4 @@ CMD mix do \
       local.hex --force, \
       local.rebar --force, \
       deps.get, \
-      test --trace
+      test /home/digital_signature.lib/test/digital_signature_test.exs:47
