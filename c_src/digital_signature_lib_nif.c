@@ -136,17 +136,17 @@ static ERL_NIF_TERM
   ERL_NIF_TERM signer = enif_make_new_map(env);
 
   enif_make_map_put(env, signer, enif_make_atom(env, "common_name"), CreateElixirString(env, subjectInfo->commonName), &signer);
-  enif_make_map_put(env, signer, enif_make_atom(env,"common_name"), CreateElixirString(env, subjectInfo->commonName), &signer);
-  enif_make_map_put(env, signer, enif_make_atom(env,"country_name"), CreateElixirString(env, subjectInfo->countryName), &signer);
-  enif_make_map_put(env, signer, enif_make_atom(env,"surname"), CreateElixirString(env, subjectInfo->surname), &signer);
-  enif_make_map_put(env, signer, enif_make_atom(env,"given_name"), CreateElixirString(env, subjectInfo->givenName), &signer);
-  enif_make_map_put(env, signer, enif_make_atom(env,"organization_name"), CreateElixirString(env, subjectInfo->organizationName), &signer);
-  enif_make_map_put(env, signer, enif_make_atom(env,"state_or_province_name"), CreateElixirString(env, subjectInfo->stateOrProvinceName), &signer);
-  enif_make_map_put(env, signer, enif_make_atom(env,"locality_name"), CreateElixirString(env, subjectInfo->localityName), &signer);
-  enif_make_map_put(env, signer, enif_make_atom(env,"organizational_unit_name"), CreateElixirString(env, subjectInfo->organizationalUnitName), &signer);
-  enif_make_map_put(env, signer, enif_make_atom(env,"title"), CreateElixirString(env, subjectInfo->title), &signer);
-  enif_make_map_put(env, signer, enif_make_atom(env,"edrpou"), CreateElixirString(env, subjectInfo->edrpou), &signer);
-  enif_make_map_put(env, signer, enif_make_atom(env,"drfo"), CreateElixirString(env, subjectInfo->drfo), &signer);
+  enif_make_map_put(env, signer, enif_make_atom(env, "common_name"), CreateElixirString(env, subjectInfo->commonName), &signer);
+  enif_make_map_put(env, signer, enif_make_atom(env, "country_name"), CreateElixirString(env, subjectInfo->countryName), &signer);
+  enif_make_map_put(env, signer, enif_make_atom(env, "surname"), CreateElixirString(env, subjectInfo->surname), &signer);
+  enif_make_map_put(env, signer, enif_make_atom(env, "given_name"), CreateElixirString(env, subjectInfo->givenName), &signer);
+  enif_make_map_put(env, signer, enif_make_atom(env, "organization_name"), CreateElixirString(env, subjectInfo->organizationName), &signer);
+  enif_make_map_put(env, signer, enif_make_atom(env, "state_or_province_name"), CreateElixirString(env, subjectInfo->stateOrProvinceName), &signer);
+  enif_make_map_put(env, signer, enif_make_atom(env, "locality_name"), CreateElixirString(env, subjectInfo->localityName), &signer);
+  enif_make_map_put(env, signer, enif_make_atom(env, "organizational_unit_name"), CreateElixirString(env, subjectInfo->organizationalUnitName), &signer);
+  enif_make_map_put(env, signer, enif_make_atom(env, "title"), CreateElixirString(env, subjectInfo->title), &signer);
+  enif_make_map_put(env, signer, enif_make_atom(env, "edrpou"), CreateElixirString(env, subjectInfo->edrpou), &signer);
+  enif_make_map_put(env, signer, enif_make_atom(env, "drfo"), CreateElixirString(env, subjectInfo->drfo), &signer);
 
   ErlNifBinary dataBin;
   enif_alloc_binary(dataBlob.dataLen, &dataBin);

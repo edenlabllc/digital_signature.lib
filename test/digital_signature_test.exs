@@ -1,6 +1,5 @@
 defmodule DigitalSignatureLibTest do
-  use ExUnit.Case
-  doctest DigitalSignatureLib
+  use ExUnit.Case, async: false
 
   describe "Must process all data correctly with all certs provided" do
     test "fail with incorrect data" do
