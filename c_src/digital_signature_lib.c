@@ -225,28 +225,18 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
     struct hostent* server;
     struct sockaddr_in serv_addr;
     int sockfd, bytes, sent, received, total;
-    char message[40960];
-    char response[40960];
 
-    sprintf(message, "POST %s HTTP/1.1\r\n", url);
-    sprintf(message + strlen(message), "Host: %s\r\n", host);
-    strcat(message, "Content-Type: application/ocsp-request\r\n");
-    sprintf(message + strlen(message), "Content-Length: %d\r\n\r\n", requestData.dataLen);
+    const char* messageTemplate =
+      "POST %s HTTP/1.1\r\nHost: %s\r\nContent-Type: application/ocsp-request\r\nContent-Length: %d\r\n\r\n";
+    char* message = calloc(40960, sizeof(char));
+    char* response = calloc(40960, sizeof(char));
+
+    sprintf(message, messageTemplate, url, host, requestData.dataLen);
 
     int messageLen = strlen(message);
 
-    char* data = requestData.data;
-    unsigned int i;
-    for (i = 0; i < requestData.dataLen; i++) {
-        message[messageLen + i] = data[i];
-    }
-
+    memcpy(message + messageLen, requestData.data, requestData.dataLen);
     messageLen += requestData.dataLen;
-
-    message[messageLen] = "\r";
-    messageLen++;
-    message[messageLen] = "\n";
-    messageLen++;
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
@@ -268,9 +258,11 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
     }
 
     total = messageLen;
+
     sent = 0;
     do {
         bytes = write(sockfd, message + sent, total - sent);
+
         if (bytes < 0) {
             return emptyResult;
         }
@@ -280,11 +272,12 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
         sent += bytes;
     } while (sent < total);
 
-    memset(response, 0, sizeof(response));
-    total = sizeof(response) - 1;
+    total = 40959;  // response - 1
+
     received = 0;
     do {
         bytes = read(sockfd, response + received, total - received);
+
         if (bytes < 0) {
             return emptyResult;
         }
@@ -302,16 +295,16 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
 
     char* body = strstr(response, "\r\n\r\n") + 4;
 
-    char* contentLengthHeader = strstr(response, "Content-Length: ") + 16;
+    char* contentLengthHeader = strstr(response, "Content-Length: ") + strlen("Content-Length: ");
     int contentLength = atoi(strtok(contentLengthHeader, "\r\n"));
 
     UAC_BLOB result = {malloc(contentLength), contentLength};
-    result.data = body;
+    memcpy(result.data, body, contentLength);
 
     // Free memory
     if(host) free(host);
-    //if(message) free(message);
-    //if(response) free(response);
+    if(message) free(message);
+    if(response) free(response);
 
     return result;
 }
