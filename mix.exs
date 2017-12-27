@@ -4,7 +4,7 @@ defmodule DigitalSignatureLib.MixProject do
   def project do
     [
       app: :digital_signature_lib,
-      version: "1.3.0",
+      version: "1.4.0",
       elixir: "~> 1.5",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
