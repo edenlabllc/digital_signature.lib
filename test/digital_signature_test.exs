@@ -53,7 +53,7 @@ defmodule DigitalSignatureLibTest do
       assert result.signer == atomize_keys(data["signer"])
     end
 
-    test "processign valid signed declaration" do
+    test "processing valid signed declaration" do
       data = get_data("test/fixtures/signed_decl_req.json")
       signed_content = get_signed_content(data)
 
@@ -143,11 +143,21 @@ defmodule DigitalSignatureLibTest do
       root: File.read!("test/fixtures/CA-Justice.cer"),
       ocsp: File.read!("test/fixtures/OCSP-Server Justice.cer")
     },
+    %{
+      root: File.read!("test/fixtures/CA-3004751DEF2C78AE010000000100000049000000.cer"),
+      ocsp: File.read!("test/fixtures/CAOCSPServer-D84EDA1BB9381E802000000010000001A000000.cer")
+    },
+    %{
+      root: File.read!("test/fixtures/cert1599998-root.crt"),
+      ocsp: File.read!("test/fixtures/cert14493930-oscp.crt")
+    }
   ]
 
   tsp = [
     File.read!("test/fixtures/CA-TSP-DFS.cer"),
-    File.read!("test/fixtures/TSP-Server Justice.cer")
+    File.read!("test/fixtures/TSP-Server Justice.cer"),
+    File.read!("test/fixtures/CATSPServer-3004751DEF2C78AE02000000010000004A000000.cer"),
+    File.read!("test/fixtures/cert14491837-tsp.crt")
   ]
 
     %{general: general, tsp: tsp}

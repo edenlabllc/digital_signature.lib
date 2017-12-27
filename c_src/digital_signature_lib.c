@@ -128,20 +128,22 @@ struct GeneralCert FindMatchingRootCertificate(void* libHandler, UAC_BLOB cert, 
 {
     struct GeneralCert emptyResult = {};
     UAC_CERT_REF issuerCertRef = {};
-    DWORD certIssuerRefResult = CertIssuerRef(libHandler, cert, &issuerCertRef);
-    if (certIssuerRefResult != 0) {
+
+    if (CertIssuerRef(libHandler, cert, &issuerCertRef) != UAC_SUCCESS) {
         return emptyResult;
     }
 
     unsigned int i = 0;
-    UAC_BLOB rootCert = generalCerts[i].root;
+    UAC_BLOB rootCert;
+
     while (i < generalLength) {
-        DWORD certMatchResult = CertMatch(libHandler, issuerCertRef, rootCert);
-        if (certMatchResult == 0) {
-            return generalCerts[i];
-        }
-        i++;
         rootCert = generalCerts[i].root;
+
+        if (CertMatch(libHandler, issuerCertRef, rootCert) == UAC_SUCCESS) {
+          return generalCerts[i];
+        }
+
+        i++;
     }
 
     return emptyResult;
@@ -198,14 +200,14 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
     const char* portDelim = ":";
     const char* pathDelim = "/";
 
-    char* host = strstr(url_copy, schemaDelim) + strlen(schemaDelim); // http:// WebReference.com:80/html/tutorial2
-    char* port = strstr(host, portDelim);  // WebReference.com : 80/html/tutorial2
+    char* host = strstr(url_copy, schemaDelim) + strlen(schemaDelim);
+    char* port = strstr(host, portDelim);
 
     int p = 80;
     if (port != NULL) {
         port += strlen(portDelim);
 
-        host = strtok(host, portDelim);            // WebReference.com :
+        host = strtok(host, portDelim);
         port = strtok(NULL, pathDelim);
 
         p = atoi(port);
@@ -293,7 +295,7 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
     char* contentLengthHeader = strstr(response, "Content-Length: ") + strlen("Content-Length: ");
     int contentLength = atoi(strtok(contentLengthHeader, "\r\n"));
 
-    UAC_BLOB result = {malloc(contentLength), contentLength};
+    UAC_BLOB result = {calloc(contentLength, sizeof(char)), contentLength};
     memcpy(result.data, body, contentLength);
 
     return result;
@@ -312,15 +314,14 @@ bool CheckOCSP(void* libHandler, UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB
     UAC_BLOB ocspResponse = SendOCSPRequest(ocspUrl, ocspRequest);
     UAC_OCSP_RESPONSE_INFO ocspResponseInfo = {};
     if (verify) {
-        DWORD ocspResponseVerifyResult = OcspResponseVerify(libHandler, ocspResponse, ocspCert);
-        if (ocspResponseVerifyResult != 0) {
+        if (OcspResponseVerify(libHandler, ocspResponse, ocspCert) != UAC_SUCCESS) {
             return false;
         }
     }
-    DWORD ocspResponseLoadResult = OcspResponseLoad(libHandler, ocspResponse, &ocspResponseInfo);
-    if (ocspResponseLoadResult != 0) {
+    if (OcspResponseLoad(libHandler, ocspResponse, &ocspResponseInfo) != UAC_SUCCESS) {
         return false;
     }
+
     return ocspResponseInfo.certStatus == 0;
 }
 
@@ -404,6 +405,7 @@ struct ValidationResult Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_
             validationResult.validationErrorMessage = "certificate timestemp expired";
             return validationResult;
         }
+
         bool checkOSCP = CheckOCSP(libHandler, cert, certInfo, matchingCert.ocsp, !isHighestLevel);
         if (!checkOSCP) {
             validationResult.validationErrorMessage = "OCSP certificate verificaton failed";
@@ -416,7 +418,10 @@ struct ValidationResult Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_
         }
     }
 
-    validationResult.isValid = true;
-    validationResult.validationErrorMessage = "";
+    if(i != 0)
+    {
+      validationResult.isValid = true;
+      validationResult.validationErrorMessage = "";
+    }
     return validationResult;
 }
