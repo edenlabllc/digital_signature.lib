@@ -1,4 +1,4 @@
-/** \addtogroup uacryptoki дополнения Украины для PKCS#11
+/** \addtogroup uacryptoki РґРѕРїРѕР»РЅРµРЅРёСЏ РЈРєСЂР°РёРЅС‹ РґР»СЏ PKCS#11
   @{ */
 
 #ifndef UACRYPTOKI_H
@@ -62,17 +62,17 @@ extern "C" {
 /** DSTU 4145-2002 key pair generation */
 #define CKM_DSTU4145_KEY_PAIR_GEN		0x80420042
 
-/** DSTU  Diffie–Hellman derive */
+/** DSTU  DiffieвЂ“Hellman derive */
 #define CKM_DSTUDH_DERIVE				0x80420043
 
-/** DSTU  Diffie–Hellman cofactor derive */
+/** DSTU  DiffieвЂ“Hellman cofactor derive */
 #define CKM_DSTUDH_COFACTOR_DERIVE		0x80420044
 
 /** GOST 28147 secret key SBOX attribute */
 #define CKA_GOST_SBOXES					0x80420311
 
-/** Идентификатор функции формирования ключа
-   для механизмов CKM_DSTUDH_DERIVE и CKM_DSTUDH_COFACTOR_DERIVE */
+/** РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С„СѓРЅРєС†РёРё С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ РєР»СЋС‡Р°
+   РґР»СЏ РјРµС…Р°РЅРёР·РјРѕРІ CKM_DSTUDH_DERIVE Рё CKM_DSTUDH_COFACTOR_DERIVE */
 #define CKD_GOST34311_KDF				0x80420211
 
 /** GOST 28147.89 parameter */

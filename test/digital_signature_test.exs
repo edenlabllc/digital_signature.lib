@@ -1,47 +1,124 @@
 defmodule DigitalSignatureLibTest do
-  use ExUnit.Case
-  doctest DigitalSignatureLib
+  use ExUnit.Case, async: false
 
-  test "fail with incorrect data" do
-    assert DigitalSignatureLib.processPKCS7Data([], %{general: [], tsp: []}, 1) == {:error, "pkcs7 data is incorrect"}
+  describe "Must process all data correctly with all certs provided" do
+    test "fail with incorrect data" do
+      assert DigitalSignatureLib.processPKCS7Data([], get_certs(), true)
+        == {:error, "signed data argument is of incorrect type: must be Elixir string (binary)"}
+    end
+
+    test "fail with empty data" do
+      {:ok, result} = DigitalSignatureLib.processPKCS7Data("", get_certs(), true)
+
+      assert result.is_valid == false
+      assert result.validation_error_message == "error processing signed data"
+    end
+
+    test "fails with incorrect signed data" do
+      {:ok, result} = DigitalSignatureLib.processPKCS7Data("123", get_certs(), true)
+
+      assert result.is_valid == false
+      assert result.validation_error_message == "error processing signed data"
+    end
+
+    test "fails with complex incorrect signed data" do
+      data = get_data("test/fixtures/incorrect_signed_data.json")
+      signed_content = get_signed_content(data)
+
+      assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), true)
+
+      assert result.is_valid == false
+      assert result.validation_error_message == "error processing signed data"
+    end
+
+    test "can process signed legal entity" do
+      data = get_data("test/fixtures/signed_le1.json")
+      signed_content = get_signed_content(data)
+
+      assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), true)
+
+      assert result.is_valid == true
+      assert decode_content(result) == data["content"]
+      assert result.signer == atomize_keys(data["signer"])
+    end
+
+    test "can process second signed legal entity" do
+      data = get_data("test/fixtures/signed_le2.json")
+      signed_content = get_signed_content(data)
+
+      assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), true)
+
+      assert result.is_valid == true
+      assert decode_content(result) == data["content"]
+      assert result.signer == atomize_keys(data["signer"])
+    end
+
+    test "processing valid signed declaration" do
+      data = get_data("test/fixtures/signed_decl_req.json")
+      signed_content = get_signed_content(data)
+
+      assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), true)
+      assert result.is_valid == true
+    end
   end
 
-  test "fail with empty data" do
-    assert DigitalSignatureLib.processPKCS7Data(<<>>, %{general: [], tsp: []}, 1) == {:error, "pkcs7 data is empty"}
-  end
+  describe "Must process all data or fail correclty when certs no available or available partially" do
+    test "fails with correct signed data and without certs provided" do
+      data = get_data("test/fixtures/signed_le1.json")
+      signed_content = get_signed_content(data)
 
-  test "fail with incorrect signed data" do
-    assert DigitalSignatureLib.processPKCS7Data(<<1>>, %{general: [], tsp: []}, 1) == {:error, "error loading signed data"}
-  end
+      {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, %{general: [], tsp: []}, true)
 
-  test "real encoded data" do
-    data = get_data("test/fixtures/sign1.json")
-    signed_content = get_signed_content(data)
+      assert result.is_valid == false
+      assert result.validation_error_message == "matching ROOT certificate not found"
+    end
 
-    assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), 1)
+    test "fails with correct signed data and only General certs provided" do
+      data = get_data("test/fixtures/signed_le1.json")
+      signed_content = get_signed_content(data)
 
-    assert result.is_valid == 1
-    assert decode_content(result) == data["content"]
-    assert result.signer == atomize_keys(data["signer"])
-  end
+      %{general: general, tsp: _tsp} = get_certs()
 
-  test "more real encoded data" do
-    data = get_data("test/fixtures/sign2.json")
-    signed_content = get_signed_content(data)
+      {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, %{general: general, tsp: []}, true)
 
-    assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), 1)
+      assert result.is_valid == false
+      assert result.validation_error_message == "matching TSP certificate not found"
+    end
 
-    assert result.is_valid == 1
-    assert decode_content(result) == data["content"]
-    assert result.signer == atomize_keys(data["signer"])
-  end
+    test "fails with correct signed data and only TSP certs provided" do
+      data = get_data("test/fixtures/signed_le1.json")
+      signed_content = get_signed_content(data)
 
-  test "processign valid signed declaration" do
-    data = get_data("test/fixtures/signed_decl_req.json")
-    signed_content = get_signed_content(data)
+      %{general: _general, tsp: tsp} = get_certs()
 
-    assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), 1)
-    assert result.is_valid == 1
+      {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, %{general: [], tsp: tsp}, true)
+
+      assert result.is_valid == false
+      assert result.validation_error_message == "matching ROOT certificate not found"
+    end
+
+    test "Validates signed data with only ROOT certs provided" do
+      data = get_data("test/fixtures/signed_le1.json")
+      signed_content = get_signed_content(data)
+
+      general = [
+        %{
+          root: File.read!("test/fixtures/CA-DFS.cer"),
+          ocsp: File.read!("test/fixtures/CA-OCSP-DFS.cer")
+        }
+      ]
+
+      tsp = [
+        File.read!("test/fixtures/CA-TSP-DFS.cer"),
+        File.read!("test/fixtures/TSP-Server Justice.cer")
+      ]
+
+      {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, %{general: general, tsp: tsp}, true)
+
+      assert result.is_valid == true
+      assert decode_content(result) == data["content"]
+      assert result.signer == atomize_keys(data["signer"])
+    end
   end
 
   defp get_data(json_file) do
@@ -66,11 +143,21 @@ defmodule DigitalSignatureLibTest do
       root: File.read!("test/fixtures/CA-Justice.cer"),
       ocsp: File.read!("test/fixtures/OCSP-Server Justice.cer")
     },
+    %{
+      root: File.read!("test/fixtures/CA-3004751DEF2C78AE010000000100000049000000.cer"),
+      ocsp: File.read!("test/fixtures/CAOCSPServer-D84EDA1BB9381E802000000010000001A000000.cer")
+    },
+    %{
+      root: File.read!("test/fixtures/cert1599998-root.crt"),
+      ocsp: File.read!("test/fixtures/cert14493930-oscp.crt")
+    }
   ]
 
   tsp = [
     File.read!("test/fixtures/CA-TSP-DFS.cer"),
-    File.read!("test/fixtures/TSP-Server Justice.cer")
+    File.read!("test/fixtures/TSP-Server Justice.cer"),
+    File.read!("test/fixtures/CATSPServer-3004751DEF2C78AE02000000010000004A000000.cer"),
+    File.read!("test/fixtures/cert14491837-tsp.crt")
   ]
 
     %{general: general, tsp: tsp}

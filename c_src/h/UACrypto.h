@@ -27,34 +27,34 @@
 #if defined( __cplusplus)
 extern "C" {
 #endif
-/** \addtogroup func Экспортируемые функции
+/** \addtogroup func Р­РєСЃРїРѕСЂС‚РёСЂСѓРµРјС‹Рµ С„СѓРЅРєС†РёРё
 	@{ */
-/** \name сообщения об ошибках  */
+/** \name СЃРѕРѕР±С‰РµРЅРёСЏ РѕР± РѕС€РёР±РєР°С…  */
 /**
-	\brief Получить сообщение о последней ошибке
-	\return указатель на строку сообщения
+	\brief РџРѕР»СѓС‡РёС‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ Рѕ РїРѕСЃР»РµРґРЅРµР№ РѕС€РёР±РєРµ
+	\return СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЃС‚СЂРѕРєСѓ СЃРѕРѕР±С‰РµРЅРёСЏ
 */
 UAC_API(const char*)	GetLastErrorMessage();
 /**
-	\brief Установить сообщение о последней ошибке
-	\param[in] message указатель на строку сообщения (до 1999 символов) или NULL
+	\brief РЈСЃС‚Р°РЅРѕРІРёС‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ Рѕ РїРѕСЃР»РµРґРЅРµР№ РѕС€РёР±РєРµ
+	\param[in] message СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЃС‚СЂРѕРєСѓ СЃРѕРѕР±С‰РµРЅРёСЏ (РґРѕ 1999 СЃРёРјРІРѕР»РѕРІ) РёР»Рё NULL
 	\return ::UAC_SUCCESS
 */
 UAC_API(DWORD)			SetLastErrorMessage(const char* message);
 /**
-	\brief Получить символьный эквивалент кода ошибки
-	\param[in] code код ошибки
-	\return указатель на строку c символьным эквивалентом кода ошибки
+	\brief РџРѕР»СѓС‡РёС‚СЊ СЃРёРјРІРѕР»СЊРЅС‹Р№ СЌРєРІРёРІР°Р»РµРЅС‚ РєРѕРґР° РѕС€РёР±РєРё
+	\param[in] code РєРѕРґ РѕС€РёР±РєРё
+	\return СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЃС‚СЂРѕРєСѓ c СЃРёРјРІРѕР»СЊРЅС‹Рј СЌРєРІРёРІР°Р»РµРЅС‚РѕРј РєРѕРґР° РѕС€РёР±РєРё
 */
 UAC_API(const char*)	GetErrorCodeDescription(int code);
 
-/** \name хеш-векторы  */
+/** \name С…РµС€-РІРµРєС‚РѕСЂС‹  */
 /**
-	\brief Вычисление хеш-вектор от данных
-	\param[in] pData данные
-	\param[in] pCert сертификат, содержащий параметры хеша, или NULL
-	\param[out] pHash буфер для хеша
-	\return код ошибки или ::UAC_SUCCESS
+	\brief Р’С‹С‡РёСЃР»РµРЅРёРµ С…РµС€-РІРµРєС‚РѕСЂ РѕС‚ РґР°РЅРЅС‹С…
+	\param[in] pData РґР°РЅРЅС‹Рµ
+	\param[in] pCert СЃРµСЂС‚РёС„РёРєР°С‚, СЃРѕРґРµСЂР¶Р°С‰РёР№ РїР°СЂР°РјРµС‚СЂС‹ С…РµС€Р°, РёР»Рё NULL
+	\param[out] pHash Р±СѓС„РµСЂ РґР»СЏ С…РµС€Р°
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_HashCreate(
 	UAC_IN PUAC_BLOB		pData,
@@ -62,26 +62,26 @@ UAC_API(DWORD) UAC_HashCreate(
 	UAC_OUT PUAC_BLOB	 	pHash );
 
 /**
-	\brief Проверка хеш-вектора от данных
-	\param[in] pData данные
-	\param[in] pCert сертификат, содержащий параметры хеша, или NULL
-	\param[in] pHash эталонное значение хеша
-	\return код ошибки или ::UAC_SUCCESS
+	\brief РџСЂРѕРІРµСЂРєР° С…РµС€-РІРµРєС‚РѕСЂР° РѕС‚ РґР°РЅРЅС‹С…
+	\param[in] pData РґР°РЅРЅС‹Рµ
+	\param[in] pCert СЃРµСЂС‚РёС„РёРєР°С‚, СЃРѕРґРµСЂР¶Р°С‰РёР№ РїР°СЂР°РјРµС‚СЂС‹ С…РµС€Р°, РёР»Рё NULL
+	\param[in] pHash СЌС‚Р°Р»РѕРЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ С…РµС€Р°
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_HashVerify(
 	UAC_IN PUAC_BLOB		pData,
 	UAC_IN PUAC_BLOB		pCert,
 	UAC_IN PUAC_BLOB	 	pHash );
 
-/** \name сертификаты  */
+/** \name СЃРµСЂС‚РёС„РёРєР°С‚С‹  */
 /**
-	\brief формирования сертификата из заявки
-	\param[in] pRequest		заявка на сертификацию PKCS#10 (самоподписаннная) или SignedData(PKCS10) (подписанная администраторм регистрации)
-	\param[in] pCertInfo	требуемые параметры владельца сертификата
-	\param[in] pIssuerKeys	ключи ЦСК
-	\param[out] pCert		буфер для сертификата
+	\brief С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ СЃРµСЂС‚РёС„РёРєР°С‚Р° РёР· Р·Р°СЏРІРєРё
+	\param[in] pRequest		Р·Р°СЏРІРєР° РЅР° СЃРµСЂС‚РёС„РёРєР°С†РёСЋ PKCS#10 (СЃР°РјРѕРїРѕРґРїРёСЃР°РЅРЅРЅР°СЏ) РёР»Рё SignedData(PKCS10) (РїРѕРґРїРёСЃР°РЅРЅР°СЏ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂРј СЂРµРіРёСЃС‚СЂР°С†РёРё)
+	\param[in] pCertInfo	С‚СЂРµР±СѓРµРјС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ РІР»Р°РґРµР»СЊС†Р° СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	\param[in] pIssuerKeys	РєР»СЋС‡Рё Р¦РЎРљ
+	\param[out] pCert		Р±СѓС„РµСЂ РґР»СЏ СЃРµСЂС‚РёС„РёРєР°С‚Р°
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_CertCreate (
 	UAC_IN PUAC_BLOB pRequest,
@@ -89,71 +89,71 @@ UAC_API(DWORD) UAC_CertCreate (
 	UAC_IN PUAC_KEYPAIR pIssuerKeys,
 	UAC_OUT PUAC_BLOB pCert );
 /**
-	\brief Загрузка информации о сертификате
-	\param[in] pCert		сертификат
-	\param[out] pCertInfo	буфер для параметров сертификата
-	\return код ошибки или ::UAC_SUCCESS
+	\brief Р—Р°РіСЂСѓР·РєР° РёРЅС„РѕСЂРјР°С†РёРё Рѕ СЃРµСЂС‚РёС„РёРєР°С‚Рµ
+	\param[in] pCert		СЃРµСЂС‚РёС„РёРєР°С‚
+	\param[out] pCertInfo	Р±СѓС„РµСЂ РґР»СЏ РїР°СЂР°РјРµС‚СЂРѕРІ СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_CertLoad (
 	UAC_IN PUAC_BLOB pCert,
 	UAC_OUT PUAC_CERT_INFO pCertInfo );
 /**
-	\brief Проверка подписи сертификата
-	\param[in] pUserCert	проверяемый сертификат
-	\param[out] pIssuerCert	сертификата издателя
-	\return код ошибки или ::UAC_SUCCESS
+	\brief РџСЂРѕРІРµСЂРєР° РїРѕРґРїРёСЃРё СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	\param[in] pUserCert	РїСЂРѕРІРµСЂСЏРµРјС‹Р№ СЃРµСЂС‚РёС„РёРєР°С‚
+	\param[out] pIssuerCert	СЃРµСЂС‚РёС„РёРєР°С‚Р° РёР·РґР°С‚РµР»СЏ
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_CertVerify (
 	UAC_IN PUAC_BLOB pUserCert,
 	UAC_IN PUAC_BLOB pIssuerCert );
 /**
-	\brief Проверка соответствия сертификата и ссылки на сертификат
-	в случае несоответствия возвращает ::UAC_ERROR_NO_SIGNER
-	\param[in] pCert		сертификат
-	\param[in] pCertRef		ссылка на сертификат
-	\return код ошибки или ::UAC_SUCCESS
+	\brief РџСЂРѕРІРµСЂРєР° СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ СЃРµСЂС‚РёС„РёРєР°С‚Р° Рё СЃСЃС‹Р»РєРё РЅР° СЃРµСЂС‚РёС„РёРєР°С‚
+	РІ СЃР»СѓС‡Р°Рµ РЅРµСЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ РІРѕР·РІСЂР°С‰Р°РµС‚ ::UAC_ERROR_NO_SIGNER
+	\param[in] pCert		СЃРµСЂС‚РёС„РёРєР°С‚
+	\param[in] pCertRef		СЃСЃС‹Р»РєР° РЅР° СЃРµСЂС‚РёС„РёРєР°С‚
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_CertMatch (
 	UAC_IN PUAC_CERT_REF	pCertRef,
 	UAC_IN PUAC_BLOB		pCert );
 
 /**
-	\brief Загрузка ссылки на сертификат
-	\param[in] pCert		сертификат
-	\param[out] pSubjectRef	структура для ссылки на сертификат
-	\return код ошибки или ::UAC_SUCCESS
+	\brief Р—Р°РіСЂСѓР·РєР° СЃСЃС‹Р»РєРё РЅР° СЃРµСЂС‚РёС„РёРєР°С‚
+	\param[in] pCert		СЃРµСЂС‚РёС„РёРєР°С‚
+	\param[out] pSubjectRef	СЃС‚СЂСѓРєС‚СѓСЂР° РґР»СЏ СЃСЃС‹Р»РєРё РЅР° СЃРµСЂС‚РёС„РёРєР°С‚
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_CertSubjectRef (
 	UAC_IN PUAC_BLOB pCert,
 	UAC_OUT PUAC_CERT_REF pSubjectRef );
 /**
-	\brief Загрузка ссылки на сертификат издателя
-	\param[in] pCert		исходный сертификат
-	\param[out] pIssuerRef	структура для ссылки на сертификат издателя
-	\return код ошибки или ::UAC_SUCCESS
+	\brief Р—Р°РіСЂСѓР·РєР° СЃСЃС‹Р»РєРё РЅР° СЃРµСЂС‚РёС„РёРєР°С‚ РёР·РґР°С‚РµР»СЏ
+	\param[in] pCert		РёСЃС…РѕРґРЅС‹Р№ СЃРµСЂС‚РёС„РёРєР°С‚
+	\param[out] pIssuerRef	СЃС‚СЂСѓРєС‚СѓСЂР° РґР»СЏ СЃСЃС‹Р»РєРё РЅР° СЃРµСЂС‚РёС„РёРєР°С‚ РёР·РґР°С‚РµР»СЏ
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_CertIssuerRef (
 	UAC_IN PUAC_BLOB pCert,
 	UAC_OUT PUAC_CERT_REF pIssuerRef );
 
 /**
-	\brief Проверка соответствия соответствия сертификата и секретного ключа
-	в случае несоответствия идентификаторов возвращает ::UAC_ERROR_KEYPAIR
-	\param[in] pKeys		пара ключей (сертификат и информация для доступа к секретному ключу)
-	\return код ошибки или ::UAC_SUCCESS
+	\brief РџСЂРѕРІРµСЂРєР° СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ СЃРµСЂС‚РёС„РёРєР°С‚Р° Рё СЃРµРєСЂРµС‚РЅРѕРіРѕ РєР»СЋС‡Р°
+	РІ СЃР»СѓС‡Р°Рµ РЅРµСЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРІ РІРѕР·РІСЂР°С‰Р°РµС‚ ::UAC_ERROR_KEYPAIR
+	\param[in] pKeys		РїР°СЂР° РєР»СЋС‡РµР№ (СЃРµСЂС‚РёС„РёРєР°С‚ Рё РёРЅС„РѕСЂРјР°С†РёСЏ РґР»СЏ РґРѕСЃС‚СѓРїР° Рє СЃРµРєСЂРµС‚РЅРѕРјСѓ РєР»СЋС‡Сѓ)
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_KeyPairVerify (
 	UAC_IN PUAC_KEYPAIR pKeys );
 
-/** \name Создание сертификатов  */
+/** \name РЎРѕР·РґР°РЅРёРµ СЃРµСЂС‚РёС„РёРєР°С‚РѕРІ  */
 /**
-	\brief Генерация ключей. Создание ключевого контейнера. Формирование самоподписанной заявки на сертификацию ключей.
-	\param[in] pRequestInfo	заявляемые параметры владельца сертификата
-	\param[in] pParam		параметры алгоритма ключа
-	\param[out] pPrivateKey	буфер для контейнера с секретным ключом
-	\param[out] pRequest	буфер для заявки на сертификацию
+	\brief Р“РµРЅРµСЂР°С†РёСЏ РєР»СЋС‡РµР№. РЎРѕР·РґР°РЅРёРµ РєР»СЋС‡РµРІРѕРіРѕ РєРѕРЅС‚РµР№РЅРµСЂР°. Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ СЃР°РјРѕРїРѕРґРїРёСЃР°РЅРЅРѕР№ Р·Р°СЏРІРєРё РЅР° СЃРµСЂС‚РёС„РёРєР°С†РёСЋ РєР»СЋС‡РµР№.
+	\param[in] pRequestInfo	Р·Р°СЏРІР»СЏРµРјС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ РІР»Р°РґРµР»СЊС†Р° СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	\param[in] pParam		РїР°СЂР°РјРµС‚СЂС‹ Р°Р»РіРѕСЂРёС‚РјР° РєР»СЋС‡Р°
+	\param[out] pPrivateKey	Р±СѓС„РµСЂ РґР»СЏ РєРѕРЅС‚РµР№РЅРµСЂР° СЃ СЃРµРєСЂРµС‚РЅС‹Рј РєР»СЋС‡РѕРј
+	\param[out] pRequest	Р±СѓС„РµСЂ РґР»СЏ Р·Р°СЏРІРєРё РЅР° СЃРµСЂС‚РёС„РёРєР°С†РёСЋ
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_CertRequestCreate (
 	UAC_IN PUAC_CERT_REQUEST_INFO	pRequestInfo,
@@ -161,9 +161,9 @@ UAC_API(DWORD) UAC_CertRequestCreate (
 	UAC_INOUT PUAC_PRIVATE_KEY		pPrivateKey,
 	UAC_OUT	PUAC_BLOB				pRequest );
 /**
-	\brief Загрузка информации о заявке на сертификацию (самоподписанной или подписанной администратором регистрации)
-	\param[in] pRequest			заявка на сертификацию
-	\param[out] pRequestInfo	структура для параметров заявки
+	\brief Р—Р°РіСЂСѓР·РєР° РёРЅС„РѕСЂРјР°С†РёРё Рѕ Р·Р°СЏРІРєРµ РЅР° СЃРµСЂС‚РёС„РёРєР°С†РёСЋ (СЃР°РјРѕРїРѕРґРїРёСЃР°РЅРЅРѕР№ РёР»Рё РїРѕРґРїРёСЃР°РЅРЅРѕР№ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂРѕРј СЂРµРіРёСЃС‚СЂР°С†РёРё)
+	\param[in] pRequest			Р·Р°СЏРІРєР° РЅР° СЃРµСЂС‚РёС„РёРєР°С†РёСЋ
+	\param[out] pRequestInfo	СЃС‚СЂСѓРєС‚СѓСЂР° РґР»СЏ РїР°СЂР°РјРµС‚СЂРѕРІ Р·Р°СЏРІРєРё
 */
 
 UAC_API(DWORD) UAC_CertRequestLoad (
@@ -171,11 +171,11 @@ UAC_API(DWORD) UAC_CertRequestLoad (
 	UAC_OUT PUAC_CERT_REQUEST_INFO pRequestInfo );
 
 /**
-	\brief Подписывание самоподписанной заявки на ключе администратора регистрации
-	\param[in] pRequest		заявка на сертификацию PKCS#10
-	\param[in] pRequestInfo	скорректированные параметры заявки
-	\param[in] pKeys		сертификат и ключ администратора регистрации
-	\param[out] pRequestSigned	буфер для подписанной заявки на сертификацию
+	\brief РџРѕРґРїРёСЃС‹РІР°РЅРёРµ СЃР°РјРѕРїРѕРґРїРёСЃР°РЅРЅРѕР№ Р·Р°СЏРІРєРё РЅР° РєР»СЋС‡Рµ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР° СЂРµРіРёСЃС‚СЂР°С†РёРё
+	\param[in] pRequest		Р·Р°СЏРІРєР° РЅР° СЃРµСЂС‚РёС„РёРєР°С†РёСЋ PKCS#10
+	\param[in] pRequestInfo	СЃРєРѕСЂСЂРµРєС‚РёСЂРѕРІР°РЅРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ Р·Р°СЏРІРєРё
+	\param[in] pKeys		СЃРµСЂС‚РёС„РёРєР°С‚ Рё РєР»СЋС‡ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР° СЂРµРіРёСЃС‚СЂР°С†РёРё
+	\param[out] pRequestSigned	Р±СѓС„РµСЂ РґР»СЏ РїРѕРґРїРёСЃР°РЅРЅРѕР№ Р·Р°СЏРІРєРё РЅР° СЃРµСЂС‚РёС„РёРєР°С†РёСЋ
 */
 UAC_API(DWORD) UAC_CertRequestSign (
 	UAC_IN PUAC_BLOB pRequest,
@@ -183,23 +183,23 @@ UAC_API(DWORD) UAC_CertRequestSign (
 	UAC_IN PUAC_KEYPAIR pKeys,
 	UAC_OUT PUAC_BLOB pRequestSigned );
 /**
-	\brief Проверка подписи заявки на сертификацию (самоподписанной или подписанной администратором регистрации)
-	\param[in] pRequest		заявка на сертификацию
-	\param[in] pSignerCert	сертификат администратора регистрации или NULL (для самоподписанной)
+	\brief РџСЂРѕРІРµСЂРєР° РїРѕРґРїРёСЃРё Р·Р°СЏРІРєРё РЅР° СЃРµСЂС‚РёС„РёРєР°С†РёСЋ (СЃР°РјРѕРїРѕРґРїРёСЃР°РЅРЅРѕР№ РёР»Рё РїРѕРґРїРёСЃР°РЅРЅРѕР№ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂРѕРј СЂРµРіРёСЃС‚СЂР°С†РёРё)
+	\param[in] pRequest		Р·Р°СЏРІРєР° РЅР° СЃРµСЂС‚РёС„РёРєР°С†РёСЋ
+	\param[in] pSignerCert	СЃРµСЂС‚РёС„РёРєР°С‚ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР° СЂРµРіРёСЃС‚СЂР°С†РёРё РёР»Рё NULL (РґР»СЏ СЃР°РјРѕРїРѕРґРїРёСЃР°РЅРЅРѕР№)
 */
 
 UAC_API(DWORD) UAC_CertRequestVerify (
 	UAC_IN PUAC_BLOB pRequest,
 	UAC_IN PUAC_BLOB pSignerCert );
 
-/** \name Списки отозванных сертификатов (CRL)  */
+/** \name РЎРїРёСЃРєРё РѕС‚РѕР·РІР°РЅРЅС‹С… СЃРµСЂС‚РёС„РёРєР°С‚РѕРІ (CRL)  */
 /**
-	\brief формирования списка отозванных сертификатов (CRL)
-	\param[in] pIssuerKeys	сертификат и ключ ЦСК
-	\param[in] pCrlInfo		структура CRL
-	\param[out] pCrl		буфер для сертификата CRL
+	\brief С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ СЃРїРёСЃРєР° РѕС‚РѕР·РІР°РЅРЅС‹С… СЃРµСЂС‚РёС„РёРєР°С‚РѕРІ (CRL)
+	\param[in] pIssuerKeys	СЃРµСЂС‚РёС„РёРєР°С‚ Рё РєР»СЋС‡ Р¦РЎРљ
+	\param[in] pCrlInfo		СЃС‚СЂСѓРєС‚СѓСЂР° CRL
+	\param[out] pCrl		Р±СѓС„РµСЂ РґР»СЏ СЃРµСЂС‚РёС„РёРєР°С‚Р° CRL
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 
 */
 UAC_API(DWORD) UAC_CrlCreate (
@@ -207,32 +207,32 @@ UAC_API(DWORD) UAC_CrlCreate (
 	UAC_IN PUAC_CRL_INFO pCrlInfo,
 	UAC_OUT PUAC_BLOB pCrl );
 /**
-	\brief Загрузка информации о списке отозванных сертификатов (CRL)
+	\brief Р—Р°РіСЂСѓР·РєР° РёРЅС„РѕСЂРјР°С†РёРё Рѕ СЃРїРёСЃРєРµ РѕС‚РѕР·РІР°РЅРЅС‹С… СЃРµСЂС‚РёС„РёРєР°С‚РѕРІ (CRL)
 	\param[in] pCrl			CRL
-	\param[in] pCrlInfo		структура для информации о CRL
+	\param[in] pCrlInfo		СЃС‚СЂСѓРєС‚СѓСЂР° РґР»СЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ CRL
 
 */
 UAC_API(DWORD) UAC_CrlLoad (
 	UAC_IN	PUAC_BLOB pCrl,
 	UAC_OUT PUAC_CRL_INFO pCrlInfo );
 /**
-	\brief Проверка подписи списка отозванных сертификатов (CRL)
+	\brief РџСЂРѕРІРµСЂРєР° РїРѕРґРїРёСЃРё СЃРїРёСЃРєР° РѕС‚РѕР·РІР°РЅРЅС‹С… СЃРµСЂС‚РёС„РёРєР°С‚РѕРІ (CRL)
 	\param[in] pCrl			CRL
-	\param[in] pIssuerCert	сертификат ЦСК
+	\param[in] pIssuerCert	СЃРµСЂС‚РёС„РёРєР°С‚ Р¦РЎРљ
 */
 UAC_API(DWORD) UAC_CrlVerify (
 	UAC_IN PUAC_BLOB pCrl,
 	UAC_IN PUAC_BLOB pIssuerCert );
 
-/** \name Конверт с подписанными данными (SignedData)  */
+/** \name РљРѕРЅРІРµСЂС‚ СЃ РїРѕРґРїРёСЃР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё (SignedData)  */
 /**
-	\brief формирования конверта с подписанными данными
-	\param[in] pData			блок данных
-	\param[in] pSigners			массив с ключами подписчиков
-	\param[in] pTimeStamps		массив с метками времени для данных для каждого подписчика или NULL
-	\param[in] dwSignersCount	количество подписчиков
-	\param[in] dwOptions		параметры/режимы
-	\par доступные опции:
+	\brief С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ РєРѕРЅРІРµСЂС‚Р° СЃ РїРѕРґРїРёСЃР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё
+	\param[in] pData			Р±Р»РѕРє РґР°РЅРЅС‹С…
+	\param[in] pSigners			РјР°СЃСЃРёРІ СЃ РєР»СЋС‡Р°РјРё РїРѕРґРїРёСЃС‡РёРєРѕРІ
+	\param[in] pTimeStamps		РјР°СЃСЃРёРІ СЃ РјРµС‚РєР°РјРё РІСЂРµРјРµРЅРё РґР»СЏ РґР°РЅРЅС‹С… РґР»СЏ РєР°Р¶РґРѕРіРѕ РїРѕРґРїРёСЃС‡РёРєР° РёР»Рё NULL
+	\param[in] dwSignersCount	РєРѕР»РёС‡РµСЃС‚РІРѕ РїРѕРґРїРёСЃС‡РёРєРѕРІ
+	\param[in] dwOptions		РїР°СЂР°РјРµС‚СЂС‹/СЂРµР¶РёРјС‹
+	\par РґРѕСЃС‚СѓРїРЅС‹Рµ РѕРїС†РёРё:
 		::UAC_OPTION_STORE_CONTENT
 		::UAC_OPTION_INCLUDE_CERT
 		::UAC_OPTION_IDENT_BY_SERIAL_NUMBER
@@ -240,9 +240,9 @@ UAC_API(DWORD) UAC_CrlVerify (
 		::UAC_OPTION_INCLUDE_SIGNED_TIME
 		::UAC_OPTION_FORCE_SIGN_ATTRS
 
-	\param[out] pSignedData		буфер для подписанных данных
+	\param[out] pSignedData		Р±СѓС„РµСЂ РґР»СЏ РїРѕРґРїРёСЃР°РЅРЅС‹С… РґР°РЅРЅС‹С…
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_SignedDataCreate (
 	UAC_IN PUAC_BLOB			pData,
@@ -253,14 +253,14 @@ UAC_API(DWORD) UAC_SignedDataCreate (
 	UAC_OUT PUAC_BLOB			pSignedData );
 
 /**
-	\brief формирования конверта с подписанными данными + добавление к подписи атрибутов
-	\param[in] pData			блок данных
-	\param[in] pSigners			массив с ключами подписчиков
-	\param[in] pTimeStamps		массив с метками времени для данных для каждого подписчика или NULL
-	\param[in] pAttributes		массив с атрибутами, устанавливаемыми подписчиками, или NULL
-	\param[in] dwSignersCount	количество подписчиков
-	\param[in] dwOptions		параметры/режимы
-	\par доступные опции:
+	\brief С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ РєРѕРЅРІРµСЂС‚Р° СЃ РїРѕРґРїРёСЃР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё + РґРѕР±Р°РІР»РµРЅРёРµ Рє РїРѕРґРїРёСЃРё Р°С‚СЂРёР±СѓС‚РѕРІ
+	\param[in] pData			Р±Р»РѕРє РґР°РЅРЅС‹С…
+	\param[in] pSigners			РјР°СЃСЃРёРІ СЃ РєР»СЋС‡Р°РјРё РїРѕРґРїРёСЃС‡РёРєРѕРІ
+	\param[in] pTimeStamps		РјР°СЃСЃРёРІ СЃ РјРµС‚РєР°РјРё РІСЂРµРјРµРЅРё РґР»СЏ РґР°РЅРЅС‹С… РґР»СЏ РєР°Р¶РґРѕРіРѕ РїРѕРґРїРёСЃС‡РёРєР° РёР»Рё NULL
+	\param[in] pAttributes		РјР°СЃСЃРёРІ СЃ Р°С‚СЂРёР±СѓС‚Р°РјРё, СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРјС‹РјРё РїРѕРґРїРёСЃС‡РёРєР°РјРё, РёР»Рё NULL
+	\param[in] dwSignersCount	РєРѕР»РёС‡РµСЃС‚РІРѕ РїРѕРґРїРёСЃС‡РёРєРѕРІ
+	\param[in] dwOptions		РїР°СЂР°РјРµС‚СЂС‹/СЂРµР¶РёРјС‹
+	\par РґРѕСЃС‚СѓРїРЅС‹Рµ РѕРїС†РёРё:
 		::UAC_OPTION_STORE_CONTENT
 		::UAC_OPTION_INCLUDE_CERT
 		::UAC_OPTION_IDENT_BY_SERIAL_NUMBER
@@ -268,9 +268,9 @@ UAC_API(DWORD) UAC_SignedDataCreate (
 		::UAC_OPTION_INCLUDE_SIGNED_TIME
 		::UAC_OPTION_FORCE_SIGN_ATTRS
 
-	\param[out] pSignedData		буфер для подписанных данных
+	\param[out] pSignedData		Р±СѓС„РµСЂ РґР»СЏ РїРѕРґРїРёСЃР°РЅРЅС‹С… РґР°РЅРЅС‹С…
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_SignedDataCreate2 (
 	UAC_IN PUAC_BLOB			pData,
@@ -282,23 +282,23 @@ UAC_API(DWORD) UAC_SignedDataCreate2 (
 	UAC_OUT PUAC_BLOB			pSignedData );
 
 /**
-	\brief формирования подписи данных из потока + добавление к атрибутов
-	\param[in] pDataInput		поток подписываемых данных
-	\param[in] pSigners			массив с ключами подписчиков
-	\param[in] pTimeStamps		массив с метками времени для данных для каждого подписчика или NULL
-	\param[in] pAttributes		массив с атрибутами, устанавливаемыми подписчиками, или NULL
-	\param[in] dwSignersCount	количество подписчиков
-	\param[in] dwOptions		параметры/режимы
-	\par доступные опции:
+	\brief С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ РїРѕРґРїРёСЃРё РґР°РЅРЅС‹С… РёР· РїРѕС‚РѕРєР° + РґРѕР±Р°РІР»РµРЅРёРµ Рє Р°С‚СЂРёР±СѓС‚РѕРІ
+	\param[in] pDataInput		РїРѕС‚РѕРє РїРѕРґРїРёСЃС‹РІР°РµРјС‹С… РґР°РЅРЅС‹С…
+	\param[in] pSigners			РјР°СЃСЃРёРІ СЃ РєР»СЋС‡Р°РјРё РїРѕРґРїРёСЃС‡РёРєРѕРІ
+	\param[in] pTimeStamps		РјР°СЃСЃРёРІ СЃ РјРµС‚РєР°РјРё РІСЂРµРјРµРЅРё РґР»СЏ РґР°РЅРЅС‹С… РґР»СЏ РєР°Р¶РґРѕРіРѕ РїРѕРґРїРёСЃС‡РёРєР° РёР»Рё NULL
+	\param[in] pAttributes		РјР°СЃСЃРёРІ СЃ Р°С‚СЂРёР±СѓС‚Р°РјРё, СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРјС‹РјРё РїРѕРґРїРёСЃС‡РёРєР°РјРё, РёР»Рё NULL
+	\param[in] dwSignersCount	РєРѕР»РёС‡РµСЃС‚РІРѕ РїРѕРґРїРёСЃС‡РёРєРѕРІ
+	\param[in] dwOptions		РїР°СЂР°РјРµС‚СЂС‹/СЂРµР¶РёРјС‹
+	\par РґРѕСЃС‚СѓРїРЅС‹Рµ РѕРїС†РёРё:
 		::UAC_OPTION_INCLUDE_CERT
 		::UAC_OPTION_IDENT_BY_SERIAL_NUMBER
 		::UAC_OPTION_IDENT_BY_KEY_ID
 		::UAC_OPTION_INCLUDE_SIGNED_TIME
 
-	\param[out] pSignedData		буфер для подписи
-	формат подписи соответствует формату SignedData без сообщения
+	\param[out] pSignedData		Р±СѓС„РµСЂ РґР»СЏ РїРѕРґРїРёСЃРё
+	С„РѕСЂРјР°С‚ РїРѕРґРїРёСЃРё СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ С„РѕСЂРјР°С‚Сѓ SignedData Р±РµР· СЃРѕРѕР±С‰РµРЅРёСЏ
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_SignatureCreate ( 
 	UAC_IN PUAC_STREAM			pDataInput,
@@ -310,23 +310,23 @@ UAC_API(DWORD) UAC_SignatureCreate (
 	UAC_OUT PUAC_BLOB	 		pSignature );
 
 /**
-	\brief Добавление новых подписей в конверт с подписанными данными
-	\param[in] pSignedData		исходный конверт с подписанными данными
-	\param[in] pExternalData	блок внешних данных или NULL, если данные находятся в конверте
-	\param[in] pSigners			массив с ключами подписчиков
-	\param[in] pTimeStamps		массив с метками времени для данных для каждого подписчика или NULL
-	\param[in] dwSignersCount	количество подписчиков
-	\param[in] dwOptions		параметры/режимы
-	\par доступные опции:
+	\brief Р”РѕР±Р°РІР»РµРЅРёРµ РЅРѕРІС‹С… РїРѕРґРїРёСЃРµР№ РІ РєРѕРЅРІРµСЂС‚ СЃ РїРѕРґРїРёСЃР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё
+	\param[in] pSignedData		РёСЃС…РѕРґРЅС‹Р№ РєРѕРЅРІРµСЂС‚ СЃ РїРѕРґРїРёСЃР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё
+	\param[in] pExternalData	Р±Р»РѕРє РІРЅРµС€РЅРёС… РґР°РЅРЅС‹С… РёР»Рё NULL, РµСЃР»Рё РґР°РЅРЅС‹Рµ РЅР°С…РѕРґСЏС‚СЃСЏ РІ РєРѕРЅРІРµСЂС‚Рµ
+	\param[in] pSigners			РјР°СЃСЃРёРІ СЃ РєР»СЋС‡Р°РјРё РїРѕРґРїРёСЃС‡РёРєРѕРІ
+	\param[in] pTimeStamps		РјР°СЃСЃРёРІ СЃ РјРµС‚РєР°РјРё РІСЂРµРјРµРЅРё РґР»СЏ РґР°РЅРЅС‹С… РґР»СЏ РєР°Р¶РґРѕРіРѕ РїРѕРґРїРёСЃС‡РёРєР° РёР»Рё NULL
+	\param[in] dwSignersCount	РєРѕР»РёС‡РµСЃС‚РІРѕ РїРѕРґРїРёСЃС‡РёРєРѕРІ
+	\param[in] dwOptions		РїР°СЂР°РјРµС‚СЂС‹/СЂРµР¶РёРјС‹
+	\par РґРѕСЃС‚СѓРїРЅС‹Рµ РѕРїС†РёРё:
 		::UAC_OPTION_INCLUDE_CERT
 		::UAC_OPTION_IDENT_BY_SERIAL_NUMBER
 		::UAC_OPTION_IDENT_BY_KEY_ID
 		::UAC_OPTION_INCLUDE_SIGNED_TIME
 		::UAC_OPTION_FORCE_SIGN_ATTRS
 
-	\param[out] pNewSignedData	буфер для нового конверта
+	\param[out] pNewSignedData	Р±СѓС„РµСЂ РґР»СЏ РЅРѕРІРѕРіРѕ РєРѕРЅРІРµСЂС‚Р°
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_SignedDataAppend (
 	UAC_IN PUAC_BLOB			pSignedData,
@@ -338,13 +338,13 @@ UAC_API(DWORD) UAC_SignedDataAppend (
 	UAC_OUT PUAC_BLOB			pNewSignedData );
 
 /**
-	\brief Загрузка информации о конверте подписанных данных
-	\param[in] pSignedData		конверт с подписанными данными
-	\param[out] pData			буфер для данных из конверта или NULL
-	\param[out] pInfo			структура для информации о конверте или NULL
-	\note Хотя бы один из параметров pData или pInfo должен быть ненулевым
+	\brief Р—Р°РіСЂСѓР·РєР° РёРЅС„РѕСЂРјР°С†РёРё Рѕ РєРѕРЅРІРµСЂС‚Рµ РїРѕРґРїРёСЃР°РЅРЅС‹С… РґР°РЅРЅС‹С…
+	\param[in] pSignedData		РєРѕРЅРІРµСЂС‚ СЃ РїРѕРґРїРёСЃР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё
+	\param[out] pData			Р±СѓС„РµСЂ РґР»СЏ РґР°РЅРЅС‹С… РёР· РєРѕРЅРІРµСЂС‚Р° РёР»Рё NULL
+	\param[out] pInfo			СЃС‚СЂСѓРєС‚СѓСЂР° РґР»СЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ РєРѕРЅРІРµСЂС‚Рµ РёР»Рё NULL
+	\note РҐРѕС‚СЏ Р±С‹ РѕРґРёРЅ РёР· РїР°СЂР°РјРµС‚СЂРѕРІ pData РёР»Рё pInfo РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РЅРµРЅСѓР»РµРІС‹Рј
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_SignedDataLoad (
 	UAC_IN	PUAC_BLOB pSignedData,
@@ -352,10 +352,10 @@ UAC_API(DWORD) UAC_SignedDataLoad (
 	UAC_OUT PUAC_SIGNED_DATA_INFO pInfo );
 
 /**
-	\brief Проверка подписи данных для конкретного подписчика
-	\param[in] pSignedData		конверт с подписанными данными
-	\param[in] pSignerCert		сертификат подписчика
-	\param[in] pExternalData	внешние данные или NULL
+	\brief РџСЂРѕРІРµСЂРєР° РїРѕРґРїРёСЃРё РґР°РЅРЅС‹С… РґР»СЏ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ РїРѕРґРїРёСЃС‡РёРєР°
+	\param[in] pSignedData		РєРѕРЅРІРµСЂС‚ СЃ РїРѕРґРїРёСЃР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё
+	\param[in] pSignerCert		СЃРµСЂС‚РёС„РёРєР°С‚ РїРѕРґРїРёСЃС‡РёРєР°
+	\param[in] pExternalData	РІРЅРµС€РЅРёРµ РґР°РЅРЅС‹Рµ РёР»Рё NULL
 */
 UAC_API(DWORD) UAC_SignedDataVerify (
 	UAC_IN PUAC_BLOB pSignedData,
@@ -363,10 +363,10 @@ UAC_API(DWORD) UAC_SignedDataVerify (
 	UAC_IN PUAC_BLOB pExternalData);
 
 /**
-	\brief Проверка подписи данных из потока для конкретного подписчика
-	\param[in] pSignedData		конверт с подписанными данными
-	\param[in] pSignerCert		сертификат подписчика
-	\param[in] pDataInput		поток подписанных данных
+	\brief РџСЂРѕРІРµСЂРєР° РїРѕРґРїРёСЃРё РґР°РЅРЅС‹С… РёР· РїРѕС‚РѕРєР° РґР»СЏ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ РїРѕРґРїРёСЃС‡РёРєР°
+	\param[in] pSignedData		РєРѕРЅРІРµСЂС‚ СЃ РїРѕРґРїРёСЃР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё
+	\param[in] pSignerCert		СЃРµСЂС‚РёС„РёРєР°С‚ РїРѕРґРїРёСЃС‡РёРєР°
+	\param[in] pDataInput		РїРѕС‚РѕРє РїРѕРґРїРёСЃР°РЅРЅС‹С… РґР°РЅРЅС‹С…
 */
 UAC_API(DWORD) UAC_SignatureVerify (
 	UAC_IN PUAC_BLOB pSignature,
@@ -374,10 +374,10 @@ UAC_API(DWORD) UAC_SignatureVerify (
 	UAC_IN PUAC_STREAM pDataInput);
 
 /**
-	\brief добавления сертификата в конверт с подписанными данными
-	\param[in] pSignedData		конверт с подписанными данными
-	\param[in] pCert			добавляемый сертификат
-	\param[out] pNewSignedData	буфер для нового конверта
+	\brief РґРѕР±Р°РІР»РµРЅРёСЏ СЃРµСЂС‚РёС„РёРєР°С‚Р° РІ РєРѕРЅРІРµСЂС‚ СЃ РїРѕРґРїРёСЃР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё
+	\param[in] pSignedData		РєРѕРЅРІРµСЂС‚ СЃ РїРѕРґРїРёСЃР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё
+	\param[in] pCert			РґРѕР±Р°РІР»СЏРµРјС‹Р№ СЃРµСЂС‚РёС„РёРєР°С‚
+	\param[out] pNewSignedData	Р±СѓС„РµСЂ РґР»СЏ РЅРѕРІРѕРіРѕ РєРѕРЅРІРµСЂС‚Р°
 */
 
 UAC_API(DWORD) UAC_SignedDataAddCert (
@@ -386,20 +386,20 @@ UAC_API(DWORD) UAC_SignedDataAddCert (
 	UAC_IN PUAC_BLOB pNewSignedData );
 
 /**
-	\brief извлечения сертификата по индексу из конверта с подписанными данными
-	\param[in] pSignedData		конверт с подписанными данными
-	\param[in] dwIndex			индекс сертификата в конверте (с нуля)
-	\param[out] pCert			буфер для извлеченного сертификата
+	\brief РёР·РІР»РµС‡РµРЅРёСЏ СЃРµСЂС‚РёС„РёРєР°С‚Р° РїРѕ РёРЅРґРµРєСЃСѓ РёР· РєРѕРЅРІРµСЂС‚Р° СЃ РїРѕРґРїРёСЃР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё
+	\param[in] pSignedData		РєРѕРЅРІРµСЂС‚ СЃ РїРѕРґРїРёСЃР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё
+	\param[in] dwIndex			РёРЅРґРµРєСЃ СЃРµСЂС‚РёС„РёРєР°С‚Р° РІ РєРѕРЅРІРµСЂС‚Рµ (СЃ РЅСѓР»СЏ)
+	\param[out] pCert			Р±СѓС„РµСЂ РґР»СЏ РёР·РІР»РµС‡РµРЅРЅРѕРіРѕ СЃРµСЂС‚РёС„РёРєР°С‚Р°
 */
 UAC_API(DWORD) UAC_SignedDataGetCert (
 	UAC_IN PUAC_BLOB		pSignedData,
 	UAC_IN DWORD			dwIndex,
 	UAC_OUT PUAC_BLOB		pCert );
 /**
-	\brief извлечение сертификата по ссылочным данным из конверта с подписанными данными
-	\param[in] pSignedData		конверт с подписанными данными
-	\param[in] pCertRef			ссылки на сертификат
-	\param[out] pCert			буфер для извлеченного сертификата
+	\brief РёР·РІР»РµС‡РµРЅРёРµ СЃРµСЂС‚РёС„РёРєР°С‚Р° РїРѕ СЃСЃС‹Р»РѕС‡РЅС‹Рј РґР°РЅРЅС‹Рј РёР· РєРѕРЅРІРµСЂС‚Р° СЃ РїРѕРґРїРёСЃР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё
+	\param[in] pSignedData		РєРѕРЅРІРµСЂС‚ СЃ РїРѕРґРїРёСЃР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё
+	\param[in] pCertRef			СЃСЃС‹Р»РєРё РЅР° СЃРµСЂС‚РёС„РёРєР°С‚
+	\param[out] pCert			Р±СѓС„РµСЂ РґР»СЏ РёР·РІР»РµС‡РµРЅРЅРѕРіРѕ СЃРµСЂС‚РёС„РёРєР°С‚Р°
 */
 
 UAC_API(DWORD) UAC_SignedDataFindCert (
@@ -407,10 +407,10 @@ UAC_API(DWORD) UAC_SignedDataFindCert (
 	UAC_IN PUAC_CERT_REF	pCertRef,
 	UAC_OUT PUAC_BLOB		pCert );
 /**
-	\brief извлечения метки времени данных из конверта с подписанными данными
-	\param[in] pSignedData		конверт с подписанными данными
-	\param[in] dwSignerIndex	индекс подписчика в конверте (с нуля)
-	\param[out] pTs 			буфер для метки времени
+	\brief РёР·РІР»РµС‡РµРЅРёСЏ РјРµС‚РєРё РІСЂРµРјРµРЅРё РґР°РЅРЅС‹С… РёР· РєРѕРЅРІРµСЂС‚Р° СЃ РїРѕРґРїРёСЃР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё
+	\param[in] pSignedData		РєРѕРЅРІРµСЂС‚ СЃ РїРѕРґРїРёСЃР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё
+	\param[in] dwSignerIndex	РёРЅРґРµРєСЃ РїРѕРґРїРёСЃС‡РёРєР° РІ РєРѕРЅРІРµСЂС‚Рµ (СЃ РЅСѓР»СЏ)
+	\param[out] pTs 			Р±СѓС„РµСЂ РґР»СЏ РјРµС‚РєРё РІСЂРµРјРµРЅРё
 */
 
 UAC_API(DWORD) UAC_SignedDataGetTs (
@@ -418,19 +418,19 @@ UAC_API(DWORD) UAC_SignedDataGetTs (
 	UAC_IN DWORD		dwSignerIndex,
 	UAC_OUT PUAC_BLOB	pTs );
 
-/** \name Проверка статуса сертификата (OCSP)  */
+/** \name РџСЂРѕРІРµСЂРєР° СЃС‚Р°С‚СѓСЃР° СЃРµСЂС‚РёС„РёРєР°С‚Р° (OCSP)  */
 /**
-	\brief формирования запроса на проверку статуса сертификата
-	\param[in] pTargetCert		сертификат, подвергаемый проверке
-	\param[in] pSignerKeys		ключи подписчика запроса или NULL, если запрос не подписывать
-	\param[in] dwOptions		опции
-	\par доступные опции:
-		::UAC_OPTION_INCLUDE_VERSION		- указать версию запроса\n
-		::UAC_OPTION_INCLUDE_NONCE			- добавить идентификатор запроса
+	\brief С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ Р·Р°РїСЂРѕСЃР° РЅР° РїСЂРѕРІРµСЂРєСѓ СЃС‚Р°С‚СѓСЃР° СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	\param[in] pTargetCert		СЃРµСЂС‚РёС„РёРєР°С‚, РїРѕРґРІРµСЂРіР°РµРјС‹Р№ РїСЂРѕРІРµСЂРєРµ
+	\param[in] pSignerKeys		РєР»СЋС‡Рё РїРѕРґРїРёСЃС‡РёРєР° Р·Р°РїСЂРѕСЃР° РёР»Рё NULL, РµСЃР»Рё Р·Р°РїСЂРѕСЃ РЅРµ РїРѕРґРїРёСЃС‹РІР°С‚СЊ
+	\param[in] dwOptions		РѕРїС†РёРё
+	\par РґРѕСЃС‚СѓРїРЅС‹Рµ РѕРїС†РёРё:
+		::UAC_OPTION_INCLUDE_VERSION		- СѓРєР°Р·Р°С‚СЊ РІРµСЂСЃРёСЋ Р·Р°РїСЂРѕСЃР°\n
+		::UAC_OPTION_INCLUDE_NONCE			- РґРѕР±Р°РІРёС‚СЊ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ Р·Р°РїСЂРѕСЃР°
 
-	\param[out] pOcspRequest	буфер для подписанного запроса
+	\param[out] pOcspRequest	Р±СѓС„РµСЂ РґР»СЏ РїРѕРґРїРёСЃР°РЅРЅРѕРіРѕ Р·Р°РїСЂРѕСЃР°
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_OcspRequestCreate (
 	UAC_IN PUAC_BLOB			pTargetCert,
@@ -439,20 +439,20 @@ UAC_API(DWORD) UAC_OcspRequestCreate (
 	UAC_OUT PUAC_BLOB			pOcspRequest );
 
 /**
-	\brief формирования запроса на проверку статуса сертификата
-	по ссылке на сертификат и сертификату издателя
-	\param[in] pTargetCertRef	ссылка на сертификат, подвергаемый проверке
-		\note Требуется ссылка с опцией ::UAC_OPTION_IDENT_BY_SERIAL_NUMBER, иначе вернет ошибку ::UAC_ERROR_NODATA
-	\param[in] pTargetIssuerCert сертификат издателя проверяемого сертификата
-	\param[in] pSignerKeys		ключи подписчика запроса или NULL, если запрос не подписывать
-	\param[in] dwOptions		опции
-	\par доступные опции:
-		::UAC_OPTION_INCLUDE_VERSION		- указать версию запроса\n
-		::UAC_OPTION_INCLUDE_NONCE			- добавить идентификатор запроса
+	\brief С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ Р·Р°РїСЂРѕСЃР° РЅР° РїСЂРѕРІРµСЂРєСѓ СЃС‚Р°С‚СѓСЃР° СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	РїРѕ СЃСЃС‹Р»РєРµ РЅР° СЃРµСЂС‚РёС„РёРєР°С‚ Рё СЃРµСЂС‚РёС„РёРєР°С‚Сѓ РёР·РґР°С‚РµР»СЏ
+	\param[in] pTargetCertRef	СЃСЃС‹Р»РєР° РЅР° СЃРµСЂС‚РёС„РёРєР°С‚, РїРѕРґРІРµСЂРіР°РµРјС‹Р№ РїСЂРѕРІРµСЂРєРµ
+		\note РўСЂРµР±СѓРµС‚СЃСЏ СЃСЃС‹Р»РєР° СЃ РѕРїС†РёРµР№ ::UAC_OPTION_IDENT_BY_SERIAL_NUMBER, РёРЅР°С‡Рµ РІРµСЂРЅРµС‚ РѕС€РёР±РєСѓ ::UAC_ERROR_NODATA
+	\param[in] pTargetIssuerCert СЃРµСЂС‚РёС„РёРєР°С‚ РёР·РґР°С‚РµР»СЏ РїСЂРѕРІРµСЂСЏРµРјРѕРіРѕ СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	\param[in] pSignerKeys		РєР»СЋС‡Рё РїРѕРґРїРёСЃС‡РёРєР° Р·Р°РїСЂРѕСЃР° РёР»Рё NULL, РµСЃР»Рё Р·Р°РїСЂРѕСЃ РЅРµ РїРѕРґРїРёСЃС‹РІР°С‚СЊ
+	\param[in] dwOptions		РѕРїС†РёРё
+	\par РґРѕСЃС‚СѓРїРЅС‹Рµ РѕРїС†РёРё:
+		::UAC_OPTION_INCLUDE_VERSION		- СѓРєР°Р·Р°С‚СЊ РІРµСЂСЃРёСЋ Р·Р°РїСЂРѕСЃР°\n
+		::UAC_OPTION_INCLUDE_NONCE			- РґРѕР±Р°РІРёС‚СЊ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ Р·Р°РїСЂРѕСЃР°
 
-	\param[out] pOcspRequest	буфер для подписанного запроса
+	\param[out] pOcspRequest	Р±СѓС„РµСЂ РґР»СЏ РїРѕРґРїРёСЃР°РЅРЅРѕРіРѕ Р·Р°РїСЂРѕСЃР°
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_OcspRequestCreateByIssuer (
 	UAC_IN PUAC_CERT_REF		pTargetCertRef,
@@ -462,30 +462,30 @@ UAC_API(DWORD) UAC_OcspRequestCreateByIssuer (
 	UAC_OUT PUAC_BLOB			pOcspRequest );
 
 /**
-	\brief Загрузка информации о запросе на проверку статуса сертификата
-	\param[in] pRequest			запрос
-	\param[out] pRequestInfo	структура информации о запросе
+	\brief Р—Р°РіСЂСѓР·РєР° РёРЅС„РѕСЂРјР°С†РёРё Рѕ Р·Р°РїСЂРѕСЃРµ РЅР° РїСЂРѕРІРµСЂРєСѓ СЃС‚Р°С‚СѓСЃР° СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	\param[in] pRequest			Р·Р°РїСЂРѕСЃ
+	\param[out] pRequestInfo	СЃС‚СЂСѓРєС‚СѓСЂР° РёРЅС„РѕСЂРјР°С†РёРё Рѕ Р·Р°РїСЂРѕСЃРµ
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_OcspRequestLoad (
 	UAC_IN	PUAC_BLOB pRequest,
 	UAC_OUT PUAC_OCSP_REQUEST_INFO pRequestInfo );
 
 /**
-	\brief Проверка подписи запроса на проверку статуса сертификата
-	\param[in] pRequest			запрос
-	\param[in] pSignerCert		сертификат подписчика
+	\brief РџСЂРѕРІРµСЂРєР° РїРѕРґРїРёСЃРё Р·Р°РїСЂРѕСЃР° РЅР° РїСЂРѕРІРµСЂРєСѓ СЃС‚Р°С‚СѓСЃР° СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	\param[in] pRequest			Р·Р°РїСЂРѕСЃ
+	\param[in] pSignerCert		СЃРµСЂС‚РёС„РёРєР°С‚ РїРѕРґРїРёСЃС‡РёРєР°
 */
 UAC_API(DWORD) UAC_OcspRequestVerify (
 	UAC_IN PUAC_BLOB pRequest,
 	UAC_IN PUAC_BLOB pSignerCert );
 
 /**
-	\brief извлечения сертификата по индексу из запроса на проверку статуса сертификата
-	\param[in] pRequest			запрос на проверку статуса сертификата
-	\param[in] dwIndex			индекс сертификата (с нуля)
-	\param[out] pCert			буфер для извлеченного сертификата
+	\brief РёР·РІР»РµС‡РµРЅРёСЏ СЃРµСЂС‚РёС„РёРєР°С‚Р° РїРѕ РёРЅРґРµРєСЃСѓ РёР· Р·Р°РїСЂРѕСЃР° РЅР° РїСЂРѕРІРµСЂРєСѓ СЃС‚Р°С‚СѓСЃР° СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	\param[in] pRequest			Р·Р°РїСЂРѕСЃ РЅР° РїСЂРѕРІРµСЂРєСѓ СЃС‚Р°С‚СѓСЃР° СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	\param[in] dwIndex			РёРЅРґРµРєСЃ СЃРµСЂС‚РёС„РёРєР°С‚Р° (СЃ РЅСѓР»СЏ)
+	\param[out] pCert			Р±СѓС„РµСЂ РґР»СЏ РёР·РІР»РµС‡РµРЅРЅРѕРіРѕ СЃРµСЂС‚РёС„РёРєР°С‚Р°
 */
 UAC_API(DWORD) UAC_OcspRequestGetCert (
 	UAC_IN PUAC_BLOB		pRequest,
@@ -493,10 +493,10 @@ UAC_API(DWORD) UAC_OcspRequestGetCert (
 	UAC_OUT PUAC_BLOB		pCert );
 
 /**
-	\brief добавления сертификата в запрос на проверку статуса сертификата
-	\param[in] pRequest			запрос на проверку статуса сертификата
-	\param[in] pCert			добавляемый сертификат
-	\param[out] pNewRequest	    буфер для нового запроса
+	\brief РґРѕР±Р°РІР»РµРЅРёСЏ СЃРµСЂС‚РёС„РёРєР°С‚Р° РІ Р·Р°РїСЂРѕСЃ РЅР° РїСЂРѕРІРµСЂРєСѓ СЃС‚Р°С‚СѓСЃР° СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	\param[in] pRequest			Р·Р°РїСЂРѕСЃ РЅР° РїСЂРѕРІРµСЂРєСѓ СЃС‚Р°С‚СѓСЃР° СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	\param[in] pCert			РґРѕР±Р°РІР»СЏРµРјС‹Р№ СЃРµСЂС‚РёС„РёРєР°С‚
+	\param[out] pNewRequest	    Р±СѓС„РµСЂ РґР»СЏ РЅРѕРІРѕРіРѕ Р·Р°РїСЂРѕСЃР°
 */
 UAC_API(DWORD) UAC_OcspRequestAddCert (
 	UAC_IN PUAC_BLOB		pRequest,
@@ -504,10 +504,10 @@ UAC_API(DWORD) UAC_OcspRequestAddCert (
 	UAC_IN PUAC_BLOB		pNewRequest );
 
 /**
-	\brief извлечение сертификата по ссылочным данным из запроса на проверку статуса сертификата
-	\param[in] pRequest			запрос на проверку статуса сертификата
-	\param[in] pCertRef			ссылки на сертификат
-	\param[out] pCert			буфер для извлеченного сертификата
+	\brief РёР·РІР»РµС‡РµРЅРёРµ СЃРµСЂС‚РёС„РёРєР°С‚Р° РїРѕ СЃСЃС‹Р»РѕС‡РЅС‹Рј РґР°РЅРЅС‹Рј РёР· Р·Р°РїСЂРѕСЃР° РЅР° РїСЂРѕРІРµСЂРєСѓ СЃС‚Р°С‚СѓСЃР° СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	\param[in] pRequest			Р·Р°РїСЂРѕСЃ РЅР° РїСЂРѕРІРµСЂРєСѓ СЃС‚Р°С‚СѓСЃР° СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	\param[in] pCertRef			СЃСЃС‹Р»РєРё РЅР° СЃРµСЂС‚РёС„РёРєР°С‚
+	\param[out] pCert			Р±СѓС„РµСЂ РґР»СЏ РёР·РІР»РµС‡РµРЅРЅРѕРіРѕ СЃРµСЂС‚РёС„РёРєР°С‚Р°
 */
 UAC_API(DWORD) UAC_OcspRequestFindCert (
 	UAC_IN PUAC_BLOB		pRequest,
@@ -515,20 +515,20 @@ UAC_API(DWORD) UAC_OcspRequestFindCert (
 	UAC_OUT PUAC_BLOB		pCert );
 
 /**
-	\brief формирования ответа о статусе сертификата
-	\param[in] pResponseInfo	информация об ответе
-	\param[in] pSignerKeys		ключи подписчика запроса или NULL, если запрос не подписывать
-	\param[in] dwOptions		опции
-	\par доступные опции:
+	\brief С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ РѕС‚РІРµС‚Р° Рѕ СЃС‚Р°С‚СѓСЃРµ СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	\param[in] pResponseInfo	РёРЅС„РѕСЂРјР°С†РёСЏ РѕР± РѕС‚РІРµС‚Рµ
+	\param[in] pSignerKeys		РєР»СЋС‡Рё РїРѕРґРїРёСЃС‡РёРєР° Р·Р°РїСЂРѕСЃР° РёР»Рё NULL, РµСЃР»Рё Р·Р°РїСЂРѕСЃ РЅРµ РїРѕРґРїРёСЃС‹РІР°С‚СЊ
+	\param[in] dwOptions		РѕРїС†РёРё
+	\par РґРѕСЃС‚СѓРїРЅС‹Рµ РѕРїС†РёРё:
 		::UAC_OPTION_INCLUDE_CERT
 		::UAC_OPTION_IDENT_BY_SERIAL_NUMBER
 		::UAC_OPTION_IDENT_BY_KEY_ID
 		::UAC_OPTION_INCLUDE_VERSION
 		::UAC_OPTION_INCLUDE_CERT
 
-	\param[out] pResponse		буфер для ответа
+	\param[out] pResponse		Р±СѓС„РµСЂ РґР»СЏ РѕС‚РІРµС‚Р°
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_OcspResponseCreate (
 	UAC_IN PUAC_OCSP_RESPONSE_INFO	pResponseInfo,
@@ -536,29 +536,29 @@ UAC_API(DWORD) UAC_OcspResponseCreate (
 	UAC_IN DWORD					dwOptions,
 	UAC_OUT PUAC_BLOB				pResponse );
 /**
-	\brief Загрузка информации об ответе на запрос статуса сертификата
-	\param[in] pResponse		ответ
-	\param[out] pResponseInfo	структура информации об ответе
+	\brief Р—Р°РіСЂСѓР·РєР° РёРЅС„РѕСЂРјР°С†РёРё РѕР± РѕС‚РІРµС‚Рµ РЅР° Р·Р°РїСЂРѕСЃ СЃС‚Р°С‚СѓСЃР° СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	\param[in] pResponse		РѕС‚РІРµС‚
+	\param[out] pResponseInfo	СЃС‚СЂСѓРєС‚СѓСЂР° РёРЅС„РѕСЂРјР°С†РёРё РѕР± РѕС‚РІРµС‚Рµ
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_OcspResponseLoad (
 	UAC_IN	PUAC_BLOB pResponse,
 	UAC_OUT PUAC_OCSP_RESPONSE_INFO pResponseInfo );
 /**
-	\brief Проверка подписи ответа на запрос статуса сертификата
-	\param[in] pResponse		ответ
-	\param[in] pSignerCert		сертификат подписчика
+	\brief РџСЂРѕРІРµСЂРєР° РїРѕРґРїРёСЃРё РѕС‚РІРµС‚Р° РЅР° Р·Р°РїСЂРѕСЃ СЃС‚Р°С‚СѓСЃР° СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	\param[in] pResponse		РѕС‚РІРµС‚
+	\param[in] pSignerCert		СЃРµСЂС‚РёС„РёРєР°С‚ РїРѕРґРїРёСЃС‡РёРєР°
 */
 UAC_API(DWORD) UAC_OcspResponseVerify (
 	UAC_IN PUAC_BLOB pResponse,
 	UAC_IN PUAC_BLOB pSignerCert );
 
 /**
-	\brief добавления сертификата в ответ на запрос статуса сертификата
-	\param[in] pResponse		ответ
-	\param[in] pCert			добавляемый сертификат
-	\param[out] pNewResponse	буфер для нового ответа
+	\brief РґРѕР±Р°РІР»РµРЅРёСЏ СЃРµСЂС‚РёС„РёРєР°С‚Р° РІ РѕС‚РІРµС‚ РЅР° Р·Р°РїСЂРѕСЃ СЃС‚Р°С‚СѓСЃР° СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	\param[in] pResponse		РѕС‚РІРµС‚
+	\param[in] pCert			РґРѕР±Р°РІР»СЏРµРјС‹Р№ СЃРµСЂС‚РёС„РёРєР°С‚
+	\param[out] pNewResponse	Р±СѓС„РµСЂ РґР»СЏ РЅРѕРІРѕРіРѕ РѕС‚РІРµС‚Р°
 */
 UAC_API(DWORD) UAC_OcspResponseAddCert (
 	UAC_IN PUAC_BLOB	pResponse,
@@ -566,10 +566,10 @@ UAC_API(DWORD) UAC_OcspResponseAddCert (
 	UAC_IN PUAC_BLOB	pNewResponse );
 
 /**
-	\brief извлечения сертификата по индексу из ответа на запрос статуса сертификата
-	\param[in] pResponse		ответ
-	\param[in] dwIndex			индекс сертификата (с нуля)
-	\param[out] pCert			буфер для извлеченного сертификата
+	\brief РёР·РІР»РµС‡РµРЅРёСЏ СЃРµСЂС‚РёС„РёРєР°С‚Р° РїРѕ РёРЅРґРµРєСЃСѓ РёР· РѕС‚РІРµС‚Р° РЅР° Р·Р°РїСЂРѕСЃ СЃС‚Р°С‚СѓСЃР° СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	\param[in] pResponse		РѕС‚РІРµС‚
+	\param[in] dwIndex			РёРЅРґРµРєСЃ СЃРµСЂС‚РёС„РёРєР°С‚Р° (СЃ РЅСѓР»СЏ)
+	\param[out] pCert			Р±СѓС„РµСЂ РґР»СЏ РёР·РІР»РµС‡РµРЅРЅРѕРіРѕ СЃРµСЂС‚РёС„РёРєР°С‚Р°
 */
 UAC_API(DWORD) UAC_OcspResponseGetCert (
 	UAC_IN PUAC_BLOB	pResponse,
@@ -577,27 +577,27 @@ UAC_API(DWORD) UAC_OcspResponseGetCert (
 	UAC_OUT PUAC_BLOB	pCert );
 
 /**
-	\brief извлечение сертификата по ссылочным данным из ответа на запрос статуса сертификата
-	\param[in] pResponse		ответ
-	\param[in] pCertRef			ссылки на сертификат
-	\param[out] pCert			буфер для извлеченного сертификата
+	\brief РёР·РІР»РµС‡РµРЅРёРµ СЃРµСЂС‚РёС„РёРєР°С‚Р° РїРѕ СЃСЃС‹Р»РѕС‡РЅС‹Рј РґР°РЅРЅС‹Рј РёР· РѕС‚РІРµС‚Р° РЅР° Р·Р°РїСЂРѕСЃ СЃС‚Р°С‚СѓСЃР° СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	\param[in] pResponse		РѕС‚РІРµС‚
+	\param[in] pCertRef			СЃСЃС‹Р»РєРё РЅР° СЃРµСЂС‚РёС„РёРєР°С‚
+	\param[out] pCert			Р±СѓС„РµСЂ РґР»СЏ РёР·РІР»РµС‡РµРЅРЅРѕРіРѕ СЃРµСЂС‚РёС„РёРєР°С‚Р°
 */
 UAC_API(DWORD) UAC_OcspResponseFindCert (
 	UAC_IN PUAC_BLOB		pResponse,
 	UAC_IN PUAC_CERT_REF	pCertRef,
 	UAC_OUT PUAC_BLOB		pCert );
 
-/** \name Метка времени (TSP)  */
+/** \name РњРµС‚РєР° РІСЂРµРјРµРЅРё (TSP)  */
 /**
-	\brief формирования запроса на создание метки времени
-	\param[in] pHash			исходный хеш-вектор данных
-	\param[in] nonce			идентификатор запроса
-	\param[in] dwOptions		опции
-	доступные опции:
-		::UAC_OPTION_QUERY_CERT				запросить сертификат сервера метки времени в ответе
-	\param[out] pTsRequest		буфер для запроса
+	\brief С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ Р·Р°РїСЂРѕСЃР° РЅР° СЃРѕР·РґР°РЅРёРµ РјРµС‚РєРё РІСЂРµРјРµРЅРё
+	\param[in] pHash			РёСЃС…РѕРґРЅС‹Р№ С…РµС€-РІРµРєС‚РѕСЂ РґР°РЅРЅС‹С…
+	\param[in] nonce			РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ Р·Р°РїСЂРѕСЃР°
+	\param[in] dwOptions		РѕРїС†РёРё
+	РґРѕСЃС‚СѓРїРЅС‹Рµ РѕРїС†РёРё:
+		::UAC_OPTION_QUERY_CERT				Р·Р°РїСЂРѕСЃРёС‚СЊ СЃРµСЂС‚РёС„РёРєР°С‚ СЃРµСЂРІРµСЂР° РјРµС‚РєРё РІСЂРµРјРµРЅРё РІ РѕС‚РІРµС‚Рµ
+	\param[out] pTsRequest		Р±СѓС„РµСЂ РґР»СЏ Р·Р°РїСЂРѕСЃР°
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_TsRequestCreate (
 	UAC_IN PUAC_BLOB			pHash,
@@ -605,24 +605,24 @@ UAC_API(DWORD) UAC_TsRequestCreate (
 	UAC_IN DWORD				dwOptions,
 	UAC_OUT PUAC_BLOB			pTsRequest );
 /**
-	\brief Загрузка информации о запросе на создание метки времени
-	\param[in] pRequest			запрос
-	\param[out] pRequestInfo	структура информации о запросе
+	\brief Р—Р°РіСЂСѓР·РєР° РёРЅС„РѕСЂРјР°С†РёРё Рѕ Р·Р°РїСЂРѕСЃРµ РЅР° СЃРѕР·РґР°РЅРёРµ РјРµС‚РєРё РІСЂРµРјРµРЅРё
+	\param[in] pRequest			Р·Р°РїСЂРѕСЃ
+	\param[out] pRequestInfo	СЃС‚СЂСѓРєС‚СѓСЂР° РёРЅС„РѕСЂРјР°С†РёРё Рѕ Р·Р°РїСЂРѕСЃРµ
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_TsRequestLoad (
 	UAC_IN	PUAC_BLOB pRequest,
 	UAC_OUT PUAC_TIME_STAMP_INFO pRequestInfo );
 
 /**
-	\brief формирования ответа c меткой времени
-	\param[in] pRequest			исходный запрос
-	\param[in] pTsInfo 			параметры ответа
-	\param[in] pSignerKeys		ключи подписчика ответа
-	\param[out] pTsResponse		буфер для ответа
+	\brief С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ РѕС‚РІРµС‚Р° c РјРµС‚РєРѕР№ РІСЂРµРјРµРЅРё
+	\param[in] pRequest			РёСЃС…РѕРґРЅС‹Р№ Р·Р°РїСЂРѕСЃ
+	\param[in] pTsInfo 			РїР°СЂР°РјРµС‚СЂС‹ РѕС‚РІРµС‚Р°
+	\param[in] pSignerKeys		РєР»СЋС‡Рё РїРѕРґРїРёСЃС‡РёРєР° РѕС‚РІРµС‚Р°
+	\param[out] pTsResponse		Р±СѓС„РµСЂ РґР»СЏ РѕС‚РІРµС‚Р°
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 
 UAC_API(DWORD) UAC_TsResponseCreate (
@@ -631,20 +631,20 @@ UAC_API(DWORD) UAC_TsResponseCreate (
 	UAC_IN PUAC_KEYPAIR			pSignerKeys,
 	UAC_OUT PUAC_BLOB			pTsResponse );
 /**
-	\brief Загрузка информации об ответе c меткой времени
-	\param[in] pTsResponse		ответ
-	\param[out] pTsInfo	        структура для информации об ответе
+	\brief Р—Р°РіСЂСѓР·РєР° РёРЅС„РѕСЂРјР°С†РёРё РѕР± РѕС‚РІРµС‚Рµ c РјРµС‚РєРѕР№ РІСЂРµРјРµРЅРё
+	\param[in] pTsResponse		РѕС‚РІРµС‚
+	\param[out] pTsInfo	        СЃС‚СЂСѓРєС‚СѓСЂР° РґР»СЏ РёРЅС„РѕСЂРјР°С†РёРё РѕР± РѕС‚РІРµС‚Рµ
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_TsResponseLoad (
 	UAC_IN	PUAC_BLOB pTsResponse,
 	UAC_OUT PUAC_TIME_STAMP_INFO pTsInfo );
 
 /**
-	\brief Проверка подписи ответа c меткой времени
-	\param[in] pResponse		ответ
-	\param[in] pSignerCert		сертификат подписчика
+	\brief РџСЂРѕРІРµСЂРєР° РїРѕРґРїРёСЃРё РѕС‚РІРµС‚Р° c РјРµС‚РєРѕР№ РІСЂРµРјРµРЅРё
+	\param[in] pResponse		РѕС‚РІРµС‚
+	\param[in] pSignerCert		СЃРµСЂС‚РёС„РёРєР°С‚ РїРѕРґРїРёСЃС‡РёРєР°
 */
 
 UAC_API(DWORD) UAC_TsResponseVerify (
@@ -652,9 +652,9 @@ UAC_API(DWORD) UAC_TsResponseVerify (
 	UAC_IN PUAC_BLOB pSignerCert );
 
 /**
-	\brief Проверка соответствия хеша сообщения c меткой времени
-	\param[in] pHash			исходный хеш-вектор данных
-	\param[out] pTsInfo	        информация об ответе
+	\brief РџСЂРѕРІРµСЂРєР° СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ С…РµС€Р° СЃРѕРѕР±С‰РµРЅРёСЏ c РјРµС‚РєРѕР№ РІСЂРµРјРµРЅРё
+	\param[in] pHash			РёСЃС…РѕРґРЅС‹Р№ С…РµС€-РІРµРєС‚РѕСЂ РґР°РЅРЅС‹С…
+	\param[out] pTsInfo	        РёРЅС„РѕСЂРјР°С†РёСЏ РѕР± РѕС‚РІРµС‚Рµ
 */
 
 UAC_API(DWORD) UAC_TsVerifyHash (
@@ -662,10 +662,10 @@ UAC_API(DWORD) UAC_TsVerifyHash (
 	UAC_IN PUAC_TIME_STAMP_INFO pTsInfo );
 
 /**
-	\brief добавления сертификата в ответ c меткой времени
-	\param[in] pResponse		ответ
-	\param[in] pCert			добавляемый сертификат
-	\param[out] pNewResponse	буфер для нового ответа
+	\brief РґРѕР±Р°РІР»РµРЅРёСЏ СЃРµСЂС‚РёС„РёРєР°С‚Р° РІ РѕС‚РІРµС‚ c РјРµС‚РєРѕР№ РІСЂРµРјРµРЅРё
+	\param[in] pResponse		РѕС‚РІРµС‚
+	\param[in] pCert			РґРѕР±Р°РІР»СЏРµРјС‹Р№ СЃРµСЂС‚РёС„РёРєР°С‚
+	\param[out] pNewResponse	Р±СѓС„РµСЂ РґР»СЏ РЅРѕРІРѕРіРѕ РѕС‚РІРµС‚Р°
 */
 
 UAC_API(DWORD) UAC_TsResponseAddCert (
@@ -674,20 +674,20 @@ UAC_API(DWORD) UAC_TsResponseAddCert (
 	UAC_IN PUAC_BLOB pNewResponse );
 
 /**
-	\brief извлечения сертификата по индексу из ответа c меткой времени
-	\param[in] pResponse		ответ
-	\param[in] dwIndex			индекс сертификата (с нуля)
-	\param[out] pCert			буфер для извлеченного сертификата
+	\brief РёР·РІР»РµС‡РµРЅРёСЏ СЃРµСЂС‚РёС„РёРєР°С‚Р° РїРѕ РёРЅРґРµРєСЃСѓ РёР· РѕС‚РІРµС‚Р° c РјРµС‚РєРѕР№ РІСЂРµРјРµРЅРё
+	\param[in] pResponse		РѕС‚РІРµС‚
+	\param[in] dwIndex			РёРЅРґРµРєСЃ СЃРµСЂС‚РёС„РёРєР°С‚Р° (СЃ РЅСѓР»СЏ)
+	\param[out] pCert			Р±СѓС„РµСЂ РґР»СЏ РёР·РІР»РµС‡РµРЅРЅРѕРіРѕ СЃРµСЂС‚РёС„РёРєР°С‚Р°
 */
 UAC_API(DWORD) UAC_TsResponseGetCert (
 	UAC_IN PUAC_BLOB	pResponse,
 	UAC_IN DWORD		dwIndex,
 	UAC_OUT PUAC_BLOB	pCert );
 /**
-	\brief извлечение сертификата по ссылочным данным из ответа c меткой времени
-	\param[in] pResponse		ответ
-	\param[in] pCertRef			ссылки на сертификат
-	\param[out] pCert			буфер для извлеченного сертификата
+	\brief РёР·РІР»РµС‡РµРЅРёРµ СЃРµСЂС‚РёС„РёРєР°С‚Р° РїРѕ СЃСЃС‹Р»РѕС‡РЅС‹Рј РґР°РЅРЅС‹Рј РёР· РѕС‚РІРµС‚Р° c РјРµС‚РєРѕР№ РІСЂРµРјРµРЅРё
+	\param[in] pResponse		РѕС‚РІРµС‚
+	\param[in] pCertRef			СЃСЃС‹Р»РєРё РЅР° СЃРµСЂС‚РёС„РёРєР°С‚
+	\param[out] pCert			Р±СѓС„РµСЂ РґР»СЏ РёР·РІР»РµС‡РµРЅРЅРѕРіРѕ СЃРµСЂС‚РёС„РёРєР°С‚Р°
 */
 
 UAC_API(DWORD) UAC_TsResponseFindCert (
@@ -695,23 +695,23 @@ UAC_API(DWORD) UAC_TsResponseFindCert (
 	UAC_IN PUAC_CERT_REF	pCertRef,
 	UAC_OUT PUAC_BLOB		pCert );
 
-/** \name Конверт с зашифрованными данными (Envelope, EnvelopedData)  */
+/** \name РљРѕРЅРІРµСЂС‚ СЃ Р·Р°С€РёС„СЂРѕРІР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё (Envelope, EnvelopedData)  */
 /**
-	\brief формирования конверта с зашифрованными данными
-	\param[in] pData			блок данных
-	\param[in] pOriginatorKey	ключи отправителя
-	\param[in] pRecipientCerts	массив с сертификатами получателей
-	\param[in] dwRecipientCount	количество получателей
-	\param[in] dwOptions		параметры/режимы
-	\par доступные опции:
+	\brief С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ РєРѕРЅРІРµСЂС‚Р° СЃ Р·Р°С€РёС„СЂРѕРІР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё
+	\param[in] pData			Р±Р»РѕРє РґР°РЅРЅС‹С…
+	\param[in] pOriginatorKey	РєР»СЋС‡Рё РѕС‚РїСЂР°РІРёС‚РµР»СЏ
+	\param[in] pRecipientCerts	РјР°СЃСЃРёРІ СЃ СЃРµСЂС‚РёС„РёРєР°С‚Р°РјРё РїРѕР»СѓС‡Р°С‚РµР»РµР№
+	\param[in] dwRecipientCount	РєРѕР»РёС‡РµСЃС‚РІРѕ РїРѕР»СѓС‡Р°С‚РµР»РµР№
+	\param[in] dwOptions		РїР°СЂР°РјРµС‚СЂС‹/СЂРµР¶РёРјС‹
+	\par РґРѕСЃС‚СѓРїРЅС‹Рµ РѕРїС†РёРё:
 		::UAC_OPTION_INCLUDE_CERT
 		::UAC_OPTION_IDENT_BY_SERIAL_NUMBER
 		::UAC_OPTION_IDENT_BY_KEY_ID
 
-	\param[out] pExternalData	буфер для внешнего зашифрованного сообщения или NULL
-	\param[out] pEnvelope		буфер для конверта
+	\param[out] pExternalData	Р±СѓС„РµСЂ РґР»СЏ РІРЅРµС€РЅРµРіРѕ Р·Р°С€РёС„СЂРѕРІР°РЅРЅРѕРіРѕ СЃРѕРѕР±С‰РµРЅРёСЏ РёР»Рё NULL
+	\param[out] pEnvelope		Р±СѓС„РµСЂ РґР»СЏ РєРѕРЅРІРµСЂС‚Р°
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 
 UAC_API(DWORD) UAC_EnvelopeCreate (
@@ -724,23 +724,23 @@ UAC_API(DWORD) UAC_EnvelopeCreate (
 	UAC_OUT PUAC_BLOB			pEnvelope );
 
 /**
-	\brief формирования конверта с зашифрованными данными с указанием ДКЕ шифрования
-	\param[in] pData			блок данных
-	\param[in] pOriginatorKey	ключи отправителя
-	\param[in] pRecipientCerts	массив с сертификатами получателей
-	\param[in] dwRecipientCount	количество получателей
-	\param[in] dwOptions		параметры/режимы
-	\par доступные опции:
+	\brief С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ РєРѕРЅРІРµСЂС‚Р° СЃ Р·Р°С€РёС„СЂРѕРІР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё СЃ СѓРєР°Р·Р°РЅРёРµРј Р”РљР• С€РёС„СЂРѕРІР°РЅРёСЏ
+	\param[in] pData			Р±Р»РѕРє РґР°РЅРЅС‹С…
+	\param[in] pOriginatorKey	РєР»СЋС‡Рё РѕС‚РїСЂР°РІРёС‚РµР»СЏ
+	\param[in] pRecipientCerts	РјР°СЃСЃРёРІ СЃ СЃРµСЂС‚РёС„РёРєР°С‚Р°РјРё РїРѕР»СѓС‡Р°С‚РµР»РµР№
+	\param[in] dwRecipientCount	РєРѕР»РёС‡РµСЃС‚РІРѕ РїРѕР»СѓС‡Р°С‚РµР»РµР№
+	\param[in] dwOptions		РїР°СЂР°РјРµС‚СЂС‹/СЂРµР¶РёРјС‹
+	\par РґРѕСЃС‚СѓРїРЅС‹Рµ РѕРїС†РёРё:
 		::UAC_OPTION_INCLUDE_CERT
 		::UAC_OPTION_IDENT_BY_SERIAL_NUMBER
 		::UAC_OPTION_IDENT_BY_KEY_ID
 
-	\param[out] pExternalData	буфер для внешнего зашифрованного сообщения или NULL
-	\param[in]  pDke			ДКЕ для шифрованния или NULL
+	\param[out] pExternalData	Р±СѓС„РµСЂ РґР»СЏ РІРЅРµС€РЅРµРіРѕ Р·Р°С€РёС„СЂРѕРІР°РЅРЅРѕРіРѕ СЃРѕРѕР±С‰РµРЅРёСЏ РёР»Рё NULL
+	\param[in]  pDke			Р”РљР• РґР»СЏ С€РёС„СЂРѕРІР°РЅРЅРёСЏ РёР»Рё NULL
 
-	\param[out] pEnvelope		буфер для конверта
+	\param[out] pEnvelope		Р±СѓС„РµСЂ РґР»СЏ РєРѕРЅРІРµСЂС‚Р°
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 
 UAC_API(DWORD) UAC_EnvelopeCreateDke (
@@ -754,23 +754,23 @@ UAC_API(DWORD) UAC_EnvelopeCreateDke (
 	UAC_OUT PUAC_BLOB			pEnvelope );
 
 /**
-	\brief формирования конверта с зашифрованными данными с указанием алгоритма шифрования
-	\param[in] pData			блок данных
-	\param[in] pOriginatorKey	ключи отправителя
-	\param[in] pRecipientCerts	массив с сертификатами получателей
-	\param[in] dwRecipientCount	количество получателей
-	\param[in] dwOptions		параметры/режимы
-	\par доступные опции:
+	\brief С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ РєРѕРЅРІРµСЂС‚Р° СЃ Р·Р°С€РёС„СЂРѕРІР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё СЃ СѓРєР°Р·Р°РЅРёРµРј Р°Р»РіРѕСЂРёС‚РјР° С€РёС„СЂРѕРІР°РЅРёСЏ
+	\param[in] pData			Р±Р»РѕРє РґР°РЅРЅС‹С…
+	\param[in] pOriginatorKey	РєР»СЋС‡Рё РѕС‚РїСЂР°РІРёС‚РµР»СЏ
+	\param[in] pRecipientCerts	РјР°СЃСЃРёРІ СЃ СЃРµСЂС‚РёС„РёРєР°С‚Р°РјРё РїРѕР»СѓС‡Р°С‚РµР»РµР№
+	\param[in] dwRecipientCount	РєРѕР»РёС‡РµСЃС‚РІРѕ РїРѕР»СѓС‡Р°С‚РµР»РµР№
+	\param[in] dwOptions		РїР°СЂР°РјРµС‚СЂС‹/СЂРµР¶РёРјС‹
+	\par РґРѕСЃС‚СѓРїРЅС‹Рµ РѕРїС†РёРё:
 		::UAC_OPTION_INCLUDE_CERT
 		::UAC_OPTION_IDENT_BY_SERIAL_NUMBER
 		::UAC_OPTION_IDENT_BY_KEY_ID
 
-	\param[out] pExternalData	буфер для внешнего зашифрованного сообщения или NULL
-	\param[in]  cypherOid		объектный идентификатор алгоритма шифрованния (или NULL == Gost28147 Mode2)
+	\param[out] pExternalData	Р±СѓС„РµСЂ РґР»СЏ РІРЅРµС€РЅРµРіРѕ Р·Р°С€РёС„СЂРѕРІР°РЅРЅРѕРіРѕ СЃРѕРѕР±С‰РµРЅРёСЏ РёР»Рё NULL
+	\param[in]  cypherOid		РѕР±СЉРµРєС‚РЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ Р°Р»РіРѕСЂРёС‚РјР° С€РёС„СЂРѕРІР°РЅРЅРёСЏ (РёР»Рё NULL == Gost28147 Mode2)
 
-	\param[out] pEnvelope		буфер для конверта
+	\param[out] pEnvelope		Р±СѓС„РµСЂ РґР»СЏ РєРѕРЅРІРµСЂС‚Р°
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 
 UAC_API(DWORD) UAC_EnvelopeCreateEx (
@@ -785,23 +785,23 @@ UAC_API(DWORD) UAC_EnvelopeCreateEx (
 
 
 /**
-	\brief формирования конверта с зашифрованными ключами с указанием алгоритма шифрования
-	\param[in] pOriginatorKey	ключи отправителя
-	\param[in] pRecipientCerts	массив с сертификатами получателей
-	\param[in] dwRecipientCount	количество получателей
-	\param[in] dwOptions		параметры/режимы
-	\par доступные опции:
+	\brief С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ РєРѕРЅРІРµСЂС‚Р° СЃ Р·Р°С€РёС„СЂРѕРІР°РЅРЅС‹РјРё РєР»СЋС‡Р°РјРё СЃ СѓРєР°Р·Р°РЅРёРµРј Р°Р»РіРѕСЂРёС‚РјР° С€РёС„СЂРѕРІР°РЅРёСЏ
+	\param[in] pOriginatorKey	РєР»СЋС‡Рё РѕС‚РїСЂР°РІРёС‚РµР»СЏ
+	\param[in] pRecipientCerts	РјР°СЃСЃРёРІ СЃ СЃРµСЂС‚РёС„РёРєР°С‚Р°РјРё РїРѕР»СѓС‡Р°С‚РµР»РµР№
+	\param[in] dwRecipientCount	РєРѕР»РёС‡РµСЃС‚РІРѕ РїРѕР»СѓС‡Р°С‚РµР»РµР№
+	\param[in] dwOptions		РїР°СЂР°РјРµС‚СЂС‹/СЂРµР¶РёРјС‹
+	\par РґРѕСЃС‚СѓРїРЅС‹Рµ РѕРїС†РёРё:
 		::UAC_OPTION_EXTERNAL_ENVELOPE
 		::UAC_OPTION_INCLUDE_CERT
 		::UAC_OPTION_IDENT_BY_SERIAL_NUMBER
 		::UAC_OPTION_IDENT_BY_KEY_ID
-	\param[in] pDataInput		входной поток открытых данных
-	\param[in] pDataOutput		выходной поток зашифрованных данных
-	\param[in]  cypherOid		объектный идентификатор алгоритма шифрованния (или NULL == Gost28147 Mode2)
-	\param[in]  pDke			параметры алгоритма шифрованния или NULL
-	\param[out] pEnvelope		буфер для конверта
+	\param[in] pDataInput		РІС…РѕРґРЅРѕР№ РїРѕС‚РѕРє РѕС‚РєСЂС‹С‚С‹С… РґР°РЅРЅС‹С…
+	\param[in] pDataOutput		РІС‹С…РѕРґРЅРѕР№ РїРѕС‚РѕРє Р·Р°С€РёС„СЂРѕРІР°РЅРЅС‹С… РґР°РЅРЅС‹С…
+	\param[in]  cypherOid		РѕР±СЉРµРєС‚РЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ Р°Р»РіРѕСЂРёС‚РјР° С€РёС„СЂРѕРІР°РЅРЅРёСЏ (РёР»Рё NULL == Gost28147 Mode2)
+	\param[in]  pDke			РїР°СЂР°РјРµС‚СЂС‹ Р°Р»РіРѕСЂРёС‚РјР° С€РёС„СЂРѕРІР°РЅРЅРёСЏ РёР»Рё NULL
+	\param[out] pEnvelope		Р±СѓС„РµСЂ РґР»СЏ РєРѕРЅРІРµСЂС‚Р°
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_EnvelopeCreateStream (
 	UAC_IN PUAC_KEYPAIR			pOriginatorKey,
@@ -815,25 +815,25 @@ UAC_API(DWORD) UAC_EnvelopeCreateStream (
 	UAC_OUT PUAC_BLOB			pEnvelope );
 
 /**
-	\brief Загрузка информации о конверте с зашифрованными данными
-	\param[in] pEnvelope		конверт
-	\param[out] pInfo	        структура для информации о конверте
+	\brief Р—Р°РіСЂСѓР·РєР° РёРЅС„РѕСЂРјР°С†РёРё Рѕ РєРѕРЅРІРµСЂС‚Рµ СЃ Р·Р°С€РёС„СЂРѕРІР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё
+	\param[in] pEnvelope		РєРѕРЅРІРµСЂС‚
+	\param[out] pInfo	        СЃС‚СЂСѓРєС‚СѓСЂР° РґР»СЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ РєРѕРЅРІРµСЂС‚Рµ
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_EnvelopeLoad (
 	UAC_IN	PUAC_BLOB pEnvelope,
 	UAC_OUT PUAC_ENVELOPE_INFO pInfo );
 
 /**
-	\brief Расшифрование данных из конверта
-	\param[in] pEnvelope		конверт
-	\param[in] pOriginatorCert	сертификат отправителя (или NULL, при динамической схеме)
-	\param[in] pRecipientKeys	ключи  получателя
-	\param[in] pExternalData    внешнее зашифрованное сообщение или NULL
-	\param[out] pPlainData		буфер для расшифрованых данных
+	\brief Р Р°СЃС€РёС„СЂРѕРІР°РЅРёРµ РґР°РЅРЅС‹С… РёР· РєРѕРЅРІРµСЂС‚Р°
+	\param[in] pEnvelope		РєРѕРЅРІРµСЂС‚
+	\param[in] pOriginatorCert	СЃРµСЂС‚РёС„РёРєР°С‚ РѕС‚РїСЂР°РІРёС‚РµР»СЏ (РёР»Рё NULL, РїСЂРё РґРёРЅР°РјРёС‡РµСЃРєРѕР№ СЃС…РµРјРµ)
+	\param[in] pRecipientKeys	РєР»СЋС‡Рё  РїРѕР»СѓС‡Р°С‚РµР»СЏ
+	\param[in] pExternalData    РІРЅРµС€РЅРµРµ Р·Р°С€РёС„СЂРѕРІР°РЅРЅРѕРµ СЃРѕРѕР±С‰РµРЅРёРµ РёР»Рё NULL
+	\param[out] pPlainData		Р±СѓС„РµСЂ РґР»СЏ СЂР°СЃС€РёС„СЂРѕРІР°РЅС‹С… РґР°РЅРЅС‹С…
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_EnvelopeDecrypt (
 	UAC_IN	PUAC_BLOB			pEnvelope,
@@ -843,17 +843,17 @@ UAC_API(DWORD) UAC_EnvelopeDecrypt (
 	UAC_OUT PUAC_BLOB			pPlainData );
 
 /**
-	\brief Расшифрование данных из потока на ключе из конверта
-	\param[in] pEnvelope		конверт
-	\param[in] pOriginatorCert	сертификат отправителя (или NULL, при динамической схеме)
-	\param[in] pRecipientKeys	ключи  получателя
-	\param[in] dwOptions		параметры/режимы
-	\par доступные опции:
+	\brief Р Р°СЃС€РёС„СЂРѕРІР°РЅРёРµ РґР°РЅРЅС‹С… РёР· РїРѕС‚РѕРєР° РЅР° РєР»СЋС‡Рµ РёР· РєРѕРЅРІРµСЂС‚Р°
+	\param[in] pEnvelope		РєРѕРЅРІРµСЂС‚
+	\param[in] pOriginatorCert	СЃРµСЂС‚РёС„РёРєР°С‚ РѕС‚РїСЂР°РІРёС‚РµР»СЏ (РёР»Рё NULL, РїСЂРё РґРёРЅР°РјРёС‡РµСЃРєРѕР№ СЃС…РµРјРµ)
+	\param[in] pRecipientKeys	РєР»СЋС‡Рё  РїРѕР»СѓС‡Р°С‚РµР»СЏ
+	\param[in] dwOptions		РїР°СЂР°РјРµС‚СЂС‹/СЂРµР¶РёРјС‹
+	\par РґРѕСЃС‚СѓРїРЅС‹Рµ РѕРїС†РёРё:
 		::UAC_OPTION_EXTERNAL_ENVELOPE
-	\param[in] pDataInput		входной поток с зашифрованним сообщением
-	\param[out] pDataOutput		поток для расшифрованых данных
+	\param[in] pDataInput		РІС…РѕРґРЅРѕР№ РїРѕС‚РѕРє СЃ Р·Р°С€РёС„СЂРѕРІР°РЅРЅРёРј СЃРѕРѕР±С‰РµРЅРёРµРј
+	\param[out] pDataOutput		РїРѕС‚РѕРє РґР»СЏ СЂР°СЃС€РёС„СЂРѕРІР°РЅС‹С… РґР°РЅРЅС‹С…
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_EnvelopeDecryptStream (
 	UAC_IN	PUAC_BLOB			pEnvelope,
@@ -863,10 +863,10 @@ UAC_API(DWORD) UAC_EnvelopeDecryptStream (
 	UAC_IN	PUAC_STREAM			pDataInput,
 	UAC_OUT PUAC_STREAM			pDataOutput );
 /**
-	\brief добавления сертификата в конверт с зашифрованными данными
-	\param[in] pEnvelope		конверт
-	\param[in] pCert			добавляемый сертификат
-	\param[out] pNewEnvelope	буфер для нового конверта
+	\brief РґРѕР±Р°РІР»РµРЅРёСЏ СЃРµСЂС‚РёС„РёРєР°С‚Р° РІ РєРѕРЅРІРµСЂС‚ СЃ Р·Р°С€РёС„СЂРѕРІР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё
+	\param[in] pEnvelope		РєРѕРЅРІРµСЂС‚
+	\param[in] pCert			РґРѕР±Р°РІР»СЏРµРјС‹Р№ СЃРµСЂС‚РёС„РёРєР°С‚
+	\param[out] pNewEnvelope	Р±СѓС„РµСЂ РґР»СЏ РЅРѕРІРѕРіРѕ РєРѕРЅРІРµСЂС‚Р°
 */
 UAC_API(DWORD) UAC_EnvelopeAddCert (
 	UAC_IN PUAC_BLOB pEnvelope,
@@ -874,10 +874,10 @@ UAC_API(DWORD) UAC_EnvelopeAddCert (
 	UAC_IN PUAC_BLOB pNewEnvelope );
 
 /**
-	\brief извлечения сертификата по индексу из конверта с зашифрованными данными
-	\param[in] pEnvelope		конверт
-	\param[in] dwIndex			индекс сертификата (с нуля)
-	\param[out] pCert			буфер для извлеченного сертификата
+	\brief РёР·РІР»РµС‡РµРЅРёСЏ СЃРµСЂС‚РёС„РёРєР°С‚Р° РїРѕ РёРЅРґРµРєСЃСѓ РёР· РєРѕРЅРІРµСЂС‚Р° СЃ Р·Р°С€РёС„СЂРѕРІР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё
+	\param[in] pEnvelope		РєРѕРЅРІРµСЂС‚
+	\param[in] dwIndex			РёРЅРґРµРєСЃ СЃРµСЂС‚РёС„РёРєР°С‚Р° (СЃ РЅСѓР»СЏ)
+	\param[out] pCert			Р±СѓС„РµСЂ РґР»СЏ РёР·РІР»РµС‡РµРЅРЅРѕРіРѕ СЃРµСЂС‚РёС„РёРєР°С‚Р°
 */
 UAC_API(DWORD) UAC_EnvelopeGetCert (
 	UAC_IN PUAC_BLOB	pEnvelope,
@@ -885,21 +885,21 @@ UAC_API(DWORD) UAC_EnvelopeGetCert (
 	UAC_OUT PUAC_BLOB	pCert );
 
 /**
-	\brief извлечение сертификата по ссылочным данным из конверта с зашифрованными данными
-	\param[in] pEnvelope		конверт
-	\param[in] pCertRef			ссылки на сертификат
-	\param[out] pCert			буфер для извлеченного сертификата
+	\brief РёР·РІР»РµС‡РµРЅРёРµ СЃРµСЂС‚РёС„РёРєР°С‚Р° РїРѕ СЃСЃС‹Р»РѕС‡РЅС‹Рј РґР°РЅРЅС‹Рј РёР· РєРѕРЅРІРµСЂС‚Р° СЃ Р·Р°С€РёС„СЂРѕРІР°РЅРЅС‹РјРё РґР°РЅРЅС‹РјРё
+	\param[in] pEnvelope		РєРѕРЅРІРµСЂС‚
+	\param[in] pCertRef			СЃСЃС‹Р»РєРё РЅР° СЃРµСЂС‚РёС„РёРєР°С‚
+	\param[out] pCert			Р±СѓС„РµСЂ РґР»СЏ РёР·РІР»РµС‡РµРЅРЅРѕРіРѕ СЃРµСЂС‚РёС„РёРєР°С‚Р°
 */
 UAC_API(DWORD) UAC_EnvelopeFindCert (
 	UAC_IN PUAC_BLOB		pEnvelope,
 	UAC_IN PUAC_CERT_REF	pCertRef,
 	UAC_OUT PUAC_BLOB		pCert );
 
-/** \name Управление параметрами  */
+/** \name РЈРїСЂР°РІР»РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР°РјРё  */
 /**
-	\brief Создание блока параметров ДСТУ4145-2002
-	\param[in] pParamInfo		параметры
-	\param[out] pParam			буфер для блока параметров
+	\brief РЎРѕР·РґР°РЅРёРµ Р±Р»РѕРєР° РїР°СЂР°РјРµС‚СЂРѕРІ Р”РЎРўРЈ4145-2002
+	\param[in] pParamInfo		РїР°СЂР°РјРµС‚СЂС‹
+	\param[out] pParam			Р±СѓС„РµСЂ РґР»СЏ Р±Р»РѕРєР° РїР°СЂР°РјРµС‚СЂРѕРІ
 */
 
 UAC_API(DWORD) UAC_DstuParamCreate(
@@ -907,13 +907,13 @@ UAC_API(DWORD) UAC_DstuParamCreate(
 	UAC_OUT	PUAC_BLOB				pParam );
 
 /**
-	\brief формирования самоподписанного сертификата
-	\param[in] pCertInfo	требуемые параметры владельца сертификата
-	\param[in] pParam		параметры алгоритма ключа
-	\param[in] pPrivateKey	ключ
-	\param[out] pCert		буфер для сертификата
+	\brief С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ СЃР°РјРѕРїРѕРґРїРёСЃР°РЅРЅРѕРіРѕ СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	\param[in] pCertInfo	С‚СЂРµР±СѓРµРјС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ РІР»Р°РґРµР»СЊС†Р° СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	\param[in] pParam		РїР°СЂР°РјРµС‚СЂС‹ Р°Р»РіРѕСЂРёС‚РјР° РєР»СЋС‡Р°
+	\param[in] pPrivateKey	РєР»СЋС‡
+	\param[out] pCert		Р±СѓС„РµСЂ РґР»СЏ СЃРµСЂС‚РёС„РёРєР°С‚Р°
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_RootCertCreate (
 	UAC_IN PUAC_CERT_INFO			pCertInfo,
@@ -923,13 +923,13 @@ UAC_API(DWORD) UAC_RootCertCreate (
 
 
 /**
-	\brief Добавление / извлечение идентификатора в контейнере с ключом
-	\param[in] pOldKey	        исходный контейнер с ключом
-	\param[in,out] pNewKey		новый контейнер с ключом (возможны новые пароли)
-	\param[in] pCert	        сертификат ключа для добавления идентификатора
-								или NULL для его извлечения
+	\brief Р”РѕР±Р°РІР»РµРЅРёРµ / РёР·РІР»РµС‡РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° РІ РєРѕРЅС‚РµР№РЅРµСЂРµ СЃ РєР»СЋС‡РѕРј
+	\param[in] pOldKey	        РёСЃС…РѕРґРЅС‹Р№ РєРѕРЅС‚РµР№РЅРµСЂ СЃ РєР»СЋС‡РѕРј
+	\param[in,out] pNewKey		РЅРѕРІС‹Р№ РєРѕРЅС‚РµР№РЅРµСЂ СЃ РєР»СЋС‡РѕРј (РІРѕР·РјРѕР¶РЅС‹ РЅРѕРІС‹Рµ РїР°СЂРѕР»Рё)
+	\param[in] pCert	        СЃРµСЂС‚РёС„РёРєР°С‚ РєР»СЋС‡Р° РґР»СЏ РґРѕР±Р°РІР»РµРЅРёСЏ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР°
+								РёР»Рё NULL РґР»СЏ РµРіРѕ РёР·РІР»РµС‡РµРЅРёСЏ
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_ResetKeyId (
 	UAC_IN	PUAC_PRIVATE_KEY	pOldKey,
@@ -938,64 +938,64 @@ UAC_API(DWORD) UAC_ResetKeyId (
 	);
 
 /**
-	\brief Смена пароля (паролей) к ключам
-	\param[in] pOldKey	        прежние параметры доступа к ключам
-	\param[in,out] pNewKey		новые параметры доступа к ключам
+	\brief РЎРјРµРЅР° РїР°СЂРѕР»СЏ (РїР°СЂРѕР»РµР№) Рє РєР»СЋС‡Р°Рј
+	\param[in] pOldKey	        РїСЂРµР¶РЅРёРµ РїР°СЂР°РјРµС‚СЂС‹ РґРѕСЃС‚СѓРїР° Рє РєР»СЋС‡Р°Рј
+	\param[in,out] pNewKey		РЅРѕРІС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ РґРѕСЃС‚СѓРїР° Рє РєР»СЋС‡Р°Рј
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_PasswordChange (
 	UAC_IN		PUAC_PRIVATE_KEY	pOldKey,
 	UAC_INOUT	PUAC_PRIVATE_KEY	pNewKey );
 
 /**
-	\brief Создание новой пары паролей администраторов к ключу ЦСК
-	\param[in] pCaKey	        прежние параметры доступа к ключам
-	\param[in,out] pNewPasswords новые параметры доступа к ключам
+	\brief РЎРѕР·РґР°РЅРёРµ РЅРѕРІРѕР№ РїР°СЂС‹ РїР°СЂРѕР»РµР№ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂРѕРІ Рє РєР»СЋС‡Сѓ Р¦РЎРљ
+	\param[in] pCaKey	        РїСЂРµР¶РЅРёРµ РїР°СЂР°РјРµС‚СЂС‹ РґРѕСЃС‚СѓРїР° Рє РєР»СЋС‡Р°Рј
+	\param[in,out] pNewPasswords РЅРѕРІС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ РґРѕСЃС‚СѓРїР° Рє РєР»СЋС‡Р°Рј
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_CaPasswordsCreate (
 	UAC_IN		PUAC_PRIVATE_KEY	pCaKey,
 	UAC_INOUT	PUAC_PRIVATE_KEY	pNewPasswords );
 /**
-	\brief Заполнение буфера случайными данными
-	\param[out] pBuf		буфер для данных
+	\brief Р—Р°РїРѕР»РЅРµРЅРёРµ Р±СѓС„РµСЂР° СЃР»СѓС‡Р°Р№РЅС‹РјРё РґР°РЅРЅС‹РјРё
+	\param[out] pBuf		Р±СѓС„РµСЂ РґР»СЏ РґР°РЅРЅС‹С…
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_Random ( UAC_OUT PUAC_BLOB pBuf );
 
 /**
-	\brief Генерация номера в 16-ричном виде
-	\param[out] number		поле для номера
-	\param[in] bytes	    точность номера в байтах
+	\brief Р“РµРЅРµСЂР°С†РёСЏ РЅРѕРјРµСЂР° РІ 16-СЂРёС‡РЅРѕРј РІРёРґРµ
+	\param[out] number		РїРѕР»Рµ РґР»СЏ РЅРѕРјРµСЂР°
+	\param[in] bytes	    С‚РѕС‡РЅРѕСЃС‚СЊ РЅРѕРјРµСЂР° РІ Р±Р°Р№С‚Р°С…
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_RandomNumber (
 	UAC_OUT	UAC_SERIAL_NUMBER	number,
 	UAC_IN	DWORD				bytes );
 
-/** \name Обобщенные функции работы с серификатами и цифровой подписью  */
+/** \name РћР±РѕР±С‰РµРЅРЅС‹Рµ С„СѓРЅРєС†РёРё СЂР°Р±РѕС‚С‹ СЃ СЃРµСЂРёС„РёРєР°С‚Р°РјРё Рё С†РёС„СЂРѕРІРѕР№ РїРѕРґРїРёСЃСЊСЋ  */
 /**
-	\brief Проверка подписи крипто-контейнера
-	\param[in] contentType	тип контейнера (UAC_CT_*)
-	\param[in] pData		проверяемый контейнер
-	\param[out] pSignerCert	сертификата подписчика
+	\brief РџСЂРѕРІРµСЂРєР° РїРѕРґРїРёСЃРё РєСЂРёРїС‚Рѕ-РєРѕРЅС‚РµР№РЅРµСЂР°
+	\param[in] contentType	С‚РёРї РєРѕРЅС‚РµР№РЅРµСЂР° (UAC_CT_*)
+	\param[in] pData		РїСЂРѕРІРµСЂСЏРµРјС‹Р№ РєРѕРЅС‚РµР№РЅРµСЂ
+	\param[out] pSignerCert	СЃРµСЂС‚РёС„РёРєР°С‚Р° РїРѕРґРїРёСЃС‡РёРєР°
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_Verify (
 	UAC_IN UAC_CT		contentType,
 	UAC_IN PUAC_BLOB	pData,
 	UAC_IN PUAC_BLOB	pSignerCert );
 /**
-	\brief извлечения сертификата из контейнера
-	\param[in] contentType	тип контейнера (UAC_CT_*)
-	\param[in] pContent		исходный контейнер
-	\param[in] dwIndex		индекс сертификата (с нуля)
-	\param[out] pCert		буфер для извлеченного сертификата
+	\brief РёР·РІР»РµС‡РµРЅРёСЏ СЃРµСЂС‚РёС„РёРєР°С‚Р° РёР· РєРѕРЅС‚РµР№РЅРµСЂР°
+	\param[in] contentType	С‚РёРї РєРѕРЅС‚РµР№РЅРµСЂР° (UAC_CT_*)
+	\param[in] pContent		РёСЃС…РѕРґРЅС‹Р№ РєРѕРЅС‚РµР№РЅРµСЂ
+	\param[in] dwIndex		РёРЅРґРµРєСЃ СЃРµСЂС‚РёС„РёРєР°С‚Р° (СЃ РЅСѓР»СЏ)
+	\param[out] pCert		Р±СѓС„РµСЂ РґР»СЏ РёР·РІР»РµС‡РµРЅРЅРѕРіРѕ СЃРµСЂС‚РёС„РёРєР°С‚Р°
 */
 UAC_API(DWORD) UAC_GetCert (
 	UAC_IN UAC_CT		contentType,
@@ -1003,11 +1003,11 @@ UAC_API(DWORD) UAC_GetCert (
 	UAC_IN DWORD		dwIndex,
 	UAC_OUT PUAC_BLOB	pCert );
 /**
-	\brief добавления сертификата в контейнер
-	\param[in] contentType	тип контейнера (UAC_CT_*)
-	\param[in] pContent		исходный контейнер
-	\param[in] pCert		добавляемый сертификат
-	\param[out] pNewContent	буфер для нового контейнера
+	\brief РґРѕР±Р°РІР»РµРЅРёСЏ СЃРµСЂС‚РёС„РёРєР°С‚Р° РІ РєРѕРЅС‚РµР№РЅРµСЂ
+	\param[in] contentType	С‚РёРї РєРѕРЅС‚РµР№РЅРµСЂР° (UAC_CT_*)
+	\param[in] pContent		РёСЃС…РѕРґРЅС‹Р№ РєРѕРЅС‚РµР№РЅРµСЂ
+	\param[in] pCert		РґРѕР±Р°РІР»СЏРµРјС‹Р№ СЃРµСЂС‚РёС„РёРєР°С‚
+	\param[out] pNewContent	Р±СѓС„РµСЂ РґР»СЏ РЅРѕРІРѕРіРѕ РєРѕРЅС‚РµР№РЅРµСЂР°
 */
 UAC_API(DWORD) UAC_AddCert (
 	UAC_IN UAC_CT		contentType,
@@ -1015,11 +1015,11 @@ UAC_API(DWORD) UAC_AddCert (
 	UAC_IN PUAC_BLOB	pCert,
 	UAC_IN PUAC_BLOB	pNewContent );
 /**
-	\brief извлечение сертификата по ссылочным данным из контейнера
-	\param[in] contentType	тип контейнера (UAC_CT_*)
-	\param[in] pContent		исходный контейнер
-	\param[in] pCertRef		ссылки на сертификат
-	\param[out] pCert		буфер для извлеченного сертификата
+	\brief РёР·РІР»РµС‡РµРЅРёРµ СЃРµСЂС‚РёС„РёРєР°С‚Р° РїРѕ СЃСЃС‹Р»РѕС‡РЅС‹Рј РґР°РЅРЅС‹Рј РёР· РєРѕРЅС‚РµР№РЅРµСЂР°
+	\param[in] contentType	С‚РёРї РєРѕРЅС‚РµР№РЅРµСЂР° (UAC_CT_*)
+	\param[in] pContent		РёСЃС…РѕРґРЅС‹Р№ РєРѕРЅС‚РµР№РЅРµСЂ
+	\param[in] pCertRef		СЃСЃС‹Р»РєРё РЅР° СЃРµСЂС‚РёС„РёРєР°С‚
+	\param[out] pCert		Р±СѓС„РµСЂ РґР»СЏ РёР·РІР»РµС‡РµРЅРЅРѕРіРѕ СЃРµСЂС‚РёС„РёРєР°С‚Р°
 */
 UAC_API(DWORD) UAC_FindCert (
 	UAC_IN UAC_CT			contentType,
@@ -1028,9 +1028,9 @@ UAC_API(DWORD) UAC_FindCert (
 	UAC_OUT PUAC_BLOB		pCert );
 
 /**
-	\brief Определить CMS-тип документа (UAC_CT_DATA, UAC_CT_SIGNEDDATA или UAC_CT_ENVELOPEDDATA)
-	\param[in] pData		исходный документ
-	\param[out] pType		буфер для CMS-типа
+	\brief РћРїСЂРµРґРµР»РёС‚СЊ CMS-С‚РёРї РґРѕРєСѓРјРµРЅС‚Р° (UAC_CT_DATA, UAC_CT_SIGNEDDATA РёР»Рё UAC_CT_ENVELOPEDDATA)
+	\param[in] pData		РёСЃС…РѕРґРЅС‹Р№ РґРѕРєСѓРјРµРЅС‚
+	\param[out] pType		Р±СѓС„РµСЂ РґР»СЏ CMS-С‚РёРїР°
 */
 
 UAC_API(DWORD) UAC_GetCmsType (
@@ -1038,9 +1038,9 @@ UAC_API(DWORD) UAC_GetCmsType (
 	UAC_OUT PDWORD				pType	);
 
 /**
-	\brief Удалить CMS-тип из документа (UAC_CT_SIGNEDDATA или UAC_CT_ENVELOPEDDATA)
-	\param[in,out] pData		документ для изменения
-	\param[out] pType		буфер для CMS-типа
+	\brief РЈРґР°Р»РёС‚СЊ CMS-С‚РёРї РёР· РґРѕРєСѓРјРµРЅС‚Р° (UAC_CT_SIGNEDDATA РёР»Рё UAC_CT_ENVELOPEDDATA)
+	\param[in,out] pData		РґРѕРєСѓРјРµРЅС‚ РґР»СЏ РёР·РјРµРЅРµРЅРёСЏ
+	\param[out] pType		Р±СѓС„РµСЂ РґР»СЏ CMS-С‚РёРїР°
 */
 
 UAC_API(DWORD) UAC_RemoveCmsType (
@@ -1048,24 +1048,24 @@ UAC_API(DWORD) UAC_RemoveCmsType (
 	UAC_OUT PDWORD				pType	);
 
 /**
-	\brief Добавить CMS-тип в документ, если это необходимо (UAC_CT_DATA, UAC_CT_SIGNEDDATA или UAC_CT_ENVELOPEDDATA)
-	\param[in] pData	исходный документ
-	\param[in] type		CMS-тип
-	\param[out] pTypedData	буфер для результата
+	\brief Р”РѕР±Р°РІРёС‚СЊ CMS-С‚РёРї РІ РґРѕРєСѓРјРµРЅС‚, РµСЃР»Рё СЌС‚Рѕ РЅРµРѕР±С…РѕРґРёРјРѕ (UAC_CT_DATA, UAC_CT_SIGNEDDATA РёР»Рё UAC_CT_ENVELOPEDDATA)
+	\param[in] pData	РёСЃС…РѕРґРЅС‹Р№ РґРѕРєСѓРјРµРЅС‚
+	\param[in] type		CMS-С‚РёРї
+	\param[out] pTypedData	Р±СѓС„РµСЂ РґР»СЏ СЂРµР·СѓР»СЊС‚Р°С‚Р°
 */
 UAC_API(DWORD) UAC_AddCmsType (
 	UAC_IN UAC_OUT PUAC_BLOB	pData,
 	UAC_IN DWORD				type,
 	UAC_OUT PUAC_BLOB			pTypedData	);
 
-/** \name хеш-векторы  */
+/** \name С…РµС€-РІРµРєС‚РѕСЂС‹  */
 /**
-	\brief Вычисление хеш-вектор от CMS-данных
-	Убирает информацию о CMS-типе перед вычислением
-	\param[in] pData данные
-	\param[in] pCert сертификат, содержащий параметры хеша, или NULL
-	\param[out] pHash буфер для хеша
-	\return код ошибки или ::UAC_SUCCESS
+	\brief Р’С‹С‡РёСЃР»РµРЅРёРµ С…РµС€-РІРµРєС‚РѕСЂ РѕС‚ CMS-РґР°РЅРЅС‹С…
+	РЈР±РёСЂР°РµС‚ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ CMS-С‚РёРїРµ РїРµСЂРµРґ РІС‹С‡РёСЃР»РµРЅРёРµРј
+	\param[in] pData РґР°РЅРЅС‹Рµ
+	\param[in] pCert СЃРµСЂС‚РёС„РёРєР°С‚, СЃРѕРґРµСЂР¶Р°С‰РёР№ РїР°СЂР°РјРµС‚СЂС‹ С…РµС€Р°, РёР»Рё NULL
+	\param[out] pHash Р±СѓС„РµСЂ РґР»СЏ С…РµС€Р°
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_CmsHashCreate (
 	UAC_IN PUAC_BLOB		pData,
@@ -1073,12 +1073,12 @@ UAC_API(DWORD) UAC_CmsHashCreate (
 	UAC_OUT PUAC_BLOB	 	pHash );
 
 /**
-	\brief Проверка хеш-вектора от CMS-данных
-	Убирает информацию о CMS-типе перед вычислением
-	\param[in] pData данные
-	\param[in] pCert сертификат, содержащий параметры хеша, или NULL
-	\param[in] pHash эталонное значение хеша
-	\return код ошибки или ::UAC_SUCCESS
+	\brief РџСЂРѕРІРµСЂРєР° С…РµС€-РІРµРєС‚РѕСЂР° РѕС‚ CMS-РґР°РЅРЅС‹С…
+	РЈР±РёСЂР°РµС‚ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ CMS-С‚РёРїРµ РїРµСЂРµРґ РІС‹С‡РёСЃР»РµРЅРёРµРј
+	\param[in] pData РґР°РЅРЅС‹Рµ
+	\param[in] pCert СЃРµСЂС‚РёС„РёРєР°С‚, СЃРѕРґРµСЂР¶Р°С‰РёР№ РїР°СЂР°РјРµС‚СЂС‹ С…РµС€Р°, РёР»Рё NULL
+	\param[in] pHash СЌС‚Р°Р»РѕРЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ С…РµС€Р°
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_CmsHashVerify (
 	UAC_IN PUAC_BLOB		pData,
@@ -1086,45 +1086,45 @@ UAC_API(DWORD) UAC_CmsHashVerify (
 	UAC_IN PUAC_BLOB	 	pHash );
 
 /**
-	\brief Загрузка CMS-конверта из потока
-	\param[in] pDataInput входной поток
-	\param[out] pCms буфер для данных
+	\brief Р—Р°РіСЂСѓР·РєР° CMS-РєРѕРЅРІРµСЂС‚Р° РёР· РїРѕС‚РѕРєР°
+	\param[in] pDataInput РІС…РѕРґРЅРѕР№ РїРѕС‚РѕРє
+	\param[out] pCms Р±СѓС„РµСЂ РґР»СЏ РґР°РЅРЅС‹С…
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_CmsLoadStream (
 	UAC_IN	PUAC_STREAM			pDataInput,
 	UAC_OUT	PUAC_BLOB			pCms);
 
-/** \name функции поддержки множества форматов ключевых контейнеров */
+/** \name С„СѓРЅРєС†РёРё РїРѕРґРґРµСЂР¶РєРё РјРЅРѕР¶РµСЃС‚РІР° С„РѕСЂРјР°С‚РѕРІ РєР»СЋС‡РµРІС‹С… РєРѕРЅС‚РµР№РЅРµСЂРѕРІ */
 /**
-	\brief Установка формата новых контейнеров с личным ключом
-	\param[in] kf		политика установки формата контейнера с личным ключом
+	\brief РЈСЃС‚Р°РЅРѕРІРєР° С„РѕСЂРјР°С‚Р° РЅРѕРІС‹С… РєРѕРЅС‚РµР№РЅРµСЂРѕРІ СЃ Р»РёС‡РЅС‹Рј РєР»СЋС‡РѕРј
+	\param[in] kf		РїРѕР»РёС‚РёРєР° СѓСЃС‚Р°РЅРѕРІРєРё С„РѕСЂРјР°С‚Р° РєРѕРЅС‚РµР№РЅРµСЂР° СЃ Р»РёС‡РЅС‹Рј РєР»СЋС‡РѕРј
 
-	-	::kfCntNew	- формат загруженных ключей - прежний,
-					- формат создаваемых ключей - старый (cnt),
-	-	::kfPk8New	- формат загруженных ключей - прежний,
-					- формат создаваемых ключей - PKCS#8,
-	-	::kfCntAlways - формат всех сохраняемых ключей - старый (cnt),
-	-	::kfPk8Always - формат всех сохраняемых ключей - PKCS#8.
+	-	::kfCntNew	- С„РѕСЂРјР°С‚ Р·Р°РіСЂСѓР¶РµРЅРЅС‹С… РєР»СЋС‡РµР№ - РїСЂРµР¶РЅРёР№,
+					- С„РѕСЂРјР°С‚ СЃРѕР·РґР°РІР°РµРјС‹С… РєР»СЋС‡РµР№ - СЃС‚Р°СЂС‹Р№ (cnt),
+	-	::kfPk8New	- С„РѕСЂРјР°С‚ Р·Р°РіСЂСѓР¶РµРЅРЅС‹С… РєР»СЋС‡РµР№ - РїСЂРµР¶РЅРёР№,
+					- С„РѕСЂРјР°С‚ СЃРѕР·РґР°РІР°РµРјС‹С… РєР»СЋС‡РµР№ - PKCS#8,
+	-	::kfCntAlways - С„РѕСЂРјР°С‚ РІСЃРµС… СЃРѕС…СЂР°РЅСЏРµРјС‹С… РєР»СЋС‡РµР№ - СЃС‚Р°СЂС‹Р№ (cnt),
+	-	::kfPk8Always - С„РѕСЂРјР°С‚ РІСЃРµС… СЃРѕС…СЂР°РЅСЏРµРјС‹С… РєР»СЋС‡РµР№ - PKCS#8.
 
 	\return ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_SetKeyFormat ( KeyFormat kf ) ;
 
-/** \name функции работы с контейнерами PFX в национальном формате */
+/** \name С„СѓРЅРєС†РёРё СЂР°Р±РѕС‚С‹ СЃ РєРѕРЅС‚РµР№РЅРµСЂР°РјРё PFX РІ РЅР°С†РёРѕРЅР°Р»СЊРЅРѕРј С„РѕСЂРјР°С‚Рµ */
 /**
-	\brief	Содание нового контейнера PFX
-			Добавления данных в существующий контейнер PFX
-	\param[in] pPfx			существующий контейнер PFX или NULL
-	\param[in] password		пароль к контейнеру
-	\param[in] fileType		тип добавляемого файла
-	\param[in] pFileData	содержимое добавляемого файла
-	\param[out] pNewPfx		новый контейнер
+	\brief	РЎРѕРґР°РЅРёРµ РЅРѕРІРѕРіРѕ РєРѕРЅС‚РµР№РЅРµСЂР° PFX
+			Р”РѕР±Р°РІР»РµРЅРёСЏ РґР°РЅРЅС‹С… РІ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РёР№ РєРѕРЅС‚РµР№РЅРµСЂ PFX
+	\param[in] pPfx			СЃСѓС‰РµСЃС‚РІСѓСЋС‰РёР№ РєРѕРЅС‚РµР№РЅРµСЂ PFX РёР»Рё NULL
+	\param[in] password		РїР°СЂРѕР»СЊ Рє РєРѕРЅС‚РµР№РЅРµСЂСѓ
+	\param[in] fileType		С‚РёРї РґРѕР±Р°РІР»СЏРµРјРѕРіРѕ С„Р°Р№Р»Р°
+	\param[in] pFileData	СЃРѕРґРµСЂР¶РёРјРѕРµ РґРѕР±Р°РІР»СЏРµРјРѕРіРѕ С„Р°Р№Р»Р°
+	\param[out] pNewPfx		РЅРѕРІС‹Р№ РєРѕРЅС‚РµР№РЅРµСЂ
 
-	\par Специфичные коды ошибок:
-		::UAC_ERROR_CONTENT_TYPE - тип файла не поддерживается
-	\return код ошибки или ::UAC_SUCCESS
+	\par РЎРїРµС†РёС„РёС‡РЅС‹Рµ РєРѕРґС‹ РѕС€РёР±РѕРє:
+		::UAC_ERROR_CONTENT_TYPE - С‚РёРї С„Р°Р№Р»Р° РЅРµ РїРѕРґРґРµСЂР¶РёРІР°РµС‚СЃСЏ
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_PfxAddFile (
 	UAC_IN PUAC_BLOB		pPfx,
@@ -1134,20 +1134,20 @@ UAC_API(DWORD) UAC_PfxAddFile (
 	UAC_OUT PUAC_BLOB	 	pNewPfx ) ;
 
 /**
-	\brief	Загрузка данных из контейнера PFX
-	\param[in] pPfx			контейнер PFX
-	\param[in] password		пароль к контейнеру
-	\param[in] fileType		тип добавляемого файла
-	\param[in] fileIndex	индекс (0..) файла данного типа
-	\param[in] pFilesCount	указатель на счетчик файлов или NULL
-	\param[in] pFileData	буфер для загружаемого файла
+	\brief	Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С… РёР· РєРѕРЅС‚РµР№РЅРµСЂР° PFX
+	\param[in] pPfx			РєРѕРЅС‚РµР№РЅРµСЂ PFX
+	\param[in] password		РїР°СЂРѕР»СЊ Рє РєРѕРЅС‚РµР№РЅРµСЂСѓ
+	\param[in] fileType		С‚РёРї РґРѕР±Р°РІР»СЏРµРјРѕРіРѕ С„Р°Р№Р»Р°
+	\param[in] fileIndex	РёРЅРґРµРєСЃ (0..) С„Р°Р№Р»Р° РґР°РЅРЅРѕРіРѕ С‚РёРїР°
+	\param[in] pFilesCount	СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЃС‡РµС‚С‡РёРє С„Р°Р№Р»РѕРІ РёР»Рё NULL
+	\param[in] pFileData	Р±СѓС„РµСЂ РґР»СЏ Р·Р°РіСЂСѓР¶Р°РµРјРѕРіРѕ С„Р°Р№Р»Р°
 
-	\par Специфичные коды ошибок:
-		::UAC_ERROR_CONTENT_TYPE		- тип файла не поддерживается \n
-		::UAC_ERROR_NODATA			- если файл типа fileType с индексом fileIndex отсутствует\n
-		* в этом случае, в FilesCount записывается количество файлов данного типа
+	\par РЎРїРµС†РёС„РёС‡РЅС‹Рµ РєРѕРґС‹ РѕС€РёР±РѕРє:
+		::UAC_ERROR_CONTENT_TYPE		- С‚РёРї С„Р°Р№Р»Р° РЅРµ РїРѕРґРґРµСЂР¶РёРІР°РµС‚СЃСЏ \n
+		::UAC_ERROR_NODATA			- РµСЃР»Рё С„Р°Р№Р» С‚РёРїР° fileType СЃ РёРЅРґРµРєСЃРѕРј fileIndex РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚\n
+		* РІ СЌС‚РѕРј СЃР»СѓС‡Р°Рµ, РІ FilesCount Р·Р°РїРёСЃС‹РІР°РµС‚СЃСЏ РєРѕР»РёС‡РµСЃС‚РІРѕ С„Р°Р№Р»РѕРІ РґР°РЅРЅРѕРіРѕ С‚РёРїР°
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_PfxGetFile (
 	UAC_IN PUAC_BLOB		pPfx,
@@ -1158,90 +1158,90 @@ UAC_API(DWORD) UAC_PfxGetFile (
 	UAC_OUT PUAC_BLOB		pFileData ) ;
 
 /**
-	\brief	Проверка целосности и доступа к контейнеру PFX
-	\param[in] pPfx			контейнер PFX
-	\param[in] password		пароль к контейнеру
+	\brief	РџСЂРѕРІРµСЂРєР° С†РµР»РѕСЃРЅРѕСЃС‚Рё Рё РґРѕСЃС‚СѓРїР° Рє РєРѕРЅС‚РµР№РЅРµСЂСѓ PFX
+	\param[in] pPfx			РєРѕРЅС‚РµР№РЅРµСЂ PFX
+	\param[in] password		РїР°СЂРѕР»СЊ Рє РєРѕРЅС‚РµР№РЅРµСЂСѓ
 
-	\par Специфичные коды ошибок:
+	\par РЎРїРµС†РёС„РёС‡РЅС‹Рµ РєРѕРґС‹ РѕС€РёР±РѕРє:
 		::UAC_ERROR_WRONG_PASSWORD
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_PfxVerify (
 	UAC_IN PUAC_BLOB		pPfx,
 	UAC_IN CONST_PCHAR		password ) ;
 
-/** \name функции работы с виртуальным файловым токеном (*.tok) */
+/** \name С„СѓРЅРєС†РёРё СЂР°Р±РѕС‚С‹ СЃ РІРёСЂС‚СѓР°Р»СЊРЅС‹Рј С„Р°Р№Р»РѕРІС‹Рј С‚РѕРєРµРЅРѕРј (*.tok) */
 
 /**
-	\brief	Подключение файлового токена к слоту PKCS#11
-	и получение его локального идентификатора
-	\param[in] pathName		путь к файловому токену
-	\param[out] pTokenId	буффер для идентификатора токена
+	\brief	РџРѕРґРєР»СЋС‡РµРЅРёРµ С„Р°Р№Р»РѕРІРѕРіРѕ С‚РѕРєРµРЅР° Рє СЃР»РѕС‚Сѓ PKCS#11
+	Рё РїРѕР»СѓС‡РµРЅРёРµ РµРіРѕ Р»РѕРєР°Р»СЊРЅРѕРіРѕ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР°
+	\param[in] pathName		РїСѓС‚СЊ Рє С„Р°Р№Р»РѕРІРѕРјСѓ С‚РѕРєРµРЅСѓ
+	\param[out] pTokenId	Р±СѓС„С„РµСЂ РґР»СЏ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° С‚РѕРєРµРЅР°
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 
 UAC_API(DWORD) UAC_TokenMount(
 	UAC_IN CONST_PCHAR pathName,
 	UAC_OUT PUAC_TOKEN pTokenId );
 /**
-	\brief	Получение идентификатора слота PKCS#11 к которому подлючен файловый токен
-	для работы с функциями PKCS#11
+	\brief	РџРѕР»СѓС‡РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° СЃР»РѕС‚Р° PKCS#11 Рє РєРѕС‚РѕСЂРѕРјСѓ РїРѕРґР»СЋС‡РµРЅ С„Р°Р№Р»РѕРІС‹Р№ С‚РѕРєРµРЅ
+	РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ С„СѓРЅРєС†РёСЏРјРё PKCS#11
 
-	Функция информационная и не использует механизм PKCS#11
+	Р¤СѓРЅРєС†РёСЏ РёРЅС„РѕСЂРјР°С†РёРѕРЅРЅР°СЏ Рё РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚ РјРµС…Р°РЅРёР·Рј PKCS#11
 
-	\param[in] pTokenId		идентификатор токена
-	\param[out] pSlot		буффер для идентификатора слота
+	\param[in] pTokenId		РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С‚РѕРєРµРЅР°
+	\param[out] pSlot		Р±СѓС„С„РµСЂ РґР»СЏ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° СЃР»РѕС‚Р°
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_TokenGetSlot(
 	UAC_IN	PUAC_TOKEN	pTokenId,
 	UAC_OUT PQWORD		pSlot );
 /**
-	\brief	Подключение идентификатора токена для слота PKCS#11
+	\brief	РџРѕРґРєР»СЋС‡РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° С‚РѕРєРµРЅР° РґР»СЏ СЃР»РѕС‚Р° PKCS#11
 	
-	Функция информационная и не использует механизм PKCS#11
+	Р¤СѓРЅРєС†РёСЏ РёРЅС„РѕСЂРјР°С†РёРѕРЅРЅР°СЏ Рё РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚ РјРµС…Р°РЅРёР·Рј PKCS#11
 
-	\param[in,out] pTokenId	буффер для идентификатора токена. 
-							поле provider_name должно содержать условное имя провайдера
-	\param[in] slot			идентификатор слота
+	\param[in,out] pTokenId	Р±СѓС„С„РµСЂ РґР»СЏ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° С‚РѕРєРµРЅР°. 
+							РїРѕР»Рµ provider_name РґРѕР»Р¶РЅРѕ СЃРѕРґРµСЂР¶Р°С‚СЊ СѓСЃР»РѕРІРЅРѕРµ РёРјСЏ РїСЂРѕРІР°Р№РґРµСЂР°
+	\param[in] slot			РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЃР»РѕС‚Р°
 
-	\note если pTokenId->provider_name содержит пустую С-строку или нулевые байты, 
-	то используется файловый токен UAC (provider_name="UAC_TOK")
+	\note РµСЃР»Рё pTokenId->provider_name СЃРѕРґРµСЂР¶РёС‚ РїСѓСЃС‚СѓСЋ РЎ-СЃС‚СЂРѕРєСѓ РёР»Рё РЅСѓР»РµРІС‹Рµ Р±Р°Р№С‚С‹, 
+	С‚Рѕ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ С„Р°Р№Р»РѕРІС‹Р№ С‚РѕРєРµРЅ UAC (provider_name="UAC_TOK")
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 
 UAC_API(DWORD) UAC_TokenWithSlot(
 	UAC_OUT PUAC_TOKEN	pTokenId,
 	UAC_IN  QWORD		slot );
 /**
-	\brief	Отключение всех слотов PKCS#11, связанных с файловым токеном
-	\param[in] pathName		путь к файловому токену
+	\brief	РћС‚РєР»СЋС‡РµРЅРёРµ РІСЃРµС… СЃР»РѕС‚РѕРІ PKCS#11, СЃРІСЏР·Р°РЅРЅС‹С… СЃ С„Р°Р№Р»РѕРІС‹Рј С‚РѕРєРµРЅРѕРј
+	\param[in] pathName		РїСѓС‚СЊ Рє С„Р°Р№Р»РѕРІРѕРјСѓ С‚РѕРєРµРЅСѓ
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_TokenUmountPath(
 	UAC_IN CONST_PCHAR		 pathName );
 /**
-	\brief	Отключение текущего подключения файлового токена
-	\param[in] pTokenId		идентификатор токена
+	\brief	РћС‚РєР»СЋС‡РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ РїРѕРґРєР»СЋС‡РµРЅРёСЏ С„Р°Р№Р»РѕРІРѕРіРѕ С‚РѕРєРµРЅР°
+	\param[in] pTokenId		РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С‚РѕРєРµРЅР°
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_TokenUmount(
 	UAC_IN PUAC_TOKEN pTokenId );
 
 /**
-	\brief	Создание пустого файлового токена
-	\param[in] pathName		путь к новому файловому токену
-	\param[in] pwd			пароль админа и пользователя к токену
-	\param[in] pwdLen		длина пароля
-	\param[in] sn			серийный номер нового токена (или NULL) 
+	\brief	РЎРѕР·РґР°РЅРёРµ РїСѓСЃС‚РѕРіРѕ С„Р°Р№Р»РѕРІРѕРіРѕ С‚РѕРєРµРЅР°
+	\param[in] pathName		РїСѓС‚СЊ Рє РЅРѕРІРѕРјСѓ С„Р°Р№Р»РѕРІРѕРјСѓ С‚РѕРєРµРЅСѓ
+	\param[in] pwd			РїР°СЂРѕР»СЊ Р°РґРјРёРЅР° Рё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ Рє С‚РѕРєРµРЅСѓ
+	\param[in] pwdLen		РґР»РёРЅР° РїР°СЂРѕР»СЏ
+	\param[in] sn			СЃРµСЂРёР№РЅС‹Р№ РЅРѕРјРµСЂ РЅРѕРІРѕРіРѕ С‚РѕРєРµРЅР° (РёР»Рё NULL) 
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_TokenFormat(
 	UAC_IN CONST_PCHAR		pathName,
@@ -1250,25 +1250,25 @@ UAC_API(DWORD) UAC_TokenFormat(
 	UAC_INOUT UAC_TOKEN_SN	sn  );
 
 /**
-	\brief	Создание файлового токена и загрузка ключа и сертификата, установка пароля
-	\param[in] tokenPathName	путь к новому файловому токену
-	\param[in] keys				ключа, сертификат и пароль для нового токена
-	\param[in] sn				серийный номер нового токена (или NULL) 
+	\brief	РЎРѕР·РґР°РЅРёРµ С„Р°Р№Р»РѕРІРѕРіРѕ С‚РѕРєРµРЅР° Рё Р·Р°РіСЂСѓР·РєР° РєР»СЋС‡Р° Рё СЃРµСЂС‚РёС„РёРєР°С‚Р°, СѓСЃС‚Р°РЅРѕРІРєР° РїР°СЂРѕР»СЏ
+	\param[in] tokenPathName	РїСѓС‚СЊ Рє РЅРѕРІРѕРјСѓ С„Р°Р№Р»РѕРІРѕРјСѓ С‚РѕРєРµРЅСѓ
+	\param[in] keys				РєР»СЋС‡Р°, СЃРµСЂС‚РёС„РёРєР°С‚ Рё РїР°СЂРѕР»СЊ РґР»СЏ РЅРѕРІРѕРіРѕ С‚РѕРєРµРЅР°
+	\param[in] sn				СЃРµСЂРёР№РЅС‹Р№ РЅРѕРјРµСЂ РЅРѕРІРѕРіРѕ С‚РѕРєРµРЅР° (РёР»Рё NULL) 
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_TokenCreate(
 	UAC_IN CONST_PCHAR		tokenPathName,
 	UAC_IN PUAC_KEYPAIR		keys,
 	UAC_INOUT UAC_TOKEN_SN	sn );
 /**
-	\brief	Загрузка дополнительного сертификата в файловый токен
-	\param[in] pTokenId		идентификатор токена
-	\param[in] pwd			пароль доступа к токену
-	\param[in] pwdLen		длина пароля доступа к токену
-	\param[in] pCert		сертификат
+	\brief	Р—Р°РіСЂСѓР·РєР° РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРіРѕ СЃРµСЂС‚РёС„РёРєР°С‚Р° РІ С„Р°Р№Р»РѕРІС‹Р№ С‚РѕРєРµРЅ
+	\param[in] pTokenId		РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С‚РѕРєРµРЅР°
+	\param[in] pwd			РїР°СЂРѕР»СЊ РґРѕСЃС‚СѓРїР° Рє С‚РѕРєРµРЅСѓ
+	\param[in] pwdLen		РґР»РёРЅР° РїР°СЂРѕР»СЏ РґРѕСЃС‚СѓРїР° Рє С‚РѕРєРµРЅСѓ
+	\param[in] pCert		СЃРµСЂС‚РёС„РёРєР°С‚
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_TokenAddCert (
 	UAC_IN PUAC_TOKEN		pTokenId,
@@ -1277,12 +1277,12 @@ UAC_API(DWORD) UAC_TokenAddCert (
 	UAC_IN PUAC_BLOB		pCert );
 
 /**
-	\brief	Чтение сертификата из файлового токена
-	\param[in] pTokenId		идентификатор токена
-	\param[in] dwIndex		индекс требуемого сертификата ( 0 - сертификат ключа токена )
-	\param[in] pCert		буфер для сертификата
+	\brief	Р§С‚РµРЅРёРµ СЃРµСЂС‚РёС„РёРєР°С‚Р° РёР· С„Р°Р№Р»РѕРІРѕРіРѕ С‚РѕРєРµРЅР°
+	\param[in] pTokenId		РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С‚РѕРєРµРЅР°
+	\param[in] dwIndex		РёРЅРґРµРєСЃ С‚СЂРµР±СѓРµРјРѕРіРѕ СЃРµСЂС‚РёС„РёРєР°С‚Р° ( 0 - СЃРµСЂС‚РёС„РёРєР°С‚ РєР»СЋС‡Р° С‚РѕРєРµРЅР° )
+	\param[in] pCert		Р±СѓС„РµСЂ РґР»СЏ СЃРµСЂС‚РёС„РёРєР°С‚Р°
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_TokenGetCert (
 	UAC_IN	PUAC_TOKEN		pTokenId,
@@ -1290,33 +1290,33 @@ UAC_API(DWORD) UAC_TokenGetCert (
 	UAC_OUT PUAC_BLOB		pCert );
 
 /**
-	\brief	Поиск и чтение сертификата из файлового токена по ссылке на сертификат
-	\param[in] pTokenId		идентификатор токена
-	\param[in] pCertRef		ссылки на сертификат
-	\param[in] pCert		буфер для сертификата
+	\brief	РџРѕРёСЃРє Рё С‡С‚РµРЅРёРµ СЃРµСЂС‚РёС„РёРєР°С‚Р° РёР· С„Р°Р№Р»РѕРІРѕРіРѕ С‚РѕРєРµРЅР° РїРѕ СЃСЃС‹Р»РєРµ РЅР° СЃРµСЂС‚РёС„РёРєР°С‚
+	\param[in] pTokenId		РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С‚РѕРєРµРЅР°
+	\param[in] pCertRef		СЃСЃС‹Р»РєРё РЅР° СЃРµСЂС‚РёС„РёРєР°С‚
+	\param[in] pCert		Р±СѓС„РµСЂ РґР»СЏ СЃРµСЂС‚РёС„РёРєР°С‚Р°
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_TokenFindCert (
 	UAC_IN	PUAC_TOKEN		pTokenId,
 	UAC_IN	PUAC_CERT_REF	pCertRef,
 	UAC_OUT PUAC_BLOB		pCert );
 /**
-	\brief	Заполнение структуры UAC_PRIVATE_KEY идентификатором токена и паролем
-	для работы с функциями UAC_* и UAC_Key*. 
-	Функция формирует в UAC_PRIVATE_KEY ссылку на виртуальный электронный ключ.
+	\brief	Р—Р°РїРѕР»РЅРµРЅРёРµ СЃС‚СЂСѓРєС‚СѓСЂС‹ UAC_PRIVATE_KEY РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРј С‚РѕРєРµРЅР° Рё РїР°СЂРѕР»РµРј
+	РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ С„СѓРЅРєС†РёСЏРјРё UAC_* Рё UAC_Key*. 
+	Р¤СѓРЅРєС†РёСЏ С„РѕСЂРјРёСЂСѓРµС‚ РІ UAC_PRIVATE_KEY СЃСЃС‹Р»РєСѓ РЅР° РІРёСЂС‚СѓР°Р»СЊРЅС‹Р№ СЌР»РµРєС‚СЂРѕРЅРЅС‹Р№ РєР»СЋС‡.
 	
-	\param[in] pTokenId		идентификатор токена
-	\param[in] pwd			пароль к токену
-	\param[in] pKey			структура UAC_PRIVATE_KEY для работы с функиями UAC_*
+	\param[in] pTokenId		РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С‚РѕРєРµРЅР°
+	\param[in] pwd			РїР°СЂРѕР»СЊ Рє С‚РѕРєРµРЅСѓ
+	\param[in] pKey			СЃС‚СЂСѓРєС‚СѓСЂР° UAC_PRIVATE_KEY РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ С„СѓРЅРєРёСЏРјРё UAC_*
 
-	\note в качестве параметра pKey можно использовать
-	адрес поля "privateKeyData" структуры UAC_KEYPAIR.
-	В этом случае заполнять поле сертификата "cert" не нужно -
-	те функции, которые требуют структуру UAC_KEYPAIR
-	будут автоматически загружать сертификат из токена.
+	\note РІ РєР°С‡РµСЃС‚РІРµ РїР°СЂР°РјРµС‚СЂР° pKey РјРѕР¶РЅРѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ
+	Р°РґСЂРµСЃ РїРѕР»СЏ "privateKeyData" СЃС‚СЂСѓРєС‚СѓСЂС‹ UAC_KEYPAIR.
+	Р’ СЌС‚РѕРј СЃР»СѓС‡Р°Рµ Р·Р°РїРѕР»РЅСЏС‚СЊ РїРѕР»Рµ СЃРµСЂС‚РёС„РёРєР°С‚Р° "cert" РЅРµ РЅСѓР¶РЅРѕ -
+	С‚Рµ С„СѓРЅРєС†РёРё, РєРѕС‚РѕСЂС‹Рµ С‚СЂРµР±СѓСЋС‚ СЃС‚СЂСѓРєС‚СѓСЂСѓ UAC_KEYPAIR
+	Р±СѓРґСѓС‚ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё Р·Р°РіСЂСѓР¶Р°С‚СЊ СЃРµСЂС‚РёС„РёРєР°С‚ РёР· С‚РѕРєРµРЅР°.
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 
 UAC_API(DWORD) UAC_TokenAsKey(
@@ -1325,22 +1325,22 @@ UAC_API(DWORD) UAC_TokenAsKey(
 	UAC_OUT PUAC_PRIVATE_KEY	pKey );
 
 /**
-	\brief	Чтение идентификатора токена UAC_TOKEN из структуры UAC_PRIVATE_KEY.
-	Идентификатор нужен для работы с функциями UAC_Token*.
+	\brief	Р§С‚РµРЅРёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° С‚РѕРєРµРЅР° UAC_TOKEN РёР· СЃС‚СЂСѓРєС‚СѓСЂС‹ UAC_PRIVATE_KEY.
+	РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РЅСѓР¶РµРЅ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ С„СѓРЅРєС†РёСЏРјРё UAC_Token*.
 
-	\param[in] pKey			структура UAC_PRIVATE_KEY 
-	\param[in] pTokenId		поле для идентификатора токена
+	\param[in] pKey			СЃС‚СЂСѓРєС‚СѓСЂР° UAC_PRIVATE_KEY 
+	\param[in] pTokenId		РїРѕР»Рµ РґР»СЏ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° С‚РѕРєРµРЅР°
 
-	\note Если pTokenId==NULL, то будет производиться проверка pKey на наличие
-	идентификатора токена. В этом случае функция возвратит:
-	::UAC_ERROR_FORMAT, если pKey НЕ содержит идентификатор токена,
-	::UAC_ERROR_NULL_PARAM,   если pKey содержит идентификатор токена.
+	\note Р•СЃР»Рё pTokenId==NULL, С‚Рѕ Р±СѓРґРµС‚ РїСЂРѕРёР·РІРѕРґРёС‚СЊСЃСЏ РїСЂРѕРІРµСЂРєР° pKey РЅР° РЅР°Р»РёС‡РёРµ
+	РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° С‚РѕРєРµРЅР°. Р’ СЌС‚РѕРј СЃР»СѓС‡Р°Рµ С„СѓРЅРєС†РёСЏ РІРѕР·РІСЂР°С‚РёС‚:
+	::UAC_ERROR_FORMAT, РµСЃР»Рё pKey РќР• СЃРѕРґРµСЂР¶РёС‚ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С‚РѕРєРµРЅР°,
+	::UAC_ERROR_NULL_PARAM,   РµСЃР»Рё pKey СЃРѕРґРµСЂР¶РёС‚ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С‚РѕРєРµРЅР°.
 	
-	\note Функция не производит проверку валидности полученного идентификатора токена
+	\note Р¤СѓРЅРєС†РёСЏ РЅРµ РїСЂРѕРёР·РІРѕРґРёС‚ РїСЂРѕРІРµСЂРєСѓ РІР°Р»РёРґРЅРѕСЃС‚Рё РїРѕР»СѓС‡РµРЅРЅРѕРіРѕ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° С‚РѕРєРµРЅР°
 
 	\return 
-		::UAC_ERROR_FORMAT - если pKey не содержит идентификатор токена
-		код ошибки или ::UAC_SUCCESS
+		::UAC_ERROR_FORMAT - РµСЃР»Рё pKey РЅРµ СЃРѕРґРµСЂР¶РёС‚ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С‚РѕРєРµРЅР°
+		РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_TokenOfKey(
 	UAC_IN  PUAC_PRIVATE_KEY	pKey,
@@ -1348,22 +1348,22 @@ UAC_API(DWORD) UAC_TokenOfKey(
 
 
 /**
-	\brief	Конфигурация автозагрузки библиотеки
-	Функция установливает каталог и параметры автозагрузки файловых токенов.
+	\brief	РљРѕРЅС„РёРіСѓСЂР°С†РёСЏ Р°РІС‚РѕР·Р°РіСЂСѓР·РєРё Р±РёР±Р»РёРѕС‚РµРєРё
+	Р¤СѓРЅРєС†РёСЏ СѓСЃС‚Р°РЅРѕРІР»РёРІР°РµС‚ РєР°С‚Р°Р»РѕРі Рё РїР°СЂР°РјРµС‚СЂС‹ Р°РІС‚РѕР·Р°РіСЂСѓР·РєРё С„Р°Р№Р»РѕРІС‹С… С‚РѕРєРµРЅРѕРІ.
 
-	Функция должна вызываться до вызова других функций UAC_Token* и функций PKCS#11:
-	в этом случае, параметры автозагрузки будут применены при первом обращении к указанным функциям.
-	в противном случае, если mountOnStartup!=0, то будет произведена повторная загрузка токенов на новых параметрах.
+	Р¤СѓРЅРєС†РёСЏ РґРѕР»Р¶РЅР° РІС‹Р·С‹РІР°С‚СЊСЃСЏ РґРѕ РІС‹Р·РѕРІР° РґСЂСѓРіРёС… С„СѓРЅРєС†РёР№ UAC_Token* Рё С„СѓРЅРєС†РёР№ PKCS#11:
+	РІ СЌС‚РѕРј СЃР»СѓС‡Р°Рµ, РїР°СЂР°РјРµС‚СЂС‹ Р°РІС‚РѕР·Р°РіСЂСѓР·РєРё Р±СѓРґСѓС‚ РїСЂРёРјРµРЅРµРЅС‹ РїСЂРё РїРµСЂРІРѕРј РѕР±СЂР°С‰РµРЅРёРё Рє СѓРєР°Р·Р°РЅРЅС‹Рј С„СѓРЅРєС†РёСЏРј.
+	РІ РїСЂРѕС‚РёРІРЅРѕРј СЃР»СѓС‡Р°Рµ, РµСЃР»Рё mountOnStartup!=0, С‚Рѕ Р±СѓРґРµС‚ РїСЂРѕРёР·РІРµРґРµРЅР° РїРѕРІС‚РѕСЂРЅР°СЏ Р·Р°РіСЂСѓР·РєР° С‚РѕРєРµРЅРѕРІ РЅР° РЅРѕРІС‹С… РїР°СЂР°РјРµС‚СЂР°С….
 
 
-	при первом инициализации библиотеки PKCS#11
+	РїСЂРё РїРµСЂРІРѕРј РёРЅРёС†РёР°Р»РёР·Р°С†РёРё Р±РёР±Р»РёРѕС‚РµРєРё PKCS#11
 
-	\param[in] tokenDir		путь к каталогу из которого автоматически монтируются токены
-							по-умолчанию "."
-	\param[in] tokenExt		расширение имени файлового токена для автозагрузки
-							по-умолчанию ".tok"
-	\param[in] mountOnStartup включение автозагрузки
-							0 = не загружать
+	\param[in] tokenDir		РїСѓС‚СЊ Рє РєР°С‚Р°Р»РѕРіСѓ РёР· РєРѕС‚РѕСЂРѕРіРѕ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё РјРѕРЅС‚РёСЂСѓСЋС‚СЃСЏ С‚РѕРєРµРЅС‹
+							РїРѕ-СѓРјРѕР»С‡Р°РЅРёСЋ "."
+	\param[in] tokenExt		СЂР°СЃС€РёСЂРµРЅРёРµ РёРјРµРЅРё С„Р°Р№Р»РѕРІРѕРіРѕ С‚РѕРєРµРЅР° РґР»СЏ Р°РІС‚РѕР·Р°РіСЂСѓР·РєРё
+							РїРѕ-СѓРјРѕР»С‡Р°РЅРёСЋ ".tok"
+	\param[in] mountOnStartup РІРєР»СЋС‡РµРЅРёРµ Р°РІС‚РѕР·Р°РіСЂСѓР·РєРё
+							0 = РЅРµ Р·Р°РіСЂСѓР¶Р°С‚СЊ
 
 
 	\return ::UAC_SUCCESS
@@ -1374,24 +1374,24 @@ UAC_API(DWORD) UAC_TokenAutoMount(
 	UAC_IN	DWORD			mountOnStartup );
 
 /**
-	\brief	Получение списка подключенных токенов заданного провайдера
+	\brief	РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РїРѕРґРєР»СЋС‡РµРЅРЅС‹С… С‚РѕРєРµРЅРѕРІ Р·Р°РґР°РЅРЅРѕРіРѕ РїСЂРѕРІР°Р№РґРµСЂР°
 	
-	идентификатор нужен для работы с функиями UAC_Token*
+	РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РЅСѓР¶РµРЅ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ С„СѓРЅРєРёСЏРјРё UAC_Token*
 
-	\param[out] pTokens		буффер для идентификаторов найденных токенов 
-							или NULL - для запроса количества токенов
-	\param[in,out] pTokenCount	поле для количества найденных токенов
-	\param[in] providerName	имя провайдера Pkcs#11 
-	\param[in] onlyWithToken =true, если требуються только слоты с подключенными токенами
+	\param[out] pTokens		Р±СѓС„С„РµСЂ РґР»СЏ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРІ РЅР°Р№РґРµРЅРЅС‹С… С‚РѕРєРµРЅРѕРІ 
+							РёР»Рё NULL - РґР»СЏ Р·Р°РїСЂРѕСЃР° РєРѕР»РёС‡РµСЃС‚РІР° С‚РѕРєРµРЅРѕРІ
+	\param[in,out] pTokenCount	РїРѕР»Рµ РґР»СЏ РєРѕР»РёС‡РµСЃС‚РІР° РЅР°Р№РґРµРЅРЅС‹С… С‚РѕРєРµРЅРѕРІ
+	\param[in] providerName	РёРјСЏ РїСЂРѕРІР°Р№РґРµСЂР° Pkcs#11 
+	\param[in] onlyWithToken =true, РµСЃР»Рё С‚СЂРµР±СѓСЋС‚СЊСЃСЏ С‚РѕР»СЊРєРѕ СЃР»РѕС‚С‹ СЃ РїРѕРґРєР»СЋС‡РµРЅРЅС‹РјРё С‚РѕРєРµРЅР°РјРё
 
-	\note В текущей версии доступны 2 провайдера: 
-	::UAC_PROVIDER - файловые токены UAC
-	::EFT_PROVIDER - ключи Efit
+	\note Р’ С‚РµРєСѓС‰РµР№ РІРµСЂСЃРёРё РґРѕСЃС‚СѓРїРЅС‹ 2 РїСЂРѕРІР°Р№РґРµСЂР°: 
+	::UAC_PROVIDER - С„Р°Р№Р»РѕРІС‹Рµ С‚РѕРєРµРЅС‹ UAC
+	::EFT_PROVIDER - РєР»СЋС‡Рё Efit
 	
-	\note Функция не производит проверку валидности полученного идентификатора токена
+	\note Р¤СѓРЅРєС†РёСЏ РЅРµ РїСЂРѕРёР·РІРѕРґРёС‚ РїСЂРѕРІРµСЂРєСѓ РІР°Р»РёРґРЅРѕСЃС‚Рё РїРѕР»СѓС‡РµРЅРЅРѕРіРѕ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° С‚РѕРєРµРЅР°
 
 	\return 
-		код ошибки или ::UAC_SUCCESS
+		РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_TokenEnum(
 	UAC_OUT	PUAC_TOKEN		pTokens,
@@ -1400,15 +1400,15 @@ UAC_API(DWORD) UAC_TokenEnum(
 	UAC_IN	bool			onlyWithToken );
 
 /**
-	\brief	Поиск токенов заданного провайдера с заданным серийным номером
-	\param[out] tokenBuf	поле для идентификатора найденного токена
-	\param[in] providerName	имя провайдера Pkcs#11 
-	\param[in] sn			серийный номер искомого токена
+	\brief	РџРѕРёСЃРє С‚РѕРєРµРЅРѕРІ Р·Р°РґР°РЅРЅРѕРіРѕ РїСЂРѕРІР°Р№РґРµСЂР° СЃ Р·Р°РґР°РЅРЅС‹Рј СЃРµСЂРёР№РЅС‹Рј РЅРѕРјРµСЂРѕРј
+	\param[out] tokenBuf	РїРѕР»Рµ РґР»СЏ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° РЅР°Р№РґРµРЅРЅРѕРіРѕ С‚РѕРєРµРЅР°
+	\param[in] providerName	РёРјСЏ РїСЂРѕРІР°Р№РґРµСЂР° Pkcs#11 
+	\param[in] sn			СЃРµСЂРёР№РЅС‹Р№ РЅРѕРјРµСЂ РёСЃРєРѕРјРѕРіРѕ С‚РѕРєРµРЅР°
 
 	\return 
-	::UAC_ERROR_NODATA, если токен не найден
-	::UAC_SUCCESS, если токен найден 
-	или код ошибки
+	::UAC_ERROR_NODATA, РµСЃР»Рё С‚РѕРєРµРЅ РЅРµ РЅР°Р№РґРµРЅ
+	::UAC_SUCCESS, РµСЃР»Рё С‚РѕРєРµРЅ РЅР°Р№РґРµРЅ 
+	РёР»Рё РєРѕРґ РѕС€РёР±РєРё
 */
 UAC_API(DWORD) UAC_TokenFind(
 	UAC_OUT	PUAC_TOKEN		tokenBuf,
@@ -1416,34 +1416,34 @@ UAC_API(DWORD) UAC_TokenFind(
 	UAC_IN  UAC_TOKEN_SN	sn);
 
 /**
-	\brief	Чтение информации о слоте и подключенном токене 
-	\param[in]	token		идентификатор токена
-	\param[out] slotInfo	поле для информации о слоте Pkcs#11 (или NULL)
-	\param[out] tokenInfo	поле для информации о токене (или NULL)
+	\brief	Р§С‚РµРЅРёРµ РёРЅС„РѕСЂРјР°С†РёРё Рѕ СЃР»РѕС‚Рµ Рё РїРѕРґРєР»СЋС‡РµРЅРЅРѕРј С‚РѕРєРµРЅРµ 
+	\param[in]	token		РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С‚РѕРєРµРЅР°
+	\param[out] slotInfo	РїРѕР»Рµ РґР»СЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ СЃР»РѕС‚Рµ Pkcs#11 (РёР»Рё NULL)
+	\param[out] tokenInfo	РїРѕР»Рµ РґР»СЏ РёРЅС„РѕСЂРјР°С†РёРё Рѕ С‚РѕРєРµРЅРµ (РёР»Рё NULL)
 
-	\note Если slotInfo==NULL и tokenInfo==NULL, то функция не производит обращения 
-	к токену а лишь проверяет корректность формата идентификатора UAC_TOKEN.
+	\note Р•СЃР»Рё slotInfo==NULL Рё tokenInfo==NULL, С‚Рѕ С„СѓРЅРєС†РёСЏ РЅРµ РїСЂРѕРёР·РІРѕРґРёС‚ РѕР±СЂР°С‰РµРЅРёСЏ 
+	Рє С‚РѕРєРµРЅСѓ Р° Р»РёС€СЊ РїСЂРѕРІРµСЂСЏРµС‚ РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚СЊ С„РѕСЂРјР°С‚Р° РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° UAC_TOKEN.
 
 	\return 
-	::UAC_SUCCESS или код ошибки
+	::UAC_SUCCESS РёР»Рё РєРѕРґ РѕС€РёР±РєРё
 */
 UAC_API(DWORD) UAC_TokenInfo(
 	UAC_IN	PUAC_TOKEN			token,
 	UAC_OUT CK_SLOT_INFO_PTR	slotInfo,
 	UAC_OUT CK_TOKEN_INFO_PTR	tokenInfo );
 
-/** \name функции работы с виртуальным электронным ключем через ссылку из UAC_PRIVATE_KEY  */
+/** \name С„СѓРЅРєС†РёРё СЂР°Р±РѕС‚С‹ СЃ РІРёСЂС‚СѓР°Р»СЊРЅС‹Рј СЌР»РµРєС‚СЂРѕРЅРЅС‹Рј РєР»СЋС‡РµРј С‡РµСЂРµР· СЃСЃС‹Р»РєСѓ РёР· UAC_PRIVATE_KEY  */
 
 /**
-	\brief	Выбор активного личного ключа по индексу и/или чтение его сертификата 
-	\param[in] pKey			данные личного ключа, ссылающиеся на токен
-	\param[in] dwIndex		локальный индекс требуемого ключа 
-	(или ::UAC_CURRENT_KEY_INDEX - текущий активный ключ в pKey)
-	\param[out] pCert		буфер для сертификата или NULL, если сертификат не нужен 
+	\brief	Р’С‹Р±РѕСЂ Р°РєС‚РёРІРЅРѕРіРѕ Р»РёС‡РЅРѕРіРѕ РєР»СЋС‡Р° РїРѕ РёРЅРґРµРєСЃСѓ Рё/РёР»Рё С‡С‚РµРЅРёРµ РµРіРѕ СЃРµСЂС‚РёС„РёРєР°С‚Р° 
+	\param[in] pKey			РґР°РЅРЅС‹Рµ Р»РёС‡РЅРѕРіРѕ РєР»СЋС‡Р°, СЃСЃС‹Р»Р°СЋС‰РёРµСЃСЏ РЅР° С‚РѕРєРµРЅ
+	\param[in] dwIndex		Р»РѕРєР°Р»СЊРЅС‹Р№ РёРЅРґРµРєСЃ С‚СЂРµР±СѓРµРјРѕРіРѕ РєР»СЋС‡Р° 
+	(РёР»Рё ::UAC_CURRENT_KEY_INDEX - С‚РµРєСѓС‰РёР№ Р°РєС‚РёРІРЅС‹Р№ РєР»СЋС‡ РІ pKey)
+	\param[out] pCert		Р±СѓС„РµСЂ РґР»СЏ СЃРµСЂС‚РёС„РёРєР°С‚Р° РёР»Рё NULL, РµСЃР»Рё СЃРµСЂС‚РёС„РёРєР°С‚ РЅРµ РЅСѓР¶РµРЅ 
 
-	\return UAC_ERROR_NO_KEY, если ключ не найден.
-	код ошибки или ::UAC_SUCCESS
-	pCert - пустой, если сертификат для заданного ключа отсутствует.
+	\return UAC_ERROR_NO_KEY, РµСЃР»Рё РєР»СЋС‡ РЅРµ РЅР°Р№РґРµРЅ.
+	РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
+	pCert - РїСѓСЃС‚РѕР№, РµСЃР»Рё СЃРµСЂС‚РёС„РёРєР°С‚ РґР»СЏ Р·Р°РґР°РЅРЅРѕРіРѕ РєР»СЋС‡Р° РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚.
 
 */
 UAC_API(DWORD) UAC_KeySelect (
@@ -1453,17 +1453,17 @@ UAC_API(DWORD) UAC_KeySelect (
 	UAC_OUT PUAC_BLOB		pCert );
 
 /**
-	\brief	Выбор активного личного ключа по сертификату ключа
+	\brief	Р’С‹Р±РѕСЂ Р°РєС‚РёРІРЅРѕРіРѕ Р»РёС‡РЅРѕРіРѕ РєР»СЋС‡Р° РїРѕ СЃРµСЂС‚РёС„РёРєР°С‚Сѓ РєР»СЋС‡Р°
 
-	\param[in] pKey			данные личного ключа, ссылающиеся на токен
-	\param[in] pCert		сертификат искомого ключа
+	\param[in] pKey			РґР°РЅРЅС‹Рµ Р»РёС‡РЅРѕРіРѕ РєР»СЋС‡Р°, СЃСЃС‹Р»Р°СЋС‰РёРµСЃСЏ РЅР° С‚РѕРєРµРЅ
+	\param[in] pCert		СЃРµСЂС‚РёС„РёРєР°С‚ РёСЃРєРѕРјРѕРіРѕ РєР»СЋС‡Р°
 	
-	\note Поиск ключа производится по идентификатору ключа. 
+	\note РџРѕРёСЃРє РєР»СЋС‡Р° РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ РїРѕ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂСѓ РєР»СЋС‡Р°. 
 
-	\note Наличие сертификата в токене не проверяется.
+	\note РќР°Р»РёС‡РёРµ СЃРµСЂС‚РёС„РёРєР°С‚Р° РІ С‚РѕРєРµРЅРµ РЅРµ РїСЂРѕРІРµСЂСЏРµС‚СЃСЏ.
 
-	\return UAC_ERROR_NO_KEY, если ключ не найден.
-	код ошибки или ::UAC_SUCCESS
+	\return UAC_ERROR_NO_KEY, РµСЃР»Рё РєР»СЋС‡ РЅРµ РЅР°Р№РґРµРЅ.
+	РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 
 */
 UAC_API(DWORD) UAC_KeySelectByCert (
@@ -1471,29 +1471,29 @@ UAC_API(DWORD) UAC_KeySelectByCert (
 	UAC_IN  PUAC_BLOB			pCert );
 
 /**
-	\brief	Запись сертификата в токен
-	\param[in] pKey			данные личного ключа, ссылающиеся на токен
-	\param[in] pCert		записываемый сертификат
+	\brief	Р—Р°РїРёСЃСЊ СЃРµСЂС‚РёС„РёРєР°С‚Р° РІ С‚РѕРєРµРЅ
+	\param[in] pKey			РґР°РЅРЅС‹Рµ Р»РёС‡РЅРѕРіРѕ РєР»СЋС‡Р°, СЃСЃС‹Р»Р°СЋС‰РёРµСЃСЏ РЅР° С‚РѕРєРµРЅ
+	\param[in] pCert		Р·Р°РїРёСЃС‹РІР°РµРјС‹Р№ СЃРµСЂС‚РёС„РёРєР°С‚
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_KeyAddCert (
 	UAC_IN PUAC_PRIVATE_KEY	pKey,
 	UAC_IN PUAC_BLOB		pCert );
 
 /**
-	\brief	Чтение сертификата из токена
-	\param[in] pKey			данные личного ключа, ссылающиеся на токен
-	\param[in] dwIndex		локальный индекс требуемого сертификата или ::UAC_CURRENT_KEY_INDEX
-	\param[in] pCert		буфер для сертификата
+	\brief	Р§С‚РµРЅРёРµ СЃРµСЂС‚РёС„РёРєР°С‚Р° РёР· С‚РѕРєРµРЅР°
+	\param[in] pKey			РґР°РЅРЅС‹Рµ Р»РёС‡РЅРѕРіРѕ РєР»СЋС‡Р°, СЃСЃС‹Р»Р°СЋС‰РёРµСЃСЏ РЅР° С‚РѕРєРµРЅ
+	\param[in] dwIndex		Р»РѕРєР°Р»СЊРЅС‹Р№ РёРЅРґРµРєСЃ С‚СЂРµР±СѓРµРјРѕРіРѕ СЃРµСЂС‚РёС„РёРєР°С‚Р° РёР»Рё ::UAC_CURRENT_KEY_INDEX
+	\param[in] pCert		Р±СѓС„РµСЂ РґР»СЏ СЃРµСЂС‚РёС„РёРєР°С‚Р°
 
-	если dwIndex == ::UAC_CURRENT_KEY_INDEX,
-	то будет прочитан сертификат, соответствующий текущему приватному ключу (выбранному функцией UAC_KeySelect);
-	если ключ не выбран, функция вернет ошибку UAC_ERROR_NO_KEY.
+	РµСЃР»Рё dwIndex == ::UAC_CURRENT_KEY_INDEX,
+	С‚Рѕ Р±СѓРґРµС‚ РїСЂРѕС‡РёС‚Р°РЅ СЃРµСЂС‚РёС„РёРєР°С‚, СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёР№ С‚РµРєСѓС‰РµРјСѓ РїСЂРёРІР°С‚РЅРѕРјСѓ РєР»СЋС‡Сѓ (РІС‹Р±СЂР°РЅРЅРѕРјСѓ С„СѓРЅРєС†РёРµР№ UAC_KeySelect);
+	РµСЃР»Рё РєР»СЋС‡ РЅРµ РІС‹Р±СЂР°РЅ, С„СѓРЅРєС†РёСЏ РІРµСЂРЅРµС‚ РѕС€РёР±РєСѓ UAC_ERROR_NO_KEY.
 	
-	Если сертификат не найден, функция вернет ошибку UAC_ERROR_NODATA.
+	Р•СЃР»Рё СЃРµСЂС‚РёС„РёРєР°С‚ РЅРµ РЅР°Р№РґРµРЅ, С„СѓРЅРєС†РёСЏ РІРµСЂРЅРµС‚ РѕС€РёР±РєСѓ UAC_ERROR_NODATA.
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_KeyGetCert (
 	UAC_IN PUAC_PRIVATE_KEY	pKey,
@@ -1501,12 +1501,12 @@ UAC_API(DWORD) UAC_KeyGetCert (
 	UAC_OUT PUAC_BLOB		pCert );
 
 /**
-	\brief	Поиск и чтение сертификата из токена по ссылке на сертификат
-	\param[in] pKey			данные личного ключа, ссылающиеся на токен
-	\param[in] pCertRef		ссылки на сертификат
-	\param[out] pCert		буфер для сертификата
+	\brief	РџРѕРёСЃРє Рё С‡С‚РµРЅРёРµ СЃРµСЂС‚РёС„РёРєР°С‚Р° РёР· С‚РѕРєРµРЅР° РїРѕ СЃСЃС‹Р»РєРµ РЅР° СЃРµСЂС‚РёС„РёРєР°С‚
+	\param[in] pKey			РґР°РЅРЅС‹Рµ Р»РёС‡РЅРѕРіРѕ РєР»СЋС‡Р°, СЃСЃС‹Р»Р°СЋС‰РёРµСЃСЏ РЅР° С‚РѕРєРµРЅ
+	\param[in] pCertRef		СЃСЃС‹Р»РєРё РЅР° СЃРµСЂС‚РёС„РёРєР°С‚
+	\param[out] pCert		Р±СѓС„РµСЂ РґР»СЏ СЃРµСЂС‚РёС„РёРєР°С‚Р°
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_KeyFindCert (
 	UAC_IN PUAC_PRIVATE_KEY	pKey,
@@ -1515,36 +1515,36 @@ UAC_API(DWORD) UAC_KeyFindCert (
 
 
 /**
-	\brief	Удаление сертификата из токена 
-	\param[in] pKey			данные личного ключа, ссылающиеся на токен
-	\param[in] pCert		сертификат 
+	\brief	РЈРґР°Р»РµРЅРёРµ СЃРµСЂС‚РёС„РёРєР°С‚Р° РёР· С‚РѕРєРµРЅР° 
+	\param[in] pKey			РґР°РЅРЅС‹Рµ Р»РёС‡РЅРѕРіРѕ РєР»СЋС‡Р°, СЃСЃС‹Р»Р°СЋС‰РёРµСЃСЏ РЅР° С‚РѕРєРµРЅ
+	\param[in] pCert		СЃРµСЂС‚РёС„РёРєР°С‚ 
 
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_KeyDelCert (
 	UAC_IN PUAC_PRIVATE_KEY	pKey,
 	UAC_IN	PUAC_BLOB		pCert );
 /**
-	\brief	Удаление активного личного ключа и сертификата из токена 
-	\param[in] pKey			данные личного ключа, ссылающиеся на токен
+	\brief	РЈРґР°Р»РµРЅРёРµ Р°РєС‚РёРІРЅРѕРіРѕ Р»РёС‡РЅРѕРіРѕ РєР»СЋС‡Р° Рё СЃРµСЂС‚РёС„РёРєР°С‚Р° РёР· С‚РѕРєРµРЅР° 
+	\param[in] pKey			РґР°РЅРЅС‹Рµ Р»РёС‡РЅРѕРіРѕ РєР»СЋС‡Р°, СЃСЃС‹Р»Р°СЋС‰РёРµСЃСЏ РЅР° С‚РѕРєРµРЅ
 
-	если ключ не выбран, функция вернет ошибку UAC_ERROR_NO_KEY.
+	РµСЃР»Рё РєР»СЋС‡ РЅРµ РІС‹Р±СЂР°РЅ, С„СѓРЅРєС†РёСЏ РІРµСЂРЅРµС‚ РѕС€РёР±РєСѓ UAC_ERROR_NO_KEY.
 	
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_KeyDel (
 	UAC_IN PUAC_PRIVATE_KEY	pKey );
 
 
 /**
-	\brief	Экспорт активного личного ключа из токена 
-	\param[in] pKey			данные личного ключа, ссылающиеся на токен
-	\param[out] pCont		буфер для контейнера с ключом
+	\brief	Р­РєСЃРїРѕСЂС‚ Р°РєС‚РёРІРЅРѕРіРѕ Р»РёС‡РЅРѕРіРѕ РєР»СЋС‡Р° РёР· С‚РѕРєРµРЅР° 
+	\param[in] pKey			РґР°РЅРЅС‹Рµ Р»РёС‡РЅРѕРіРѕ РєР»СЋС‡Р°, СЃСЃС‹Р»Р°СЋС‰РёРµСЃСЏ РЅР° С‚РѕРєРµРЅ
+	\param[out] pCont		Р±СѓС„РµСЂ РґР»СЏ РєРѕРЅС‚РµР№РЅРµСЂР° СЃ РєР»СЋС‡РѕРј
 
-	если ключ не выбран, функция вернет ошибку UAC_ERROR_NO_KEY.
-	если ключ недоступен для чтения, функция вернет ошибку UAC_ERROR_TOKEN_ID.
+	РµСЃР»Рё РєР»СЋС‡ РЅРµ РІС‹Р±СЂР°РЅ, С„СѓРЅРєС†РёСЏ РІРµСЂРЅРµС‚ РѕС€РёР±РєСѓ UAC_ERROR_NO_KEY.
+	РµСЃР»Рё РєР»СЋС‡ РЅРµРґРѕСЃС‚СѓРїРµРЅ РґР»СЏ С‡С‚РµРЅРёСЏ, С„СѓРЅРєС†РёСЏ РІРµСЂРЅРµС‚ РѕС€РёР±РєСѓ UAC_ERROR_TOKEN_ID.
 	
-	\return код ошибки или ::UAC_SUCCESS
+	\return РєРѕРґ РѕС€РёР±РєРё РёР»Рё ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_KeyGet (
 	UAC_IN PUAC_PRIVATE_KEY	pKey,
@@ -1552,8 +1552,8 @@ UAC_API(DWORD) UAC_KeyGet (
 	);
 
 /**
-	\brief	Установка callback-функции выделения памяти для динамического UAC_BLOB
-	\param[in] pAllocate	callback-функции выделения памяти для динамического UAC_BLOB или NULL
+	\brief	РЈСЃС‚Р°РЅРѕРІРєР° callback-С„СѓРЅРєС†РёРё РІС‹РґРµР»РµРЅРёСЏ РїР°РјСЏС‚Рё РґР»СЏ РґРёРЅР°РјРёС‡РµСЃРєРѕРіРѕ UAC_BLOB
+	\param[in] pAllocate	callback-С„СѓРЅРєС†РёРё РІС‹РґРµР»РµРЅРёСЏ РїР°РјСЏС‚Рё РґР»СЏ РґРёРЅР°РјРёС‡РµСЃРєРѕРіРѕ UAC_BLOB РёР»Рё NULL
 
 	\return ::UAC_SUCCESS
 */

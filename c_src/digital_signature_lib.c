@@ -19,8 +19,17 @@ struct GeneralCert
 
 struct Certs
 {
-    struct GeneralCert general[100];
-    UAC_BLOB tsp[100];
+    struct GeneralCert* general;
+    unsigned int generalLength;
+
+    UAC_BLOB* tsp;
+    unsigned int tspLength;
+};
+
+struct ValidationResult
+{
+  bool isValid;
+  char* validationErrorMessage;
 };
 
 DWORD GetTimeStamp(void* libHandler, UAC_BLOB signedData, PUAC_BLOB timeStamp)
@@ -114,42 +123,48 @@ DWORD OcspResponseLoad(void* libHandler, UAC_BLOB response, PUAC_OCSP_RESPONSE_I
     return (*ocspResponseLoad)(&response, ocspResponseInfo);
 }
 
-struct GeneralCert FindMatchingRootCertificate(void* libHandler, UAC_BLOB cert, struct GeneralCert generalCerts[100])
+struct GeneralCert FindMatchingRootCertificate(void* libHandler, UAC_BLOB cert, struct GeneralCert* generalCerts,
+  unsigned int generalLength)
 {
-    struct GeneralCert emptyResult;
-    memset(&emptyResult, 0, sizeof(emptyResult));
+    struct GeneralCert emptyResult = {};
     UAC_CERT_REF issuerCertRef = {};
-    DWORD certIssuerRefResult = CertIssuerRef(libHandler, cert, &issuerCertRef);
-    if (certIssuerRefResult != 0) {
+
+    if (CertIssuerRef(libHandler, cert, &issuerCertRef) != UAC_SUCCESS) {
         return emptyResult;
     }
 
-    int i = 0;
-    UAC_BLOB rootCert = generalCerts[i].root;
-    while (rootCert.data != NULL) {
-        DWORD certMatchResult = CertMatch(libHandler, issuerCertRef, rootCert);
-        if (certMatchResult == 0) {
-            return generalCerts[i];
-        }
-        i++;
+    unsigned int i = 0;
+    UAC_BLOB rootCert;
+
+    while (i < generalLength) {
         rootCert = generalCerts[i].root;
+
+        if (CertMatch(libHandler, issuerCertRef, rootCert) == UAC_SUCCESS) {
+          return generalCerts[i];
+        }
+
+        i++;
     }
+
     return emptyResult;
 }
 
-UAC_BLOB FindMatchingTspCertificate(void* libHandler, UAC_CERT_REF signerRef, UAC_BLOB certs[100])
+UAC_BLOB FindMatchingTspCertificate(void* libHandler, UAC_CERT_REF signerRef, UAC_BLOB* tsp, unsigned int tspLength)
 {
     UAC_BLOB emptyBlob = {};
-    int i = 0;
-    UAC_BLOB tspCert = certs[i];
-    while (tspCert.data != NULL) {
+    unsigned int i = 0;
+    UAC_BLOB tspCert = tsp[i];
+
+    while (i < tspLength) {
         DWORD certMatchResult = CertMatch(libHandler, signerRef, tspCert);
         if (certMatchResult == 0) {
-            return certs[i];
+            return tsp[i];
         }
+
         i++;
-        tspCert = certs[i];
+        tspCert = tsp[i];
     }
+
     return emptyBlob;
 }
 
@@ -177,47 +192,49 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
 {
     UAC_BLOB emptyResult = {};
 
-    char* host = malloc(strlen(url));
-    memset(host, 0, strlen(url));
-    char* port = malloc(strlen(url));
-    memset(port, 0, strlen(url));
-    memcpy(host, url, strlen(url));
-    host = strstr(host, "://") + 3;
-    port = strstr(host, ":") + 1;
+    // ---- Parse URL ----
+    char url_copy[strlen(url)];
+    memcpy(url_copy, url, strlen(url));
+
+    const char* schemaDelim = "://";
+    const char* portDelim = ":";
+    const char* pathDelim = "/";
+
+    char* host = strstr(url_copy, schemaDelim) + strlen(schemaDelim);
+    char* port = strstr(host, portDelim);
+
     int p = 80;
-    if (port != NULL + 1) {
-        port = strtok(port, "/");
+    if (port != NULL) {
+        port += strlen(portDelim);
+
+        host = strtok(host, portDelim);
+        port = strtok(NULL, pathDelim);
+
         p = atoi(port);
-        host = strtok(host, ":");
+    } else {
+        host = strtok(host, pathDelim);
     }
-    else {
-        host = strtok(host, "/");
-    }
+    // ---- End of URL parsing ----
 
     struct hostent* server;
     struct sockaddr_in serv_addr;
     int sockfd, bytes, sent, received, total;
-    char message[40960], response[40960];
 
-    sprintf(message, "POST %s HTTP/1.1\r\n", url);
-    sprintf(message + strlen(message), "Host: %s\r\n", host);
-    strcat(message, "Content-Type: application/ocsp-request\r\n");
-    sprintf(message + strlen(message), "Content-Length: %d\r\n\r\n", requestData.dataLen);
+    char message[40960], response[40960];
+    memset(message, 0, sizeof(message));
+    memset(response, 0, sizeof(response));
+
+    char* messageTemplate =
+      "POST %s HTTP/1.1\r\nHost: %s\r\nContent-Type: application/ocsp-request\r\nContent-Length: %d\r\n\r\n";
+
+    sprintf(message, messageTemplate, url, host, requestData.dataLen);
 
     int messageLen = strlen(message);
-
-    char* data = requestData.data;
-    int i;
-    for (i = 0; i < requestData.dataLen; i++) {
-        message[messageLen + i] = data[i];
-    }
-
+    memcpy(message + messageLen, requestData.data, requestData.dataLen);
     messageLen += requestData.dataLen;
 
-    message[messageLen] = "\r";
-    messageLen++;
-    message[messageLen] = "\n";
-    messageLen++;
+    message[messageLen] = "\r\n";
+    messageLen += strlen("\r\n");
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
@@ -239,9 +256,11 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
     }
 
     total = messageLen;
+
     sent = 0;
     do {
         bytes = write(sockfd, message + sent, total - sent);
+
         if (bytes < 0) {
             return emptyResult;
         }
@@ -251,8 +270,8 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
         sent += bytes;
     } while (sent < total);
 
-    memset(response, 0, sizeof(response));
     total = sizeof(response) - 1;
+
     received = 0;
     do {
         bytes = read(sockfd, response + received, total - received);
@@ -271,20 +290,21 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
 
     close(sockfd);
 
-    char* body = strstr(response, "\r\n\r\n") + 4;
+    char* body = strstr(response, "\r\n\r\n") + strlen("\r\n\r\n");
 
-    char* contentLengthHeader = strstr(response, "Content-Length: ") + 16;
+    char* contentLengthHeader = strstr(response, "Content-Length: ") + strlen("Content-Length: ");
     int contentLength = atoi(strtok(contentLengthHeader, "\r\n"));
 
-    UAC_BLOB result = {malloc(contentLength), contentLength};
-    result.data = body;
+    UAC_BLOB result = {calloc(contentLength, sizeof(char)), contentLength};
+    memcpy(result.data, body, contentLength);
+
     return result;
 }
 
 bool CheckOCSP(void* libHandler, UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB ocspCert, bool verify)
 {
-    char ocspRequestBuf[cert.dataLen];
-    memset(ocspRequestBuf, 0, cert.dataLen);
+    char* ocspRequestBuf = calloc(cert.dataLen, sizeof(char));
+
     UAC_BLOB ocspRequest = {ocspRequestBuf, cert.dataLen};
     DWORD ocspRequestCreateResult = OcspRequestCreate(libHandler, cert, &ocspRequest);
     if (ocspRequestCreateResult != 0) {
@@ -294,91 +314,114 @@ bool CheckOCSP(void* libHandler, UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB
     UAC_BLOB ocspResponse = SendOCSPRequest(ocspUrl, ocspRequest);
     UAC_OCSP_RESPONSE_INFO ocspResponseInfo = {};
     if (verify) {
-        DWORD ocspResponseVerifyResult = OcspResponseVerify(libHandler, ocspResponse, ocspCert);
-        if (ocspResponseVerifyResult != 0) {
+        if (OcspResponseVerify(libHandler, ocspResponse, ocspCert) != UAC_SUCCESS) {
             return false;
         }
     }
-    DWORD ocspResponseLoadResult = OcspResponseLoad(libHandler, ocspResponse, &ocspResponseInfo);
-    if (ocspResponseLoadResult != 0) {
+    if (OcspResponseLoad(libHandler, ocspResponse, &ocspResponseInfo) != UAC_SUCCESS) {
         return false;
     }
+
     return ocspResponseInfo.certStatus == 0;
 }
 
-bool Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDataInfo, PUAC_SUBJECT_INFO subjectInfo,
+struct ValidationResult Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDataInfo, PUAC_SUBJECT_INFO subjectInfo,
            struct Certs certs)
 {
+    struct ValidationResult validationResult = {false, "error validating signed data container"};
     int signaturesCount = signedDataInfo.dwSignatureCount;
-    char* timeStampBuf = malloc(signedData.dataLen);
-    //memset(timeStampBuf, 0, signedData.dataLen);
+
+    char* timeStampBuf = calloc(signedData.dataLen, sizeof(char));
     UAC_BLOB timeStamp = {timeStampBuf, signedData.dataLen};
-    DWORD getTimeStampResult = GetTimeStamp(libHandler, signedData, &timeStamp);
-    if (getTimeStampResult != 0) {
-        return false;
+    if (GetTimeStamp(libHandler, signedData, &timeStamp) != UAC_SUCCESS) {
+        validationResult.validationErrorMessage = "retrieving a timestamp of data from an envelope with signed data failed";
+        return validationResult;
     }
+
     UAC_TIME_STAMP_INFO timeStampInfo = {};
-    DWORD getTimeStampInfoResult = GetTimeStampInfo(libHandler, timeStamp, &timeStampInfo);
-    if (getTimeStampInfoResult != 0) {
-        return false;
+    if (GetTimeStampInfo(libHandler, timeStamp, &timeStampInfo) != UAC_SUCCESS) {
+        validationResult.validationErrorMessage = "loading information about the response with a timestamp failed";
+        return validationResult;
     }
+
     UAC_TIME timeStampDateTime = timeStampInfo.genTime;
-    UAC_BLOB tspCert = FindMatchingTspCertificate(libHandler, timeStampInfo.signature.signerRef, certs.tsp);
+    UAC_BLOB tspCert = FindMatchingTspCertificate(libHandler, timeStampInfo.signature.signerRef, certs.tsp,
+      certs.tspLength);
+
     int i;
     for (i = 0; i < signaturesCount; i++) {
-        char* certBuf = malloc(signedData.dataLen);
-        // memset(certBuf, 0, signedData.dataLen);
+        char* certBuf = calloc(signedData.dataLen, sizeof(char));
         UAC_BLOB cert = {certBuf, signedData.dataLen};
-        DWORD getCertResult = GetCert(libHandler, signedData, i, &cert);
-        if (getCertResult != 0) {
-            return false;
+        if (GetCert(libHandler, signedData, i, &cert) != UAC_SUCCESS) {
+            validationResult.validationErrorMessage = "retrieving certificate from signed data container failed";
+            return validationResult;
         }
+
         UAC_CERT_INFO certInfo = {};
-        DWORD getCertInfoResult = GetCertInfo(libHandler, cert, &certInfo);
-        if (getCertInfoResult != 0) {
-            return false;
+        if (GetCertInfo(libHandler, cert, &certInfo) != UAC_SUCCESS) {
+            validationResult.validationErrorMessage = "processing certificate information from signed data failed";
+            return validationResult;
         }
+
         memcpy(subjectInfo, &certInfo.subject, sizeof(UAC_SUBJECT_INFO));
-        struct GeneralCert matchingCert = FindMatchingRootCertificate(libHandler, cert, certs.general);
+        struct GeneralCert matchingCert = FindMatchingRootCertificate(libHandler, cert, certs.general,
+          certs.generalLength);
         if (matchingCert.root.data == NULL) {
-            return false;
+            validationResult.validationErrorMessage = "matching ROOT certificate not found";
+            return validationResult;
         }
+
         UAC_BLOB rootCert = matchingCert.root;
         DWORD certVerifyResult = CertVerify(libHandler, cert, rootCert);
         if (certVerifyResult != 0) {
-            return false;
+            validationResult.validationErrorMessage = "ROOT certificate signature verification failed";
+            return validationResult;
         }
         UAC_CERT_INFO rootCertInfo = {};
         DWORD getRootCertInfoResult = GetCertInfo(libHandler, rootCert, &rootCertInfo);
         if (getRootCertInfoResult != 0) {
-            return false;
+            validationResult.validationErrorMessage = "loading ROOT certificate information failed";
+            return validationResult;
         }
         bool isHighestLevel = IsHighestLevel(rootCertInfo);
         if (!isHighestLevel) {
             if (tspCert.data == NULL) {
-                return false;
+                validationResult.validationErrorMessage = "matching TSP certificate not found";
+                return validationResult;
             }
             bool isTimeStampCertValid = VerifyTimeStampCert(libHandler, timeStamp, tspCert);
             if (!isTimeStampCertValid) {
-                return false;
+                validationResult.validationErrorMessage = "checking the signature of a response with a timestamp failed";
+            return validationResult;
             }
         }
         bool isTimeStampValid = CheckTimeStamp(certInfo, timeStampDateTime);
         if (!isTimeStampValid) {
-            return false;
+            validationResult.validationErrorMessage = "signature timestamp verification failed";
+            return validationResult;
         }
         bool isCertNotExpired = CheckTimeStamp(certInfo, time(0));
         if (!isCertNotExpired) {
-            return false;
+            validationResult.validationErrorMessage = "certificate timestemp expired";
+            return validationResult;
         }
+
         bool checkOSCP = CheckOCSP(libHandler, cert, certInfo, matchingCert.ocsp, !isHighestLevel);
         if (!checkOSCP) {
-            return false;
+            validationResult.validationErrorMessage = "OCSP certificate verificaton failed";
+            return validationResult;
         }
         DWORD signedDataVerifyResult = SignedDataVerify(libHandler, signedData, cert);
-        if (signedDataVerifyResult != 0) {
-            return false;
+        if (signedDataVerifyResult != UAC_SUCCESS) {
+            validationResult.validationErrorMessage = "verification of data siganture for a given subscriber failed";
+            return validationResult;
         }
     }
-    return true;
+
+    if(i != 0)
+    {
+      validationResult.isValid = true;
+      validationResult.validationErrorMessage = "";
+    }
+    return validationResult;
 }

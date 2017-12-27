@@ -1,7 +1,7 @@
 /**
   * AVEST extensions for PKCS#11
-  * Дополнения АВЕСТ для PKCS#11 
-  * (C) ЗАО АВЕСТ, 2006-2012
+  * Р”РѕРїРѕР»РЅРµРЅРёСЏ РђР’Р•РЎРў РґР»СЏ PKCS#11 
+  * (C) Р—РђРћ РђР’Р•РЎРў, 2006-2012
   */
 
 #ifndef AVCRYPTOKI_H
@@ -32,7 +32,7 @@ typedef CK_CALLBACK_FUNCTION(CK_RV, CK_GET_EXTERNAL_RANDOM)(
 );
 #endif
 
-/* Значение VENDOR BASE */
+/* Р—РЅР°С‡РµРЅРёРµ VENDOR BASE */
 #define CAV_DEF_BASE						0x8E000000
 
 
@@ -53,20 +53,20 @@ typedef CK_CALLBACK_FUNCTION(CK_RV, CK_GET_EXTERNAL_RANDOM)(
 /* RDS - GOST R 34.10-2001 */
 #define CKK_AV_RDS							(CAV_DEF_BASE + 0x00000002)
 	
-/* BDH - ПФОК согласно РД РБ ... */
+/* BDH - РџР¤РћРљ СЃРѕРіР»Р°СЃРЅРѕ Р Р” Р Р‘ ... */
 #define CKK_AV_BDH							(CAV_DEF_BASE + 0x00000004)
 
-/* СТБ 1176.2-99 + BDH */
+/* РЎРўР‘ 1176.2-99 + BDH */
 #define CKK_AV_BDS_BDH						(CAV_DEF_BASE + 0x00000006)
 
 
-/* СТБ 1176.2-99 с предварительным хэшированием */
+/* РЎРўР‘ 1176.2-99 СЃ РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅС‹Рј С…СЌС€РёСЂРѕРІР°РЅРёРµРј */
 #define CKK_AV_HASH_BDS						(CAV_DEF_BASE + 0x00000009)
 
-/* СТБ 1176.2-99 с предварительным хэшированием + ПФОК */
+/* РЎРўР‘ 1176.2-99 СЃ РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅС‹Рј С…СЌС€РёСЂРѕРІР°РЅРёРµРј + РџР¤РћРљ */
 #define CKK_AV_HASH_BDS_BDH					(CAV_DEF_BASE + 0x0000000A)
 
-/* Секретный ключ согласно СТБ П 34.101.31.2007 */
+/* РЎРµРєСЂРµС‚РЅС‹Р№ РєР»СЋС‡ СЃРѕРіР»Р°СЃРЅРѕ РЎРўР‘ Рџ 34.101.31.2007 */
 #define CKK_AV_BELT							(CAV_DEF_BASE + 0x0000000B)
 
 
@@ -99,7 +99,7 @@ typedef CK_CALLBACK_FUNCTION(CK_RV, CK_GET_EXTERNAL_RANDOM)(
 #define CKA_AV_PRM_OID						(CAV_DEF_BASE + 0x00000011)
 #define CKA_AV_PRM_OID_STR					(CAV_DEF_BASE + 0x00000012)
 
-/* Атрибуты ПФОК по РД РБ */
+/* РђС‚СЂРёР±СѓС‚С‹ РџР¤РћРљ РїРѕ Р Р” Р Р‘ */
 #define CKA_AV_BDH_PRM_L					(CAV_DEF_BASE + 0x00000013)
 #define CKA_AV_BDH_PRM_R					(CAV_DEF_BASE + 0x00000014)
 #define CKA_AV_BDH_PRM_P					(CAV_DEF_BASE + 0x00000015)
@@ -110,16 +110,16 @@ typedef CK_CALLBACK_FUNCTION(CK_RV, CK_GET_EXTERNAL_RANDOM)(
 #define CKA_AV_BDS_VALUE					(CAV_DEF_BASE + 0x00000018)
 #define CKA_AV_BDH_VALUE					(CAV_DEF_BASE + 0x00000019)
 
-/* Значение открытого ключа, передаваемое в формате SubjectPublicKeyInfo */
+/* Р—РЅР°С‡РµРЅРёРµ РѕС‚РєСЂС‹С‚РѕРіРѕ РєР»СЋС‡Р°, РїРµСЂРµРґР°РІР°РµРјРѕРµ РІ С„РѕСЂРјР°С‚Рµ SubjectPublicKeyInfo */
 #define CKA_AV_SPKI_VALUE					(CAV_DEF_BASE + 0x0000001A)
 
-/* Для функции C_SetLibraryAttributes */
-/* Устанавливаемый контекст смарткарты */
+/* Р”Р»СЏ С„СѓРЅРєС†РёРё C_SetLibraryAttributes */
+/* РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРјС‹Р№ РєРѕРЅС‚РµРєСЃС‚ СЃРјР°СЂС‚РєР°СЂС‚С‹ */
 #ifndef CKA_AV_SLOT_ID
 #define CKA_AV_SLOT_ID						(CAV_DEF_BASE + 0x0000001B)
 #define CKA_AV_SMART_CONTEXT				(CAV_DEF_BASE + 0x0000001C)
 #define CKA_AV_TOKEN_DETACH					(CAV_DEF_BASE + 0x0000001D)
-/* Устанавливаемый callback для получения внешней случайности */
+/* РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРјС‹Р№ callback РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ РІРЅРµС€РЅРµР№ СЃР»СѓС‡Р°Р№РЅРѕСЃС‚Рё */
 #define CKA_AV_EXT_RANDOM_CALLBACK			(CAV_DEF_BASE + 0x0000001E)
 #endif
 
@@ -159,7 +159,7 @@ typedef CK_CALLBACK_FUNCTION(CK_RV, CK_GET_EXTERNAL_RANDOM)(
 #define CKM_AV_BHF_BDS                        		(CAV_DEF_BASE + 0x0000000E)
 
 
-/* Механизмы ПФОК по РД РБ */
+/* РњРµС…Р°РЅРёР·РјС‹ РџР¤РћРљ РїРѕ Р Р” Р Р‘ */
 #define CKM_AV_BDH_PARAMETER_GEN                   	(CAV_DEF_BASE + 0x00000012)
 #define CKM_AV_BDH_PARAMETER_CHECK              	(CAV_DEF_BASE + 0x00000013)
 #define CKM_AV_BDH_KEY_PAIR_GEN                 	(CAV_DEF_BASE + 0x00000014)
@@ -179,39 +179,39 @@ typedef CK_CALLBACK_FUNCTION(CK_RV, CK_GET_EXTERNAL_RANDOM)(
 #define CKM_AV_BDS_BDH_AUTH_DERIVE					(CAV_DEF_BASE + 0x00000020)
 #define CKM_AV_BDS_BDH_ONEWAY_AUTH_DERIVE			(CAV_DEF_BASE + 0x00000021)
 
-/* Хэш-функция согласно СТБ П 34.101.31-2007 */
+/* РҐСЌС€-С„СѓРЅРєС†РёСЏ СЃРѕРіР»Р°СЃРЅРѕ РЎРўР‘ Рџ 34.101.31-2007 */
 #define CKM_AV_BELT_HASH                   			(CAV_DEF_BASE + 0x00000022)
 
 
-/* Электронная цифровая подпись согласно CTБ 1176.2-99 */
-/* с использованием хэш-функции согласно СТБ П 34.101.31-2007 */
+/* Р­Р»РµРєС‚СЂРѕРЅРЅР°СЏ С†РёС„СЂРѕРІР°СЏ РїРѕРґРїРёСЃСЊ СЃРѕРіР»Р°СЃРЅРѕ CTР‘ 1176.2-99 */
+/* СЃ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµРј С…СЌС€-С„СѓРЅРєС†РёРё СЃРѕРіР»Р°СЃРЅРѕ РЎРўР‘ Рџ 34.101.31-2007 */
 #define CKM_AV_BELT_HASH_BDS               			(CAV_DEF_BASE + 0x00000025)
 
-/* Электронная цифровая подпись согласно CTБ 1176.2-99 */
-/* с использованием хэш-функции согласно СТБ П 34.101.31-2007 */
-/* и ПФОК согласно проекта РД РБ «Банковские технологии. Протоколы формирования общего ключа»*/
+/* Р­Р»РµРєС‚СЂРѕРЅРЅР°СЏ С†РёС„СЂРѕРІР°СЏ РїРѕРґРїРёСЃСЊ СЃРѕРіР»Р°СЃРЅРѕ CTР‘ 1176.2-99 */
+/* СЃ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµРј С…СЌС€-С„СѓРЅРєС†РёРё СЃРѕРіР»Р°СЃРЅРѕ РЎРўР‘ Рџ 34.101.31-2007 */
+/* Рё РџР¤РћРљ СЃРѕРіР»Р°СЃРЅРѕ РїСЂРѕРµРєС‚Р° Р Р” Р Р‘ В«Р‘Р°РЅРєРѕРІСЃРєРёРµ С‚РµС…РЅРѕР»РѕРіРёРё. РџСЂРѕС‚РѕРєРѕР»С‹ С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ РѕР±С‰РµРіРѕ РєР»СЋС‡Р°В»*/
 #define CKM_AV_BELT_HASH_BDS_BDH               			(CAV_DEF_BASE + 0x00000027)
 
 
-/* Электронная цифровая подпись согласно CTБ 1176.2-99 */
-/* с использованием хэш-функции согласно СТБ П 34.101.31-2007 или CTБ 1176.1-99 */
+/* Р­Р»РµРєС‚СЂРѕРЅРЅР°СЏ С†РёС„СЂРѕРІР°СЏ РїРѕРґРїРёСЃСЊ СЃРѕРіР»Р°СЃРЅРѕ CTР‘ 1176.2-99 */
+/* СЃ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµРј С…СЌС€-С„СѓРЅРєС†РёРё СЃРѕРіР»Р°СЃРЅРѕ РЎРўР‘ Рџ 34.101.31-2007 РёР»Рё CTР‘ 1176.1-99 */
 #define CKM_AV_HASH_BDS_PARAMETER_GEN			(CAV_DEF_BASE + 0x00000023)
 #define CKM_AV_HASH_BDS_KEY_PAIR_GEN          	(CAV_DEF_BASE + 0x00000024)
 
 
-/* Электронная цифровая подпись согласно CTБ 1176.2-99 */
-/* с использованием хэш-функции согласно СТБ П 34.101.31-2007 или CTБ 1176.1-99 */
-/* и ПФОК согласно проекта РД РБ «Банковские технологии. Протоколы формирования общего ключа»*/
+/* Р­Р»РµРєС‚СЂРѕРЅРЅР°СЏ С†РёС„СЂРѕРІР°СЏ РїРѕРґРїРёСЃСЊ СЃРѕРіР»Р°СЃРЅРѕ CTР‘ 1176.2-99 */
+/* СЃ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµРј С…СЌС€-С„СѓРЅРєС†РёРё СЃРѕРіР»Р°СЃРЅРѕ РЎРўР‘ Рџ 34.101.31-2007 РёР»Рё CTР‘ 1176.1-99 */
+/* Рё РџР¤РћРљ СЃРѕРіР»Р°СЃРЅРѕ РїСЂРѕРµРєС‚Р° Р Р” Р Р‘ В«Р‘Р°РЅРєРѕРІСЃРєРёРµ С‚РµС…РЅРѕР»РѕРіРёРё. РџСЂРѕС‚РѕРєРѕР»С‹ С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ РѕР±С‰РµРіРѕ РєР»СЋС‡Р°В»*/
 #define CKM_AV_HASH_BDS_BDH_KEY_PAIR_GEN        	(CAV_DEF_BASE + 0x00000026)
 #define CKM_AV_HASH_BDS_BDH_NO_AUTH_DERIVE      	(CAV_DEF_BASE + 0x00000028)
 #define CKM_AV_HASH_BDS_BDH_AUTH_DERIVE         	(CAV_DEF_BASE + 0x00000029)
 #define CKM_AV_HASH_BDS_BDH_ONEWAY_AUTH_DERIVE  	(CAV_DEF_BASE + 0x0000002A)
 
 
-/* Механизм загрузки/выгрузки PKCS#8 формата AVEST */
+/* РњРµС…Р°РЅРёР·Рј Р·Р°РіСЂСѓР·РєРё/РІС‹РіСЂСѓР·РєРё PKCS#8 С„РѕСЂРјР°С‚Р° AVEST */
 #define CKM_AV_PKCS8							  	(CAV_DEF_BASE + 0x0000002B)
 
-/*! Механизмы БЕЛТ СТБ П 34.101.31-2007 */
+/*! РњРµС…Р°РЅРёР·РјС‹ Р‘Р•Р›Рў РЎРўР‘ Рџ 34.101.31-2007 */
 #define CKM_AV_BELT_KEY_GEN						  	(CAV_DEF_BASE + 0x0000002C)
 #define CKM_AV_BELT_ECB						  		(CAV_DEF_BASE + 0x0000002D)
 #define CKM_AV_BELT_CBC						  		(CAV_DEF_BASE + 0x0000002E)
@@ -219,20 +219,20 @@ typedef CK_CALLBACK_FUNCTION(CK_RV, CK_GET_EXTERNAL_RANDOM)(
 #define CKM_AV_BELT_CTR						  		(CAV_DEF_BASE + 0x00000030)
 #define CKM_AV_BELT_MAC						  		(CAV_DEF_BASE + 0x00000031)
 
-// Механизм генерации открытого ключа CTБ 1176.2-99 по личному
+// РњРµС…Р°РЅРёР·Рј РіРµРЅРµСЂР°С†РёРё РѕС‚РєСЂС‹С‚РѕРіРѕ РєР»СЋС‡Р° CTР‘ 1176.2-99 РїРѕ Р»РёС‡РЅРѕРјСѓ
 #define CKM_AV_BDS_PUBLIC_DERIVE              		(CAV_DEF_BASE + 0x00000032)
 
-// Механизм генерации открытого ключа CTБ 1176.2-99+хэш по личному
+// РњРµС…Р°РЅРёР·Рј РіРµРЅРµСЂР°С†РёРё РѕС‚РєСЂС‹С‚РѕРіРѕ РєР»СЋС‡Р° CTР‘ 1176.2-99+С…СЌС€ РїРѕ Р»РёС‡РЅРѕРјСѓ
 #define CKM_AV_HASH_BDS_PUBLIC_DERIVE              	(CAV_DEF_BASE + 0x00000033)
 
-// Механизм генерации открытого ключа по личному 
-// по РД РБ «Банковские технологии. Протоколы формирования общего ключа» 
+// РњРµС…Р°РЅРёР·Рј РіРµРЅРµСЂР°С†РёРё РѕС‚РєСЂС‹С‚РѕРіРѕ РєР»СЋС‡Р° РїРѕ Р»РёС‡РЅРѕРјСѓ 
+// РїРѕ Р Р” Р Р‘ В«Р‘Р°РЅРєРѕРІСЃРєРёРµ С‚РµС…РЅРѕР»РѕРіРёРё. РџСЂРѕС‚РѕРєРѕР»С‹ С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ РѕР±С‰РµРіРѕ РєР»СЋС‡Р°В» 
 #define CKM_AV_BDH_PUBLIC_DERIVE              		(CAV_DEF_BASE + 0x00000034)
 
-// Механизм генерации композитного открытого ключа CTБ 1176.2-99 и ПФОК по личному
+// РњРµС…Р°РЅРёР·Рј РіРµРЅРµСЂР°С†РёРё РєРѕРјРїРѕР·РёС‚РЅРѕРіРѕ РѕС‚РєСЂС‹С‚РѕРіРѕ РєР»СЋС‡Р° CTР‘ 1176.2-99 Рё РџР¤РћРљ РїРѕ Р»РёС‡РЅРѕРјСѓ
 #define CKM_AV_BDS_BDH_PUBLIC_DERIVE              	(CAV_DEF_BASE + 0x00000035)
 
-// Механизм генерации композитного открытого ключа CTБ 1176.2-99+хэш и ПФОК по личному
+// РњРµС…Р°РЅРёР·Рј РіРµРЅРµСЂР°С†РёРё РєРѕРјРїРѕР·РёС‚РЅРѕРіРѕ РѕС‚РєСЂС‹С‚РѕРіРѕ РєР»СЋС‡Р° CTР‘ 1176.2-99+С…СЌС€ Рё РџР¤РћРљ РїРѕ Р»РёС‡РЅРѕРјСѓ
 #define CKM_AV_HASH_BDS_BDH_PUBLIC_DERIVE           (CAV_DEF_BASE + 0x00000036)
 
 // GOST ECB + MAC
@@ -344,7 +344,7 @@ typedef struct CK_AV_RHF_PARAM {
 /* Pointer for  CK_AV_RHF_PARAM */
 typedef CK_AV_RHF_PARAM CK_PTR CK_AV_RHF_PARAM_PTR;
 
-/* Параметр механизмов шифрования БЕЛТ */	
+/* РџР°СЂР°РјРµС‚СЂ РјРµС…Р°РЅРёР·РјРѕРІ С€РёС„СЂРѕРІР°РЅРёСЏ Р‘Р•Р›Рў */	
 typedef struct CK_AV_BELT_PARAM {
 	CK_BYTE   IV[16];         // initializing vector
 } CK_AV_BELT_PARAM;
@@ -354,7 +354,7 @@ typedef CK_AV_BELT_PARAM CK_PTR CK_AV_BELT_PARAM_PTR;
 
 
 
-/*! Структура загрузки/выгрузки PKCS#8 формата AVEST */
+/*! РЎС‚СЂСѓРєС‚СѓСЂР° Р·Р°РіСЂСѓР·РєРё/РІС‹РіСЂСѓР·РєРё PKCS#8 С„РѕСЂРјР°С‚Р° AVEST */
 typedef struct CK_AV_PKCS8_PARAM {
   CK_ULONG ulPasswordLen;
   CK_UTF8CHAR_PTR pPassword;
