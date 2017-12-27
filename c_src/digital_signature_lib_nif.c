@@ -88,6 +88,17 @@ struct Certs GetCertsFromArg(ErlNifEnv* env, const ERL_NIF_TERM arg)
   return certs;
 }
 
+static bool GetChekValue(ErlNifEnv* env,  const ERL_NIF_TERM checkAtom)
+{
+  bool check;
+  char checkValue[6];
+
+  enif_get_atom(env, checkAtom, checkValue, sizeof(checkValue), ERL_NIF_LATIN1);
+  check = strcmp(checkValue, "false") == 0 ? false : true;
+
+  return check;
+}
+
 // ----- Helper functions
 
 static ERL_NIF_TERM
@@ -95,7 +106,8 @@ static ERL_NIF_TERM
 {
   void* libHandler;
   struct ValidationResult validationResult = {true, ""};
-  bool check;
+
+  bool check = GetChekValue(env, argv[2]);
 
   libHandler = dlopen(LIB_PATH, RTLD_LAZY);
   if (!libHandler) {
@@ -118,9 +130,7 @@ static ERL_NIF_TERM
 
   if(LoadSignedData(libHandler, signedData, &dataBlob, &signedDataInfo) == UAC_SUCCESS)
   {
-    char checkValue[6];
-    enif_get_atom(env, argv[2], checkValue, sizeof(checkValue), ERL_NIF_LATIN1);
-    check = strcmp(checkValue, "false") == 0 ? false : true;
+
 
     if (check) {
       validationResult = Check(libHandler, signedData, signedDataInfo, subjectInfo, certs);
