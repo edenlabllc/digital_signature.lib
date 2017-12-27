@@ -19,6 +19,7 @@ defmodule DigitalSignatureLibTest do
 
       assert result.is_valid == false
       assert result.validation_error_message == "error processing signed data"
+      assert result.content == "";
     end
 
     test "fails with complex incorrect signed data" do

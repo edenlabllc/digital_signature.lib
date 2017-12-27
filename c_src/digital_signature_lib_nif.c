@@ -113,22 +113,28 @@ static ERL_NIF_TERM
   UAC_BLOB dataBlob = {malloc(p7Data.size), p7Data.size};
 
   UAC_SIGNED_DATA_INFO signedDataInfo = {};
-  DWORD loadSignedDataResult = LoadSignedData(libHandler, signedData, &dataBlob, &signedDataInfo);
-  if(loadSignedDataResult != UAC_SUCCESS)
+
+  PUAC_SUBJECT_INFO subjectInfo = calloc(sizeof(UAC_SUBJECT_INFO), sizeof(UAC_SUBJECT_INFO));
+
+  if(LoadSignedData(libHandler, signedData, &dataBlob, &signedDataInfo) == UAC_SUCCESS)
   {
+    char checkValue[6];
+    enif_get_atom(env, argv[2], checkValue, sizeof(checkValue), ERL_NIF_LATIN1);
+    check = strcmp(checkValue, "false") == 0 ? false : true;
+
+    if (check) {
+      validationResult = Check(libHandler, signedData, signedDataInfo, subjectInfo, certs);
+    }
+  }
+  else
+  {
+    dataBlob.data = "";
+    dataBlob.dataLen = strlen("");
+
     validationResult.isValid = false;
     validationResult.validationErrorMessage = "error processing signed data";
   }
 
-  char checkValue[6];
-  enif_get_atom(env, argv[2], checkValue, sizeof(checkValue), ERL_NIF_LATIN1);
-  check = strcmp(checkValue, "false") == 0 ? false : true;
-
-  PUAC_SUBJECT_INFO subjectInfo = malloc(sizeof(UAC_SUBJECT_INFO));
-
-  if (validationResult.isValid && check) {
-    validationResult = Check(libHandler, signedData, signedDataInfo, subjectInfo, certs);
-  }
   dlclose(libHandler);
 
   // Result
