@@ -130,14 +130,13 @@ static ERL_NIF_TERM
 
   if(LoadSignedData(libHandler, signedData, &dataBlob, &signedDataInfo) == UAC_SUCCESS)
   {
-
-
     if (check) {
       validationResult = Check(libHandler, signedData, signedDataInfo, subjectInfo, certs);
     }
   }
   else
   {
+    if(dataBlob.data) free(dataBlob.data);
     dataBlob.data = "";
     dataBlob.dataLen = strlen("");
 
@@ -181,6 +180,13 @@ static ERL_NIF_TERM
     enif_make_map_put(env, result, enif_make_atom(env, "validation_error_message"), valErrMes, &result);
   }
 
+  // Free
+  if(certs.general) free(certs.general);
+  if(certs.tsp) free(certs.tsp);
+  if(dataBlob.data && dataBlob.dataLen > strlen("")) free(dataBlob.data);
+  if(subjectInfo) free(subjectInfo);
+
+  // Result tupple {:ok, ...}
   return enif_make_tuple2(env, enif_make_atom(env, "ok"), result);
 }
 
