@@ -215,10 +215,9 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
         host = strtok(host, pathDelim);
     }
     // ---- End of URL parsing ----
-
     struct hostent* server;
     struct sockaddr_in serv_addr;
-    int sockfd, bytes, sent, received, total;
+    int sockfd;
 
     const int MESSAGE_SIZE = 102400; // 10 Kb
     char* message = calloc(MESSAGE_SIZE, sizeof(char));
@@ -236,9 +235,6 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
     int messageLen = strlen(message);
     memcpy(message + messageLen, requestData.data, requestData.dataLen);
     messageLen += requestData.dataLen;
-
-    *(message + messageLen) = EOF;
-    messageLen += sizeof(EOF);
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
@@ -259,36 +255,17 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
         return emptyResult;
     }
 
-    total = messageLen;
+    // Send request to socket
+    int sent = send(sockfd, message, messageLen, 0);
+    if(sent < 0)
+    {
+        return emptyResult;
+    }
 
-    sent = 0;
-    do {
-        bytes = write(sockfd, message + sent, total - sent);
-
-        if (bytes < 0) {
-            return emptyResult;
-        }
-        if (bytes == 0) {
-            break;
-        }
-        sent += bytes;
-    } while (sent < total);
-
-    total = MESSAGE_SIZE - 1;
-
-    received = 0;
-    do {
-        bytes = read(sockfd, response + received, total - received);
-        if (bytes < 0) {
-            return emptyResult;
-        }
-        if (bytes == 0) {
-            break;
-        }
-        received += bytes;
-    } while (received < total);
-
-    if (received == total) {
+    // Receive response from socket
+    int received = recv(sockfd, response, MESSAGE_SIZE, MSG_WAITALL);
+    if(received < 0)
+    {
         return emptyResult;
     }
 
