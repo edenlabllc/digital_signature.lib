@@ -220,21 +220,25 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
     struct sockaddr_in serv_addr;
     int sockfd, bytes, sent, received, total;
 
-    char message[40960], response[40960];
-    memset(message, 0, sizeof(message));
-    memset(response, 0, sizeof(response));
+    const int MESSAGE_SIZE = 102400; // 10 Kb
+    char* message = calloc(MESSAGE_SIZE, sizeof(char));
+    char* response = calloc(MESSAGE_SIZE, sizeof(char));
 
     char* messageTemplate =
-      "POST %s HTTP/1.1\r\nHost: %s\r\nContent-Type: application/ocsp-request\r\nContent-Length: %d\r\n\r\n";
+      "POST %s HTTP/1.0\r\n"
+      "Host: %s:%d\r\n"
+      "Content-Type: application/ocsp-request\r\n"
+      "Content-Length: %d\r\n"
+      "\r\n";
 
-    sprintf(message, messageTemplate, url, host, requestData.dataLen);
+    sprintf(message, messageTemplate, url, host, p, requestData.dataLen);
 
     int messageLen = strlen(message);
     memcpy(message + messageLen, requestData.data, requestData.dataLen);
     messageLen += requestData.dataLen;
 
-    message[messageLen] = "\r\n";
-    messageLen += strlen("\r\n");
+    *(message + messageLen) = EOF;
+    messageLen += sizeof(EOF);
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
@@ -270,7 +274,7 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
         sent += bytes;
     } while (sent < total);
 
-    total = sizeof(response) - 1;
+    total = MESSAGE_SIZE - 1;
 
     received = 0;
     do {
@@ -290,13 +294,16 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
 
     close(sockfd);
 
-    char* body = strstr(response, "\r\n\r\n") + strlen("\r\n\r\n");
-
-    char* contentLengthHeader = strstr(response, "Content-Length: ") + strlen("Content-Length: ");
-    int contentLength = atoi(strtok(contentLengthHeader, "\r\n"));
+    char* contentLengthStart = strstr(response, "Content-Length: ") + strlen("Content-Length: ");
+    int contentLength = atoi(contentLengthStart);
+    int headerLength = received - contentLength;
 
     UAC_BLOB result = {calloc(contentLength, sizeof(char)), contentLength};
-    memcpy(result.data, body, contentLength);
+    memcpy(result.data, response + headerLength, contentLength);
+
+    // Free
+    if(message) free(message);
+    if(response) free(response);
 
     return result;
 }

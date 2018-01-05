@@ -61,6 +61,13 @@ defmodule DigitalSignatureLibTest do
       assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), true)
       assert result.is_valid == true
     end
+
+    test "can validate data signed with Privat personal key" do
+      data = File.read!("test/fixtures/hello.txt.sig")
+
+      assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(data, get_certs(), true)
+      IO.inspect(result)
+    end
   end
 
   describe "Must process all data or fail correclty when certs no available or available partially" do
