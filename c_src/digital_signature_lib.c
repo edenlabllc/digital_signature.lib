@@ -106,7 +106,7 @@ DWORD OcspRequestCreate(void* libHandler, UAC_BLOB cert, PUAC_BLOB ocspRequest)
 {
     DWORD (*ocspRequestCreate)(PUAC_BLOB, PUAC_KEYPAIR, DWORD, PUAC_BLOB);
     ocspRequestCreate = dlsym(libHandler, "UAC_OcspRequestCreate");
-    return (*ocspRequestCreate)(&cert, NULL, UAC_OPTION_INCLUDE_NONCE, ocspRequest);
+    return (*ocspRequestCreate)(&cert, NULL, 0, ocspRequest);
 }
 
 DWORD OcspResponseVerify(void* libHandler, UAC_BLOB response, UAC_BLOB cert)
@@ -121,6 +121,20 @@ DWORD OcspResponseLoad(void* libHandler, UAC_BLOB response, PUAC_OCSP_RESPONSE_I
     DWORD (*ocspResponseLoad)(PUAC_BLOB, PUAC_OCSP_RESPONSE_INFO);
     ocspResponseLoad = dlsym(libHandler, "UAC_OcspResponseLoad");
     return (*ocspResponseLoad)(&response, ocspResponseInfo);
+}
+
+DWORD SignedDataFindCert(void* libHandler, PUAC_BLOB pSignedData, PUAC_CERT_REF pCertRef, PUAC_BLOB pCert)
+{
+    DWORD (*signedDataFindCert)(PUAC_BLOB, PUAC_CERT_REF, PUAC_BLOB);
+    signedDataFindCert = dlsym(libHandler, "UAC_SignedDataFindCert");
+    return (*signedDataFindCert)(pSignedData, pCertRef, pCert);
+}
+
+DWORD OcspResponseFindCert(void* libHandler, PUAC_BLOB pResponse, PUAC_CERT_REF pCertRef, PUAC_BLOB pCert)
+{
+    DWORD (*ocspResponseFindCert)(PUAC_BLOB, PUAC_CERT_REF, PUAC_BLOB);
+    ocspResponseFindCert = dlsym(libHandler, "UAC_OcspResponseFindCert");
+    return (*ocspResponseFindCert)(pResponse, pCertRef, pCert);
 }
 
 struct GeneralCert FindMatchingRootCertificate(void* libHandler, UAC_BLOB cert, struct GeneralCert* generalCerts,
@@ -218,23 +232,24 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
 
     struct hostent* server;
     struct sockaddr_in serv_addr;
-    int sockfd, bytes, sent, received, total;
+    int sockfd;
 
-    char message[40960], response[40960];
-    memset(message, 0, sizeof(message));
-    memset(response, 0, sizeof(response));
+    const int MESSAGE_SIZE = 102400; // 10 Kb
+    char* message = calloc(MESSAGE_SIZE, sizeof(char));
+    char* response = calloc(MESSAGE_SIZE, sizeof(char));
 
     char* messageTemplate =
-      "POST %s HTTP/1.1\r\nHost: %s\r\nContent-Type: application/ocsp-request\r\nContent-Length: %d\r\n\r\n";
+      "POST %s HTTP/1.0\r\n"
+      "Host: %s:%d\r\n"
+      "Content-Type: application/ocsp-request\r\n"
+      "Content-Length: %d\r\n"
+      "\r\n";
 
-    sprintf(message, messageTemplate, url, host, requestData.dataLen);
+    sprintf(message, messageTemplate, url, host, p, requestData.dataLen);
 
     int messageLen = strlen(message);
     memcpy(message + messageLen, requestData.data, requestData.dataLen);
     messageLen += requestData.dataLen;
-
-    message[messageLen] = "\r\n";
-    messageLen += strlen("\r\n");
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
@@ -255,71 +270,68 @@ UAC_BLOB SendOCSPRequest(char* url, UAC_BLOB requestData)
         return emptyResult;
     }
 
-    total = messageLen;
+    // Send request to socket
+    if(send(sockfd, message, messageLen, 0) < 0)
+    {
+        return emptyResult;
+    }
 
-    sent = 0;
-    do {
-        bytes = write(sockfd, message + sent, total - sent);
-
-        if (bytes < 0) {
-            return emptyResult;
-        }
-        if (bytes == 0) {
-            break;
-        }
-        sent += bytes;
-    } while (sent < total);
-
-    total = sizeof(response) - 1;
-
-    received = 0;
-    do {
-        bytes = read(sockfd, response + received, total - received);
-        if (bytes < 0) {
-            return emptyResult;
-        }
-        if (bytes == 0) {
-            break;
-        }
-        received += bytes;
-    } while (received < total);
-
-    if (received == total) {
+    // Receive response from socket
+    int received = recv(sockfd, response, MESSAGE_SIZE, MSG_WAITALL);
+    if(received < 0)
+    {
         return emptyResult;
     }
 
     close(sockfd);
 
-    char* body = strstr(response, "\r\n\r\n") + strlen("\r\n\r\n");
-
-    char* contentLengthHeader = strstr(response, "Content-Length: ") + strlen("Content-Length: ");
-    int contentLength = atoi(strtok(contentLengthHeader, "\r\n"));
+    char* contentLengthStart = strstr(response, "Content-Length: ") + strlen("Content-Length: ");
+    int contentLength = atoi(contentLengthStart);
+    int headerLength = received - contentLength;
 
     UAC_BLOB result = {calloc(contentLength, sizeof(char)), contentLength};
-    memcpy(result.data, body, contentLength);
+    memcpy(result.data, response + headerLength, contentLength);
+
+    // Free
+    if(message) free(message);
+    if(response) free(response);
 
     return result;
 }
 
 bool CheckOCSP(void* libHandler, UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB ocspCert, bool verify)
 {
-    char* ocspRequestBuf = calloc(cert.dataLen, sizeof(char));
+    char* ocspRequestBuf[4960];
+    UAC_BLOB ocspRequest = {ocspRequestBuf, sizeof(ocspRequestBuf)};
 
-    UAC_BLOB ocspRequest = {ocspRequestBuf, cert.dataLen};
     DWORD ocspRequestCreateResult = OcspRequestCreate(libHandler, cert, &ocspRequest);
-    if (ocspRequestCreateResult != 0) {
+    if (ocspRequestCreateResult != UAC_SUCCESS) {
         return false;
     }
+
     char* ocspUrl = certInfo.accessOCSP;
     UAC_BLOB ocspResponse = SendOCSPRequest(ocspUrl, ocspRequest);
-    UAC_OCSP_RESPONSE_INFO ocspResponseInfo = {};
-    if (verify) {
-        if (OcspResponseVerify(libHandler, ocspResponse, ocspCert) != UAC_SUCCESS) {
-            return false;
-        }
-    }
+    UAC_OCSP_RESPONSE_INFO ocspResponseInfo = {0};
+
     if (OcspResponseLoad(libHandler, ocspResponse, &ocspResponseInfo) != UAC_SUCCESS) {
         return false;
+    }
+
+    char certBuf[3072];
+    UAC_BLOB resp_cert={ certBuf, sizeof(certBuf) };
+    if (ocspResponseInfo.signature.signerRef.options != 0) {  // Respose signed
+        if (UAC_SUCCESS != OcspResponseFindCert(libHandler, &ocspResponse, &ocspResponseInfo.signature.signerRef, &resp_cert)) {
+          resp_cert = ocspCert;
+        }
+    }
+
+    if(verify) {
+      DWORD signResult = OcspResponseVerify(libHandler, ocspResponse, resp_cert);
+      if (UAC_ERROR_NO_SIGNATURE == signResult) {
+          return false;
+      } else if (UAC_SUCCESS != signResult) {
+          return false;
+      }
     }
 
     return ocspResponseInfo.certStatus == 0;
@@ -329,7 +341,6 @@ struct ValidationResult Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_
            struct Certs certs)
 {
     struct ValidationResult validationResult = {false, "error validating signed data container"};
-    int signaturesCount = signedDataInfo.dwSignatureCount;
 
     char* timeStampBuf = calloc(signedData.dataLen, sizeof(char));
     UAC_BLOB timeStamp = {timeStampBuf, signedData.dataLen};
@@ -348,10 +359,13 @@ struct ValidationResult Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_
     UAC_BLOB tspCert = FindMatchingTspCertificate(libHandler, timeStampInfo.signature.signerRef, certs.tsp,
       certs.tspLength);
 
-    int i;
-    for (i = 0; i < signaturesCount; i++) {
-        char* certBuf = calloc(signedData.dataLen, sizeof(char));
-        UAC_BLOB cert = {certBuf, signedData.dataLen};
+    DWORD i;
+    for (i = 0; i < signedDataInfo.dwSignatureCount; i++) {
+        char certBuf[3072];         // Certificate size is limited < 3 Kb
+        UAC_BLOB cert = {certBuf, sizeof(certBuf)};
+
+        //SignedDataFindCert(libHandler, &signedData, &signedDataInfo.pSignatures[i], &cert);
+
         if (GetCert(libHandler, signedData, i, &cert) != UAC_SUCCESS) {
             validationResult.validationErrorMessage = "retrieving certificate from signed data container failed";
             return validationResult;
@@ -418,7 +432,7 @@ struct ValidationResult Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_
         }
     }
 
-    if(i != 0)
+    if(i > 0)
     {
       validationResult.isValid = true;
       validationResult.validationErrorMessage = "";
