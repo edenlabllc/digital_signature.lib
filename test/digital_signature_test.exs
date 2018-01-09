@@ -10,14 +10,14 @@ defmodule DigitalSignatureLibTest do
     test "fail with empty data" do
       {:ok, result} = DigitalSignatureLib.processPKCS7Data("", get_certs(), true)
 
-      assert result.is_valid == false
+      refute result.is_valid
       assert result.validation_error_message == "error processing signed data"
     end
 
     test "fails with incorrect signed data" do
       {:ok, result} = DigitalSignatureLib.processPKCS7Data("123", get_certs(), true)
 
-      assert result.is_valid == false
+      refute result.is_valid
       assert result.validation_error_message == "error processing signed data"
       assert result.content == "";
     end
@@ -28,7 +28,7 @@ defmodule DigitalSignatureLibTest do
 
       assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), true)
 
-      assert result.is_valid == false
+      refute result.is_valid
       assert result.validation_error_message == "error processing signed data"
     end
 
@@ -38,7 +38,7 @@ defmodule DigitalSignatureLibTest do
 
       assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), true)
 
-      assert result.is_valid == true
+      assert result.is_valid
       assert decode_content(result) == data["content"]
       assert result.signer == atomize_keys(data["signer"])
     end
@@ -49,7 +49,7 @@ defmodule DigitalSignatureLibTest do
 
       assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), true)
 
-      assert result.is_valid == true
+      assert result.is_valid
       assert decode_content(result) == data["content"]
       assert result.signer == atomize_keys(data["signer"])
     end
@@ -59,14 +59,22 @@ defmodule DigitalSignatureLibTest do
       signed_content = get_signed_content(data)
 
       assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), true)
-      assert result.is_valid == true
+      assert result.is_valid
     end
 
-    test "can validate data signed with Privat personal key" do
+    test "can validate data signed with invalid Privat personal key" do
+      data = File.read!("test/fixtures/hello_invalid.txt.sig")
+
+      assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(data, get_certs(), true)
+      refute result.is_valid
+      assert result.validation_error_message == "OCSP certificate verificaton failed"
+    end
+
+    test "can validate data signed with valid Privat personal key" do
       data = File.read!("test/fixtures/hello.txt.sig")
 
       assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(data, get_certs(), true)
-      assert result.is_valid == true
+      assert result.is_valid
       assert result.content == "{\"hello\": \"world\"}"
     end
   end
@@ -78,7 +86,7 @@ defmodule DigitalSignatureLibTest do
 
       {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, %{general: [], tsp: []}, true)
 
-      assert result.is_valid == false
+      refute result.is_valid
       assert result.validation_error_message == "matching ROOT certificate not found"
     end
 
@@ -90,7 +98,7 @@ defmodule DigitalSignatureLibTest do
 
       {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, %{general: general, tsp: []}, true)
 
-      assert result.is_valid == false
+      refute result.is_valid
       assert result.validation_error_message == "matching TSP certificate not found"
     end
 
@@ -102,7 +110,7 @@ defmodule DigitalSignatureLibTest do
 
       {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, %{general: [], tsp: tsp}, true)
 
-      assert result.is_valid == false
+      refute result.is_valid
       assert result.validation_error_message == "matching ROOT certificate not found"
     end
 
@@ -124,7 +132,7 @@ defmodule DigitalSignatureLibTest do
 
       {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, %{general: general, tsp: tsp}, true)
 
-      assert result.is_valid == true
+      assert result.is_valid
       assert decode_content(result) == data["content"]
       assert result.signer == atomize_keys(data["signer"])
     end
