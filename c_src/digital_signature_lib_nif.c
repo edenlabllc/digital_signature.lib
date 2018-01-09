@@ -121,15 +121,20 @@ static ERL_NIF_TERM
 
   UAC_BLOB signedData = { p7Data.data, p7Data.size };
 
-  struct Certs certs  = GetCertsFromArg(env, argv[1]);
-  UAC_BLOB dataBlob = {malloc(p7Data.size), p7Data.size};
-
-  UAC_SIGNED_DATA_INFO signedDataInfo = {};
-
+  struct Certs certs = {0};
+  UAC_BLOB dataBlob = {0};
+  UAC_SIGNED_DATA_INFO signedDataInfo = {0};
   PUAC_SUBJECT_INFO subjectInfo = calloc(sizeof(UAC_SUBJECT_INFO), sizeof(UAC_SUBJECT_INFO));
 
-  if(LoadSignedData(libHandler, signedData, &dataBlob, &signedDataInfo) == UAC_SUCCESS)
+  if(LoadSignedData(libHandler, signedData, NULL, &signedDataInfo) == UAC_SUCCESS)
   {
+    signedDataInfo.pSignatures = malloc(sizeof(UAC_SIGNATURE_INFO) * signedDataInfo.dwSignatureCount);
+    dataBlob.data = malloc(signedDataInfo.dwDataLength);
+    dataBlob.dataLen = signedDataInfo.dwDataLength;
+    LoadSignedData(libHandler, signedData, &dataBlob, &signedDataInfo);
+
+    certs = GetCertsFromArg(env, argv[1]);
+
     if (check) {
       validationResult = Check(libHandler, signedData, signedDataInfo, subjectInfo, certs);
     }
@@ -185,6 +190,7 @@ static ERL_NIF_TERM
   if(certs.tsp) free(certs.tsp);
   if(dataBlob.data && dataBlob.dataLen > strlen("")) free(dataBlob.data);
   if(subjectInfo) free(subjectInfo);
+  if(signedDataInfo.pSignatures) free(signedDataInfo.pSignatures);
 
   // Result tupple {:ok, ...}
   return enif_make_tuple2(env, enif_make_atom(env, "ok"), result);

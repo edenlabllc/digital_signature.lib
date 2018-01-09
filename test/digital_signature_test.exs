@@ -66,7 +66,8 @@ defmodule DigitalSignatureLibTest do
       data = File.read!("test/fixtures/hello.txt.sig")
 
       assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(data, get_certs(), true)
-      IO.inspect(result)
+      assert result.is_valid == true
+      assert result.content == "{\"hello\": \"world\"}"
     end
   end
 
