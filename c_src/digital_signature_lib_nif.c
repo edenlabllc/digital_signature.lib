@@ -2,6 +2,7 @@
 
 #include "erl_nif.h"
 #include "digital_signature_lib.c"
+#include "is_utf8.h"
 
 #define LIB_PATH_LENGHT 256
 char LIB_PATH[LIB_PATH_LENGHT];
@@ -11,6 +12,13 @@ char LIB_PATH[LIB_PATH_LENGHT];
 static ERL_NIF_TERM CreateElixirString(ErlNifEnv* env, const char* str)
 {
   int strLength = strlen(str);
+
+  char *message = NULL;
+  int faulty_bytes = 0;
+  if(is_utf8((unsigned char*) str, strLength, &message, &faulty_bytes) != 0) {
+    str = '\0';
+    strLength = 0;
+  }
 
   ErlNifBinary elixirStr;
   enif_alloc_binary(strLength, &elixirStr);

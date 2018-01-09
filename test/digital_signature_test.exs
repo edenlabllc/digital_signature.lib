@@ -136,6 +136,15 @@ defmodule DigitalSignatureLibTest do
       assert decode_content(result) == data["content"]
       assert result.signer == atomize_keys(data["signer"])
     end
+
+    test "can validate data with invalid entries in siganture_info" do
+      data = get_data("test/fixtures/invalid_sign_entries.json")
+      signed_content = get_signed_content(data)
+
+      assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), true)
+      refute result.is_valid
+      assert result.validation_error_message == "matching ROOT certificate not found"
+    end
   end
 
   defp get_data(json_file) do
