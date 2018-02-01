@@ -416,7 +416,7 @@ struct ValidationResult Check(void* libHandler, UAC_BLOB signedData, UAC_SIGNED_
         }
         bool isCertNotExpired = CheckTimeStamp(certInfo, time(0));
         if (!isCertNotExpired) {
-            validationResult.validationErrorMessage = "certificate timestemp expired";
+            validationResult.validationErrorMessage = "certificate timestamp expired";
             return validationResult;
         }
 

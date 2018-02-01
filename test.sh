@@ -1,6 +1,15 @@
 #!/bin/bash
 
-docker build -t digital_signature_lib_test -f Dockerfile.test .
+IMAGE=$(docker build -f Dockerfile.test . | tail -1 | awk '{ print $NF }')
 
-docker run --rm -it digital_signature_lib_test:latest
+CONTAINER=$(docker run -d $IMAGE /bin/bash -c 'cd /home/digital_signature.lib; mix test')
 
+docker attach $CONTAINER
+
+RC=$(docker wait $CONTAINER)
+
+docker rm $CONTAINER
+
+#docker rmi $IMAGE
+
+#exit $RC

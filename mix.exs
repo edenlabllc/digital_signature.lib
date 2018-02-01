@@ -8,8 +8,8 @@ defmodule DigitalSignatureLib.MixProject do
       elixir: "~> 1.5",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      compilers: [:elixir_make] ++ Mix.compilers
-     ]
+      compilers: [:elixir_make] ++ Mix.compilers()
+    ]
   end
 
   # Run "mix help compile.app" to learn about applications.

@@ -27,8 +27,8 @@ WORKDIR /home/digital_signature.lib
 
 ENV MIX_ENV=test
 
-CMD mix do \
+RUN mix do \
       local.hex --force, \
       local.rebar --force, \
       deps.get, \
-      test --trace
+      deps.compile
