@@ -4,7 +4,7 @@ defmodule DigitalSignatureLib.MixProject do
   def project do
     [
       app: :digital_signature_lib,
-      version: "1.4.1",
+      version: "1.4.2",
       elixir: "~> 1.5",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -23,7 +23,7 @@ defmodule DigitalSignatureLib.MixProject do
   defp deps do
     [
       {:elixir_make, "~> 0.4", runtime: false},
-      {:poison, "~> 3.1", only: [:dev, :test]}
+      {:jason, "~> 1.0", only: [:dev, :test]}
     ]
   end
 end

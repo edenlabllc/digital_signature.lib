@@ -55,7 +55,7 @@ defmodule DigitalSignatureLibTest do
     end
 
     test "processing signed declaration with outdated signature" do
-      data = get_data("test/fixtures/signed_decl_req_outdated.json")
+      data = get_data("test/fixtures/outdated_cert.json")
       signed_content = get_signed_content(data)
 
       assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), true)
@@ -139,18 +139,23 @@ defmodule DigitalSignatureLibTest do
     end
 
     test "can validate data with invalid entries in siganture_info" do
-      data = get_data("test/fixtures/invalid_sign_entries.json")
+      data = get_data("test/fixtures/no_cert_and_invalid_signer.json")
       signed_content = get_signed_content(data)
 
       assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), true)
       refute result.is_valid
       assert result.validation_error_message == "matching ROOT certificate not found"
+
+      # this field contains invalid (non UTF-8) data inside the signed package - so we are returing an empty string
+      assert result.signer.organization_name == ""
+      # this field contains invalid (non UTF-8) data inside the signed package - so we are returing an empty string
+      assert result.signer.organizational_unit_name == ""
     end
   end
 
   defp get_data(json_file) do
     file = File.read!(json_file)
-    json = Poison.decode!(file)
+    json = Jason.decode!(file)
 
     json["data"]
   end
@@ -191,7 +196,7 @@ defmodule DigitalSignatureLibTest do
   end
 
   defp decode_content(result) do
-    Poison.decode!(result.content)
+    Jason.decode!(result.content)
   end
 
   defp atomize_keys(map) do
