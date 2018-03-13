@@ -5,6 +5,8 @@ WORKDIR /home/digital_signature.lib
 
 ENV MIX_ENV=test
 
+RUN cp priv/libUACryptoQ.so /usr/lib/libUACryptoQ.so.1
+
 RUN mix do \
       local.hex --force, \
       local.rebar --force, \
