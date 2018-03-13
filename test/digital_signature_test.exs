@@ -122,20 +122,14 @@ defmodule DigitalSignatureLibTest do
       general = [
         %{
           root: File.read!("test/fixtures/CA-DFS.cer"),
-          ocsp: File.read!("test/fixtures/CA-OCSP-DFS.cer")
+          ocsp: nil
         }
       ]
 
-      tsp = [
-        File.read!("test/fixtures/CA-TSP-DFS.cer"),
-        File.read!("test/fixtures/TSP-Server Justice.cer")
-      ]
+      {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, %{general: general, tsp: []}, true)
 
-      {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, %{general: general, tsp: tsp}, true)
-
-      assert result.is_valid
-      assert decode_content(result) == data["content"]
-      assert result.signer == atomize_keys(data["signer"])
+      refute result.is_valid
+      assert result.validation_error_message == "matching TSP certificate not found"
     end
 
     test "can validate data with invalid entries in siganture_info" do
@@ -169,7 +163,11 @@ defmodule DigitalSignatureLibTest do
     general = [
       %{
         root: File.read!("test/fixtures/CA-DFS.cer"),
-        ocsp: File.read!("test/fixtures/CA-OCSP-DFS.cer")
+        ocsp: File.read!("test/fixtures/OCSP-IDDDFS-080218.cer")
+      },
+      %{
+        root: File.read!("test/fixtures/CA-IDDDFS-080218.cer"),
+        ocsp: File.read!("test/fixtures/OCSP-IDDDFS-080218.cer")
       },
       %{
         root: File.read!("test/fixtures/CA-Justice.cer"),
@@ -189,7 +187,8 @@ defmodule DigitalSignatureLibTest do
       File.read!("test/fixtures/CA-TSP-DFS.cer"),
       File.read!("test/fixtures/TSP-Server Justice.cer"),
       File.read!("test/fixtures/CATSPServer-3004751DEF2C78AE02000000010000004A000000.cer"),
-      File.read!("test/fixtures/cert14491837-tsp.crt")
+      File.read!("test/fixtures/cert14491837-tsp.crt"),
+      File.read!("test/fixtures/TSA-IDDDFS-140218.cer")
     ]
 
     %{general: general, tsp: tsp}
