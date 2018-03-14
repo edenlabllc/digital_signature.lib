@@ -152,7 +152,7 @@ struct ValidationResult
 //   return (*ocspResponseFindCert)(pResponse, pCertRef, pCert);
 // }
 
-struct GeneralCert FindMatchingRootCertificate(void *libHandler, UAC_BLOB cert, struct GeneralCert *generalCerts,
+struct GeneralCert FindMatchingRootCertificate(UAC_BLOB cert, struct GeneralCert *generalCerts,
                                                unsigned int generalLength)
 {
   struct GeneralCert emptyResult = {};
@@ -170,7 +170,7 @@ struct GeneralCert FindMatchingRootCertificate(void *libHandler, UAC_BLOB cert, 
   {
     rootCert = generalCerts[i].root;
 
-    if (UAC_CertMatch(&issuerCertRef, rootCert) == UAC_SUCCESS)
+    if (UAC_CertMatch(&issuerCertRef, &rootCert) == UAC_SUCCESS)
     {
       return generalCerts[i];
     }
@@ -181,7 +181,7 @@ struct GeneralCert FindMatchingRootCertificate(void *libHandler, UAC_BLOB cert, 
   return emptyResult;
 }
 
-UAC_BLOB FindMatchingTspCertificate(void *libHandler, UAC_CERT_REF signerRef, UAC_BLOB *tsp, unsigned int tspLength)
+UAC_BLOB FindMatchingTspCertificate(UAC_CERT_REF signerRef, UAC_BLOB *tsp, unsigned int tspLength)
 {
   UAC_BLOB emptyBlob = {};
   unsigned int i = 0;
@@ -189,7 +189,7 @@ UAC_BLOB FindMatchingTspCertificate(void *libHandler, UAC_CERT_REF signerRef, UA
 
   while (i < tspLength)
   {
-    DWORD certMatchResult = UAC_CertMatch(&signerRef, tspCert);
+    DWORD certMatchResult = UAC_CertMatch(&signerRef, &tspCert);
     if (certMatchResult == 0)
     {
       return tsp[i];
@@ -210,9 +210,9 @@ bool IsHighestLevel(UAC_CERT_INFO certInfo)
   return compareResult == 0;
 }
 
-bool VerifyTimeStampCert(void *libHandler, UAC_BLOB timeStamp, UAC_BLOB tspCert)
+bool VerifyTimeStampCert(UAC_BLOB timeStamp, UAC_BLOB tspCert)
 {
-  DWORD tsResponseVerifyResult = UAC_TsResponseVerify(&timeStamp, tspCert);
+  DWORD tsResponseVerifyResult = UAC_TsResponseVerify(&timeStamp, &tspCert);
   return tsResponseVerifyResult == 0;
 }
 
@@ -328,7 +328,7 @@ UAC_BLOB SendOCSPRequest(char *url, UAC_BLOB requestData)
   return result;
 }
 
-bool CheckOCSP(void *libHandler, UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB ocspCert, bool verify)
+bool CheckOCSP(UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB ocspCert, bool verify)
 {
   char *ocspRequestBuf[4960];
   UAC_BLOB ocspRequest = {ocspRequestBuf, sizeof(ocspRequestBuf)};
@@ -374,7 +374,7 @@ bool CheckOCSP(void *libHandler, UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB
   return ocspResponseInfo.certStatus == 0;
 }
 
-struct ValidationResult Check(void *libHandler, UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDataInfo, PUAC_SUBJECT_INFO subjectInfo,
+struct ValidationResult Check(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDataInfo, PUAC_SUBJECT_INFO subjectInfo,
                               struct Certs certs)
 {
   struct ValidationResult validationResult = {false, "error validating signed data container"};
@@ -395,7 +395,7 @@ struct ValidationResult Check(void *libHandler, UAC_BLOB signedData, UAC_SIGNED_
   }
 
   UAC_TIME timeStampDateTime = timeStampInfo.genTime;
-  UAC_BLOB tspCert = FindMatchingTspCertificate(libHandler, timeStampInfo.signature.signerRef, certs.tsp,
+  UAC_BLOB tspCert = FindMatchingTspCertificate(timeStampInfo.signature.signerRef, certs.tsp,
                                                 certs.tspLength);
 
   DWORD i;
@@ -420,7 +420,7 @@ struct ValidationResult Check(void *libHandler, UAC_BLOB signedData, UAC_SIGNED_
     }
 
     memcpy(subjectInfo, &certInfo.subject, sizeof(UAC_SUBJECT_INFO));
-    struct GeneralCert matchingCert = FindMatchingRootCertificate(libHandler, cert, certs.general,
+    struct GeneralCert matchingCert = FindMatchingRootCertificate(cert, certs.general,
                                                                   certs.generalLength);
     if (matchingCert.root.data == NULL)
     {
@@ -429,12 +429,13 @@ struct ValidationResult Check(void *libHandler, UAC_BLOB signedData, UAC_SIGNED_
     }
 
     UAC_BLOB rootCert = matchingCert.root;
-    DWORD certVerifyResult = UAC_CertVerify(&cert, rootCert);
+    DWORD certVerifyResult = UAC_CertVerify(&cert, &rootCert);
     if (certVerifyResult != 0)
     {
       validationResult.validationErrorMessage = "ROOT certificate signature verification failed";
       return validationResult;
     }
+
     UAC_CERT_INFO rootCertInfo = {};
     DWORD getRootCertInfoResult = UAC_CertLoad(&rootCert, &rootCertInfo);
     if (getRootCertInfoResult != 0)
@@ -442,6 +443,7 @@ struct ValidationResult Check(void *libHandler, UAC_BLOB signedData, UAC_SIGNED_
       validationResult.validationErrorMessage = "loading ROOT certificate information failed";
       return validationResult;
     }
+
     bool isHighestLevel = IsHighestLevel(rootCertInfo);
     if (!isHighestLevel)
     {
@@ -450,13 +452,14 @@ struct ValidationResult Check(void *libHandler, UAC_BLOB signedData, UAC_SIGNED_
         validationResult.validationErrorMessage = "matching TSP certificate not found";
         return validationResult;
       }
-      bool isTimeStampCertValid = VerifyTimeStampCert(libHandler, timeStamp, tspCert);
+      bool isTimeStampCertValid = VerifyTimeStampCert(timeStamp, tspCert);
       if (!isTimeStampCertValid)
       {
         validationResult.validationErrorMessage = "checking the signature of a response with a timestamp failed";
         return validationResult;
       }
     }
+
     bool isTimeStampValid = CheckTimeStamp(certInfo, timeStampDateTime);
     if (!isTimeStampValid)
     {
@@ -470,7 +473,7 @@ struct ValidationResult Check(void *libHandler, UAC_BLOB signedData, UAC_SIGNED_
       return validationResult;
     }
 
-    bool checkOSCP = CheckOCSP(libHandler, cert, certInfo, matchingCert.ocsp, !isHighestLevel);
+    bool checkOSCP = CheckOCSP(cert, certInfo, matchingCert.ocsp, !isHighestLevel);
     if (!checkOSCP)
     {
       validationResult.validationErrorMessage = "OCSP certificate verificaton failed";

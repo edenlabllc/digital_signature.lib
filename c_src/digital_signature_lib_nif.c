@@ -4,9 +4,6 @@
 #include "digital_signature_lib.c"
 #include "is_utf8.h"
 
-#define LIB_PATH_LENGHT 256
-char LIB_PATH[LIB_PATH_LENGHT];
-
 // ----- Helper functions
 
 static ERL_NIF_TERM CreateElixirString(ErlNifEnv *env, const char *str)
@@ -115,16 +112,9 @@ static bool GetChekValue(ErlNifEnv *env, const ERL_NIF_TERM checkAtom)
 static ERL_NIF_TERM
 ProcessPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-  void *libHandler;
   struct ValidationResult validationResult = {true, ""};
 
   bool check = GetChekValue(env, argv[2]);
-
-  libHandler = 0; // dlopen(LIB_PATH, RTLD_LAZY);
-  // if (!libHandler)
-  // {
-  //   return CreateErrorTuppe(env, dlerror());
-  // }
 
   ErlNifBinary p7Data;
   if (!enif_inspect_binary(env, argv[0], &p7Data))
@@ -150,7 +140,7 @@ ProcessPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 
     if (check)
     {
-      validationResult = Check(libHandler, signedData, signedDataInfo, subjectInfo, certs);
+      validationResult = Check(signedData, signedDataInfo, subjectInfo, certs);
     }
   }
   else
@@ -220,11 +210,4 @@ ProcessPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 static ErlNifFunc nif_funcs[] = {
     {"processPKCS7Data", 3, ProcessPKCS7Data, ERL_NIF_DIRTY_JOB_CPU_BOUND}};
 
-int load(ErlNifEnv *env, void **priv_data, ERL_NIF_TERM load_info)
-{
-  enif_get_string(env, load_info, LIB_PATH, LIB_PATH_LENGHT, ERL_NIF_LATIN1);
-
-  return 0;
-}
-
-ERL_NIF_INIT(Elixir.DigitalSignatureLib, nif_funcs, load, NULL, NULL, NULL);
+ERL_NIF_INIT(Elixir.DigitalSignatureLib, nif_funcs, NULL, NULL, NULL, NULL);
