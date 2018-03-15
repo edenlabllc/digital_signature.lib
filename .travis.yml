@@ -5,7 +5,7 @@ language: elixir
 elixir:
   - 1.6.3
 otp_release:
-  - 20.2
+  - 20.3
 env:
   global:
     - MIX_ENV=test
@@ -14,4 +14,5 @@ branches:
     - /[0-9]*\.[0-9]*\.[0-9]*/
 script:
   - mix compile || travis_terminate 1
+  - sudo ln -s $TRAVIS_BUILD_DIR/priv/libUACryptoQ.so /usr/lib/libUACryptoQ.so.1
   - mix test --exclude pending --trace || travis_terminate 1

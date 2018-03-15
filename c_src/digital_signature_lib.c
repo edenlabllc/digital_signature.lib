@@ -9,7 +9,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <unistd.h>
-#include "h/UACryptoDef.h"
+#include "UACryptoDef.h"
 
 struct GeneralCert
 {
