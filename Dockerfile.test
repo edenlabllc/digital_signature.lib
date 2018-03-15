@@ -4,6 +4,9 @@ ADD . /home/digital_signature.lib
 WORKDIR /home/digital_signature.lib
 
 ENV MIX_ENV=test
+ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+
+RUN ln -s /home/digital_signature.lib/priv/libUACryptoQ.so /usr/local/lib/libUACryptoQ.so.1
 
 RUN mix do \
       local.hex --force, \
