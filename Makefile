@@ -4,7 +4,6 @@ ERLANG_PATH = $(shell erl -eval 'io:format("~s", [lists:concat([code:root_dir(),
 CFLAGS += -I$(ERLANG_PATH)
 CFLAGS += -Ic_src/h
 CFLAGS += -Lpriv -lUACryptoQ
-CFLAGS += --verbose
 
 LIB_NAME = priv/digital_signature_lib_nif.so
 ifneq ($(CROSSCOMPILE),)
@@ -23,6 +22,7 @@ endif
 
 NIF_SRC=\
 	c_src/digital_signature_lib_nif.c \
+	c_src/digital_signature_lib.c \
 	c_src/is_utf8.c
 
 all: $(LIB_NAME)

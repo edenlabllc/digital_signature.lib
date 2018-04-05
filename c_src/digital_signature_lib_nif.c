@@ -1,7 +1,5 @@
-#define LINUX
-
 #include "erl_nif.h"
-#include "digital_signature_lib.c"
+#include "digital_signature_lib.h"
 #include "is_utf8.h"
 
 // ----- Helper functions
@@ -96,7 +94,7 @@ struct Certs GetCertsFromArg(ErlNifEnv *env, const ERL_NIF_TERM arg)
   return certs;
 }
 
-static bool GetChekValue(ErlNifEnv *env, const ERL_NIF_TERM checkAtom)
+static bool GetCheckValue(ErlNifEnv *env, const ERL_NIF_TERM checkAtom)
 {
   bool check;
   char checkValue[6];
@@ -114,7 +112,7 @@ ProcessPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
   struct ValidationResult validationResult = {true, ""};
 
-  bool check = GetChekValue(env, argv[2]);
+  bool check = GetCheckValue(env, argv[2]);
 
   ErlNifBinary p7Data;
   if (!enif_inspect_binary(env, argv[0], &p7Data))
@@ -153,8 +151,6 @@ ProcessPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
     validationResult.isValid = false;
     validationResult.validationErrorMessage = "error processing signed data";
   }
-
-  // dlclose(libHandler);
 
   // Result
 

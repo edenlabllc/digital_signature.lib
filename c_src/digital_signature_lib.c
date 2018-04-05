@@ -8,28 +8,8 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <unistd.h>
-#include "UACryptoDef.h"
 
-struct GeneralCert
-{
-  UAC_BLOB root;
-  UAC_BLOB ocsp;
-};
-
-struct Certs
-{
-  struct GeneralCert *general;
-  unsigned int generalLength;
-
-  UAC_BLOB *tsp;
-  unsigned int tspLength;
-};
-
-struct ValidationResult
-{
-  bool isValid;
-  char *validationErrorMessage;
-};
+#include "digital_signature_lib.h"
 
 struct GeneralCert FindMatchingRootCertificate(UAC_BLOB cert, struct GeneralCert *generalCerts,
                                                unsigned int generalLength)
