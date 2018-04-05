@@ -126,7 +126,7 @@ typedef CHAR								UAC_TEXT_SIZE10[10+1];
 #define UAC_ERROR_NO_RECIPIENT				43
 /// неверный идентификатор или тип токена
 #define UAC_ERROR_TOKEN_ID					44
-/// не выбран активный ключ 
+/// не выбран активный ключ
 #define UAC_ERROR_NO_KEY					45
 /// ошибка чтения/записи UAC_STREAM
 #define UAC_ERROR_STREAM					50
@@ -435,8 +435,8 @@ typedef struct _UAC_SUBJECT_INFO
 	UAC_TEXT_SIZE64 title;							///< название
 	UAC_TEXT_SIZE10 edrpou;							///< код ЕДРПОУ
 	UAC_TEXT_SIZE10	drfo;							///< код ДРФО или ПИН
-	
-	
+
+
 } UAC_SUBJECT_INFO, *PUAC_SUBJECT_INFO, UAC_ISSUER_INFO, *PUAC_ISSUER_INFO;
 
 /// Ссылка на сертификат ключа
@@ -449,7 +449,7 @@ typedef struct _UAC_CERT_REF
 	DWORD				options;					///< варианты идентификации = ::UAC_OPTION_IDENT_BY_SERIAL_NUMBER | ::UAC_OPTION_IDENT_BY_KEY_ID | ::UAC_OPTION_IDENT_BY_NAME
 	UAC_TEXT_SIZE64		issuerSecondaryName;		///< доп информация - серийный номер издателя (вместе с серийным номером сертификата)
 	UAC_TEXT_SIZE64		subjectSecondaryName;		///< доп информация - серийный номер издателя (вместе с общим именем владельца сертификата)
-	
+
 } UAC_CERT_REF, *PUAC_CERT_REF;
 
 /// Информация о цифровой подписи
@@ -499,7 +499,7 @@ typedef struct _UAC_CERT_INFO
 	UAC_TEXT_SIZE256	accessCaRepository;			///< точки доступа к ЦСК
 	UAC_TEXT_SIZE256	accessTSP;					///< точки доступа к серверу метки времени
 	UAC_TEXT_SIZE256	accessOCSP;					///< точки доступа к серверу OCSP
-	UAC_TEXT_SIZE256	accessCaIssuers;			
+	UAC_TEXT_SIZE256	accessCaIssuers;
 
 	DWORD				pathLen;
 	UAC_TEXT_SIZE64		keyTypeOid;					///< Объектный идентификатор алгоритма ключа
@@ -645,27 +645,27 @@ typedef char TokenTypeTag[8];
 typedef TokenTypeTag * PUAC_TOKEN_PROVIDER_NAME;
 
 typedef struct _UAC_TOKEN {
-	TokenTypeTag	provider_name;						///< условное имя провайдера токена pkcs#11 
+	TokenTypeTag	provider_name;						///< условное имя провайдера токена pkcs#11
 	QWORD			slotid;								///< идентификатора слота (Pkcs#11)
 	QWORD			key_handle;							///< идентификатор выбранного ключа или 0 (Pkcs#11)
 } UAC_TOKEN, * PUAC_TOKEN;
 
-enum KeyFormat
+typedef enum KeyFormat
 {
 	kfCntNew = 0,
 	kfPk8New = 1,
 	kfCntAlways = 2,
 	kfPk8Always = 3
-};
+} KeyFormat;
 
-enum BagSet {
+typedef enum BagSet {
 	bsKeyBag = 1,
 	bsShroudedKeyBag = 2,
 	bsCertBag = 3,
 	bsCrlBag = 4,
 	bsSecretBag,
 	bsSafeContentsBag
-};
+} BagSet;
 
 typedef PVOID (CALLBACK_CONVENTION * PUAC_ALLOCATE_DYNAMIC_BLOB)( PUAC_BLOB pBlob, DWORD bytes );
 typedef DWORD (*PUAC_STREAM_READ)( PVOID context, PVOID* pbuf, unsigned* psize );
@@ -674,7 +674,7 @@ typedef DWORD (*PUAC_STREAM_WRITE)( PVOID context, PVOID buf, unsigned size );
 
 typedef struct _UAC_STREAM {
 	PVOID	context;		///< Указатель - контекст выполнения функций {read, write}
-	PUAC_STREAM_READ read;	///< Указатель на функцию чтения данных 
+	PUAC_STREAM_READ read;	///< Указатель на функцию чтения данных
 	PUAC_STREAM_WRITE write;///< Указатель на функцию записи данных
 } UAC_STREAM, *PUAC_STREAM;
 

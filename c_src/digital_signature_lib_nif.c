@@ -1,4 +1,5 @@
 #include "erl_nif.h"
+#include <stdbool.h>
 #include "digital_signature_lib.h"
 #include "is_utf8.h"
 

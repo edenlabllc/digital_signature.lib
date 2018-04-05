@@ -1,10 +1,10 @@
+#define LINUX
+
 #ifndef _DIGITAL_SIGANTURE_LIB_H
 #define _DIGITAL_SIGANTURE_LIB_H
 
-#define LINUX
-
 #include <stdbool.h>
-#include "UACryptoDef.h"
+#include "UACrypto.h"
 
 struct GeneralCert
 {
