@@ -5,7 +5,6 @@ CFLAGS += -I$(ERLANG_PATH)
 CFLAGS += -Ic_src
 CFLAGS += -Ic_src/h
 CFLAGS += -Lpriv -lUACryptoQ
-CFLAGS += -DERTS_DIRTY_SCHEDULERS
 
 LIB_NAME = priv/digital_signature_lib_nif.so
 ifneq ($(CROSSCOMPILE),)

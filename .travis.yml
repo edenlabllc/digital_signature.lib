@@ -1,5 +1,5 @@
 language: elixir
-sudo: false
+sudo: true
 elixir:
   - 1.6.4
 otp_release:
@@ -17,14 +17,14 @@ env:
   global:
     - MIX_ENV=test
     - CC=gcc-6
+    - LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 branches:
   except:
     - /[0-9]*\.[0-9]*\.[0-9]*/
 script:
-  - export LD_LIBRARY_PATH=$TRAVIS_BUILD_DIR/priv:$LD_LIBRARY_PATH
-  - echo $LD_LIBRARY_PATH
-  - ln -sv $TRAVIS_BUILD_DIR/priv/libUACryptoQ.so $TRAVIS_BUILD_DIR/priv/libUACryptoQ.so.1 || travis_terminate 1
-  - ls $TRAVIS_BUILD_DIR/priv/
+  - sudo ln -sv priv/libUACryptoQ.so /usr/local/lib/libUACryptoQ.so.1 || travis_terminate 1
+  - sudo cp priv/libUACryptoQ.so /usr/local/lib
+  - sudo ldconfig
   - mix compile || travis_terminate 1
-  - ldd $TRAVIS_BUILD_DIR/priv/digital_signature_lib_nif.so
+  - ldd priv/digital_signature_lib_nif.so
   - mix test --exclude pending --trace || travis_terminate 1
