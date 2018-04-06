@@ -3,7 +3,7 @@
 #define LINUX
 
 #include <stdbool.h>
-#include "UACryptoClient.h"
+#include "UACrypto.h"
 
 struct GeneralCert
 {
