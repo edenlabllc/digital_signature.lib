@@ -16,7 +16,7 @@ before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y erlang-dev gcc make
 script:
- # - export LD_LIBRARY_PATH=$TRAVIS_BUILD_DIR/priv:$LD_LIBRARY_PATH
+  - export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
   - export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
   - sudo ln -sv $TRAVIS_BUILD_DIR/priv/libUACryptoQ.so /usr/local/lib/libUACryptoQ.so.1 || travis_terminate 1
   - mix compile || travis_terminate 1
