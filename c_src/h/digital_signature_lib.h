@@ -1,7 +1,6 @@
-#define LINUX
+#pragma once
 
-#ifndef _DIGITAL_SIGANTURE_LIB_H
-#define _DIGITAL_SIGANTURE_LIB_H
+#define LINUX
 
 #include <stdbool.h>
 #include "UACrypto.h"
@@ -29,5 +28,3 @@ struct ValidationResult
 
 struct ValidationResult Check(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDataInfo, PUAC_SUBJECT_INFO subjectInfo,
                               struct Certs certs);
-
-#endif /* _DIGITAL_SIGANTURE_LIB_H */
