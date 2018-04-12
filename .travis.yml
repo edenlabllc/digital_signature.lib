@@ -1,30 +1,21 @@
-language: elixir
+language: bash
+
 sudo: true
-elixir:
-  - 1.6.4
-otp_release:
-  - 20.3
-cache:
-  directories:
-    - deps
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-6
-env:
-  global:
-    - MIX_ENV=test
-    - CC=gcc-6
-    - LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+
+services:
+  - docker
+
 branches:
   except:
     - /[0-9]*\.[0-9]*\.[0-9]*/
+
+before_script:
+  - IMAGE=$(docker build -f Dockerfile.test . | tail -1 | awk '{ print $NF }')
+  - CONTAINER=$(docker run -d $IMAGE /bin/bash -c 'cd /home/digital_signature.lib; mix test --exclude pending --trace')
+
 script:
-  - sudo ln -sv priv/libUACryptoQ.so /usr/local/lib/libUACryptoQ.so.1 || travis_terminate 1
-  - sudo cp priv/libUACryptoQ.so /usr/local/lib
-  - sudo ldconfig
-  - mix compile || travis_terminate 1
-  - ldd priv/digital_signature_lib_nif.so
-  - mix test --exclude pending --trace || travis_terminate 1
+  - sudo docker attach $CONTAINER
+  - sudo docker wait $CONTAINER || travis_terminate 1
+
+after_script:
+  - sudo docker rm $CONTAINER
