@@ -171,8 +171,27 @@ UAC_BLOB SendOCSPRequest(char *url, UAC_BLOB requestData)
 
   close(sockfd);
 
-  char *contentLengthStart = strstr(response, "Content-Length: ") + strlen("Content-Length: ");
-  int contentLength = atoi(contentLengthStart);
+  // Validate response content type
+  if (strstr(response, "application/ocsp-response") == NULL)
+  {
+    return emptyResult;
+  }
+
+  // Validate and parse response content length
+  char *contentLengthStart = strstr(response, "Content-Length: ");
+
+  if (contentLengthStart == NULL)
+  {
+    return emptyResult;
+  }
+
+  int contentLength = atoi(contentLengthStart + strlen("Content-Length: "));
+
+  if (contentLength == 0)
+  {
+    return emptyResult;
+  }
+
   int headerLength = received - contentLength;
 
   UAC_BLOB result = {calloc(contentLength, sizeof(char)), contentLength};
