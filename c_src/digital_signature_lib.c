@@ -8,6 +8,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include "digital_signature_lib.h"
 
@@ -135,10 +136,18 @@ UAC_BLOB SendOCSPRequest(char *url, UAC_BLOB requestData)
   messageLen += requestData.dataLen;
 
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
   if (sockfd < 0)
   {
+    fprintf(stderr, "[error] OCSP Request: error creating socket\n");
     return emptyResult;
   }
+
+  // Set Socket timeout (3 sec)
+  struct timeval tv;
+  tv.tv_sec = 3;
+  tv.tv_usec = 0;
+  setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char *)&tv, sizeof tv);
 
   server = gethostbyname(host);
   if (server == NULL)
@@ -163,9 +172,11 @@ UAC_BLOB SendOCSPRequest(char *url, UAC_BLOB requestData)
   }
 
   // Receive response from socket
-  int received = recv(sockfd, response, MESSAGE_SIZE, MSG_WAITALL);
-  if (received < 0)
+  ssize_t received;
+  received = recv(sockfd, response, MESSAGE_SIZE, MSG_WAITALL);
+  if (received == -1)
   {
+    fprintf(stderr, "[error] OCSP Request - recv: %s (%d)\n", strerror(errno), errno);
     return emptyResult;
   }
 
@@ -174,6 +185,7 @@ UAC_BLOB SendOCSPRequest(char *url, UAC_BLOB requestData)
   // Validate response content type
   if (strstr(response, "application/ocsp-response") == NULL)
   {
+    fprintf(stderr, "[error] OCSP Request: incorrect response content type\n");
     return emptyResult;
   }
 
@@ -182,6 +194,7 @@ UAC_BLOB SendOCSPRequest(char *url, UAC_BLOB requestData)
 
   if (contentLengthStart == NULL)
   {
+    fprintf(stderr, "[error] OCSP Request: incorrect response content length\n");
     return emptyResult;
   }
 
@@ -189,6 +202,13 @@ UAC_BLOB SendOCSPRequest(char *url, UAC_BLOB requestData)
 
   if (contentLength == 0)
   {
+    fprintf(stderr, "[error] OCSP Request: incorrect response content length\n");
+    return emptyResult;
+  }
+
+  if (received <= contentLength)
+  {
+    fprintf(stderr, "[error] OCSP Request: partial content received (timeout)\n");
     return emptyResult;
   }
 
