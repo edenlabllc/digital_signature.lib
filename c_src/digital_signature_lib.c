@@ -185,7 +185,7 @@ UAC_BLOB SendOCSPRequest(char *url, UAC_BLOB requestData)
   // Validate response content type
   if (strstr(response, "application/ocsp-response") == NULL)
   {
-    fprintf(stderr, "[error] OCSP Request: incorrect response content type\n");
+    fprintf(stderr, "[error] OCSP Request: incorrect response content type, url: %s\n", url);
     return emptyResult;
   }
 
