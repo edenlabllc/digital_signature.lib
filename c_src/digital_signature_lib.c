@@ -277,15 +277,15 @@ struct ValidationResult Check(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDa
 {
   struct ValidationResult validationResult = {false, "error validating signed data container"};
 
-  char *timeStampBuf = calloc(signedData.dataLen, sizeof(char));
-  UAC_BLOB timeStamp = {timeStampBuf, signedData.dataLen};
+  char tsBuf[4000];
+  UAC_BLOB timeStamp = {tsBuf, sizeof(tsBuf)};
   if (UAC_SignedDataGetTs(&signedData, 0, &timeStamp) != UAC_SUCCESS)
   {
     validationResult.validationErrorMessage = "retrieving a timestamp of data from an envelope with signed data failed";
     return validationResult;
   }
 
-  UAC_TIME_STAMP_INFO timeStampInfo = {};
+  UAC_TIME_STAMP_INFO timeStampInfo = {0};
   if (UAC_TsResponseLoad(&timeStamp, &timeStampInfo) != UAC_SUCCESS)
   {
     validationResult.validationErrorMessage = "loading information about the response with a timestamp failed";

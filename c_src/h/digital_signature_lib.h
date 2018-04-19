@@ -16,7 +16,7 @@ struct Certs
   struct GeneralCert *general;
   unsigned int generalLength;
 
-  UAC_BLOB *tsp;
+  PUAC_BLOB tsp;
   unsigned int tspLength;
 };
 
