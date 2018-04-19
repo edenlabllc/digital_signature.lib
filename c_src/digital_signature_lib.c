@@ -9,6 +9,7 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <errno.h>
+#include "erl_nif.h"
 
 #include "digital_signature_lib.h"
 
@@ -85,7 +86,7 @@ bool CheckTimeStamp(UAC_CERT_INFO certInfo, UAC_TIME signatureDate)
 
 UAC_BLOB SendOCSPRequest(char *url, UAC_BLOB requestData)
 {
-  UAC_BLOB emptyResult = {};
+  UAC_BLOB emptyResult = {NULL, 0};
 
   // ---- Parse URL ----
   char url_copy[strlen(url)];
@@ -119,8 +120,10 @@ UAC_BLOB SendOCSPRequest(char *url, UAC_BLOB requestData)
   int sockfd;
 
   const int MESSAGE_SIZE = 102400; // 10 Kb
-  char *message = calloc(MESSAGE_SIZE, sizeof(char));
-  char *response = calloc(MESSAGE_SIZE, sizeof(char));
+  char *message = enif_alloc(MESSAGE_SIZE);
+  memset(message, 0, sizeof(char));
+  char *response = enif_alloc(MESSAGE_SIZE);
+  memset(response, 0, sizeof(char));
 
   char *messageTemplate =
       "POST %s HTTP/1.0\r\n"
@@ -214,14 +217,8 @@ UAC_BLOB SendOCSPRequest(char *url, UAC_BLOB requestData)
 
   int headerLength = received - contentLength;
 
-  UAC_BLOB result = {calloc(contentLength, sizeof(char)), contentLength};
+  UAC_BLOB result = {enif_alloc(contentLength), contentLength};
   memcpy(result.data, response + headerLength, contentLength);
-
-  // Free
-  if (message)
-    free(message);
-  if (response)
-    free(response);
 
   return result;
 }
