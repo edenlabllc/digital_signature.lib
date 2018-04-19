@@ -119,11 +119,10 @@ UAC_BLOB SendOCSPRequest(char *url, UAC_BLOB requestData)
   struct sockaddr_in serv_addr;
   int sockfd;
 
-  const int MESSAGE_SIZE = 102400; // 10 Kb
-  char *message = enif_alloc(MESSAGE_SIZE);
-  memset(message, 0, sizeof(char));
-  char *response = enif_alloc(MESSAGE_SIZE);
-  memset(response, 0, sizeof(char));
+  char message[10240];
+  memset(message, 0, 10240);
+  char response[30720];
+  memset(response, 0, 30720);
 
   char *messageTemplate =
       "POST %s HTTP/1.0\r\n"
@@ -176,7 +175,7 @@ UAC_BLOB SendOCSPRequest(char *url, UAC_BLOB requestData)
 
   // Receive response from socket
   ssize_t received;
-  received = recv(sockfd, response, MESSAGE_SIZE, MSG_WAITALL);
+  received = recv(sockfd, response, sizeof(response), MSG_WAITALL);
   if (received == -1)
   {
     fprintf(stderr, "[error] OCSP Request - recv: %s (%d)\n", strerror(errno), errno);
@@ -225,6 +224,8 @@ UAC_BLOB SendOCSPRequest(char *url, UAC_BLOB requestData)
 
 bool CheckOCSP(UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB ocspCert, bool verify)
 {
+  bool validation_result = true;
+
   char *ocspRequestBuf[4960];
   UAC_BLOB ocspRequest = {ocspRequestBuf, sizeof(ocspRequestBuf)};
 
@@ -238,35 +239,36 @@ bool CheckOCSP(UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB ocspCert, bool ve
   UAC_BLOB ocspResponse = SendOCSPRequest(ocspUrl, ocspRequest);
   UAC_OCSP_RESPONSE_INFO ocspResponseInfo = {0};
 
-  if (UAC_OcspResponseLoad(&ocspResponse, &ocspResponseInfo) != UAC_SUCCESS)
+  if (UAC_OcspResponseLoad(&ocspResponse, &ocspResponseInfo) == UAC_SUCCESS)
   {
-    return false;
-  }
+    char certBuf[3072];
+    UAC_BLOB resp_cert = {certBuf, sizeof(certBuf)};
+    if (ocspResponseInfo.signature.signerRef.options != 0)
+    { // Respose signed
+      if (UAC_SUCCESS != UAC_OcspResponseFindCert(&ocspResponse, &ocspResponseInfo.signature.signerRef, &resp_cert))
+      {
+        resp_cert = ocspCert;
+      }
+    }
 
-  char certBuf[3072];
-  UAC_BLOB resp_cert = {certBuf, sizeof(certBuf)};
-  if (ocspResponseInfo.signature.signerRef.options != 0)
-  { // Respose signed
-    if (UAC_SUCCESS != UAC_OcspResponseFindCert(&ocspResponse, &ocspResponseInfo.signature.signerRef, &resp_cert))
+    if (verify)
     {
-      resp_cert = ocspCert;
+      DWORD signResult = UAC_OcspResponseVerify(&ocspResponse, &resp_cert);
+      if (UAC_ERROR_NO_SIGNATURE == signResult || UAC_SUCCESS != signResult)
+      {
+        validation_result = false;
+      }
     }
   }
-
-  if (verify)
+  else
   {
-    DWORD signResult = UAC_OcspResponseVerify(&ocspResponse, &resp_cert);
-    if (UAC_ERROR_NO_SIGNATURE == signResult)
-    {
-      return false;
-    }
-    else if (UAC_SUCCESS != signResult)
-    {
-      return false;
-    }
+    validation_result = false;
   }
 
-  return ocspResponseInfo.certStatus == 0;
+  if (ocspResponse.data)
+    enif_free(ocspResponse.data);
+
+  return validation_result && (ocspResponseInfo.certStatus == 0);
 }
 
 struct ValidationResult Check(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDataInfo, PUAC_SUBJECT_INFO subjectInfo,
