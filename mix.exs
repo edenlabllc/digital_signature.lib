@@ -4,8 +4,8 @@ defmodule DigitalSignatureLib.MixProject do
   def project do
     [
       app: :digital_signature_lib,
-      version: "1.4.2",
-      elixir: "~> 1.5",
+      version: "2.0.0",
+      elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       compilers: [:elixir_make] ++ Mix.compilers()
