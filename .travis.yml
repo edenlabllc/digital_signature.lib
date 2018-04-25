@@ -1,17 +1,21 @@
-sudo: false
+language: bash
 
-language: elixir
+sudo: true
 
-elixir:
-  - 1.6.3
-otp_release:
-  - 20.2
-env:
-  global:
-    - MIX_ENV=test
+services:
+  - docker
+
 branches:
   except:
     - /[0-9]*\.[0-9]*\.[0-9]*/
+
+before_script:
+  - IMAGE=$(docker build -f Dockerfile.test . | tail -1 | awk '{ print $NF }')
+  - CONTAINER=$(docker run -d $IMAGE /bin/bash -c 'cd /home/digital_signature.lib; mix test --exclude pending --trace')
+
 script:
-  - mix compile || travis_terminate 1
-  - mix test --exclude pending --trace || travis_terminate 1
+  - sudo docker attach $CONTAINER || travis_terminate 1
+  - sudo docker wait $CONTAINER || travis_terminate 1
+
+after_script:
+  - sudo docker rm $CONTAINER

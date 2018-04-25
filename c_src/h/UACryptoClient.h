@@ -252,7 +252,7 @@ UAC_API(DWORD) UAC_SignedDataCreate2 (
 
 	\return код ошибки или ::UAC_SUCCESS
 */
-UAC_API(DWORD) UAC_SignatureCreate ( 
+UAC_API(DWORD) UAC_SignatureCreate (
 	UAC_IN PUAC_STREAM			pDataInput,
 	UAC_IN PUAC_KEYPAIR			pSigners,
 	UAC_IN PUAC_BLOB			pTimeStamps,
@@ -769,7 +769,6 @@ UAC_API(DWORD) UAC_DstuParamCreate(
 	UAC_OUT	PUAC_BLOB				pParam );
 
 /**
-/**
 	\brief Добавление / извлечение идентификатора в контейнере с ключом
 	\param[in] pOldKey	        исходный контейнер с ключом
 	\param[in,out] pNewKey		новый контейнер с ключом (возможны новые пароли)
@@ -784,6 +783,7 @@ UAC_API(DWORD) UAC_ResetKeyId (
 	UAC_IN	PUAC_BLOB			pCert
 	);
 
+/**
 	\brief Смена пароля (паролей) к ключам
 	\param[in] pOldKey	        прежние параметры доступа к ключам
 	\param[in,out] pNewKey		новые параметры доступа к ключам
@@ -1037,14 +1037,14 @@ UAC_API(DWORD) UAC_TokenGetSlot(
 	UAC_OUT PQWORD		pSlot );
 /**
 	\brief	Подключение идентификатора токена для слота PKCS#11
-	
+
 	Функция информационная и не использует механизм PKCS#11
 
-	\param[in,out] pTokenId	буффер для идентификатора токена. 
+	\param[in,out] pTokenId	буффер для идентификатора токена.
 							поле provider_name должно содержать условное имя провайдера
 	\param[in] slot			идентификатор слота
 
-	\note если pTokenId->provider_name содержит пустую С-строку или нулевые байты, 
+	\note если pTokenId->provider_name содержит пустую С-строку или нулевые байты,
 	то используется файловый токен UAC (provider_name="UAC_TOK")
 
 	\return код ошибки или ::UAC_SUCCESS
@@ -1075,13 +1075,13 @@ UAC_API(DWORD) UAC_TokenUmount(
 	\param[in] pathName		путь к новому файловому токену
 	\param[in] pwd			пароль админа и пользователя к токену
 	\param[in] pwdLen		длина пароля
-	\param[in] sn			серийный номер нового токена (или NULL) 
+	\param[in] sn			серийный номер нового токена (или NULL)
 
 	\return код ошибки или ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_TokenFormat(
 	UAC_IN CONST_PCHAR		pathName,
-	UAC_IN CONST_PCHAR		pwd, 
+	UAC_IN CONST_PCHAR		pwd,
 	UAC_IN DWORD			pwdLen,
 	UAC_INOUT UAC_TOKEN_SN	sn  );
 
@@ -1089,7 +1089,7 @@ UAC_API(DWORD) UAC_TokenFormat(
 	\brief	Создание файлового токена и загрузка ключа и сертификата, установка пароля
 	\param[in] tokenPathName	путь к новому файловому токену
 	\param[in] keys				ключа, сертификат и пароль для нового токена
-	\param[in] sn				серийный номер нового токена (или NULL) 
+	\param[in] sn				серийный номер нового токена (или NULL)
 
 	\return код ошибки или ::UAC_SUCCESS
 */
@@ -1108,7 +1108,7 @@ UAC_API(DWORD) UAC_TokenCreate(
 */
 UAC_API(DWORD) UAC_TokenAddCert (
 	UAC_IN PUAC_TOKEN		pTokenId,
-	UAC_IN CONST_PCHAR		pwd, 
+	UAC_IN CONST_PCHAR		pwd,
 	UAC_IN DWORD			pwdLen,
 	UAC_IN PUAC_BLOB		pCert );
 
@@ -1139,9 +1139,9 @@ UAC_API(DWORD) UAC_TokenFindCert (
 	UAC_OUT PUAC_BLOB		pCert );
 /**
 	\brief	Заполнение структуры UAC_PRIVATE_KEY идентификатором токена и паролем
-	для работы с функциями UAC_* и UAC_Key*. 
+	для работы с функциями UAC_* и UAC_Key*.
 	Функция формирует в UAC_PRIVATE_KEY ссылку на виртуальный электронный ключ.
-	
+
 	\param[in] pTokenId		идентификатор токена
 	\param[in] pwd			пароль к токену
 	\param[in] pKey			структура UAC_PRIVATE_KEY для работы с функиями UAC_*
@@ -1164,17 +1164,17 @@ UAC_API(DWORD) UAC_TokenAsKey(
 	\brief	Чтение идентификатора токена UAC_TOKEN из структуры UAC_PRIVATE_KEY.
 	Идентификатор нужен для работы с функциями UAC_Token*.
 
-	\param[in] pKey			структура UAC_PRIVATE_KEY 
+	\param[in] pKey			структура UAC_PRIVATE_KEY
 	\param[in] pTokenId		поле для идентификатора токена
 
 	\note Если pTokenId==NULL, то будет производиться проверка pKey на наличие
 	идентификатора токена. В этом случае функция возвратит:
 	::UAC_ERROR_FORMAT, если pKey НЕ содержит идентификатор токена,
 	::UAC_ERROR_NULL_PARAM,   если pKey содержит идентификатор токена.
-	
+
 	\note Функция не производит проверку валидности полученного идентификатора токена
 
-	\return 
+	\return
 		::UAC_ERROR_FORMAT - если pKey не содержит идентификатор токена
 		код ошибки или ::UAC_SUCCESS
 */
@@ -1211,22 +1211,22 @@ UAC_API(DWORD) UAC_TokenAutoMount(
 
 /**
 	\brief	Получение списка подключенных токенов заданного провайдера
-	
+
 	идентификатор нужен для работы с функиями UAC_Token*
 
-	\param[out] pTokens		буффер для идентификаторов найденных токенов 
+	\param[out] pTokens		буффер для идентификаторов найденных токенов
 							или NULL - для запроса количества токенов
 	\param[in,out] pTokenCount	поле для количества найденных токенов
-	\param[in] providerName	имя провайдера Pkcs#11 
+	\param[in] providerName	имя провайдера Pkcs#11
 	\param[in] onlyWithToken =true, если требуються только слоты с подключенными токенами
 
-	\note В текущей версии доступны 2 провайдера: 
+	\note В текущей версии доступны 2 провайдера:
 	::UAC_PROVIDER - файловые токены UAC
 	::EFT_PROVIDER - ключи Efit
-	
+
 	\note Функция не производит проверку валидности полученного идентификатора токена
 
-	\return 
+	\return
 		код ошибки или ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_TokenEnum(
@@ -1238,12 +1238,12 @@ UAC_API(DWORD) UAC_TokenEnum(
 /**
 	\brief	Поиск токенов заданного провайдера с заданным серийным номером
 	\param[out] tokenBuf	поле для идентификатора найденного токена
-	\param[in] providerName	имя провайдера Pkcs#11 
+	\param[in] providerName	имя провайдера Pkcs#11
 	\param[in] sn			серийный номер искомого токена
 
-	\return 
+	\return
 	::UAC_ERROR_NODATA, если токен не найден
-	::UAC_SUCCESS, если токен найден 
+	::UAC_SUCCESS, если токен найден
 	или код ошибки
 */
 UAC_API(DWORD) UAC_TokenFind(
@@ -1252,15 +1252,15 @@ UAC_API(DWORD) UAC_TokenFind(
 	UAC_IN  UAC_TOKEN_SN	sn);
 
 /**
-	\brief	Чтение информации о слоте и подключенном токене 
+	\brief	Чтение информации о слоте и подключенном токене
 	\param[in]	token		идентификатор токена
 	\param[out] slotInfo	поле для информации о слоте Pkcs#11 (или NULL)
 	\param[out] tokenInfo	поле для информации о токене (или NULL)
 
-	\note Если slotInfo==NULL и tokenInfo==NULL, то функция не производит обращения 
+	\note Если slotInfo==NULL и tokenInfo==NULL, то функция не производит обращения
 	к токену а лишь проверяет корректность формата идентификатора UAC_TOKEN.
 
-	\return 
+	\return
 	::UAC_SUCCESS или код ошибки
 */
 UAC_API(DWORD) UAC_TokenInfo(
@@ -1271,11 +1271,11 @@ UAC_API(DWORD) UAC_TokenInfo(
 /** \name функции работы с виртуальным электронным ключем через ссылку из UAC_PRIVATE_KEY  */
 
 /**
-	\brief	Выбор активного личного ключа по индексу и/или чтение его сертификата 
+	\brief	Выбор активного личного ключа по индексу и/или чтение его сертификата
 	\param[in] pKey			данные личного ключа, ссылающиеся на токен
-	\param[in] dwIndex		локальный индекс требуемого ключа 
+	\param[in] dwIndex		локальный индекс требуемого ключа
 	(или ::UAC_CURRENT_KEY_INDEX - текущий активный ключ в pKey)
-	\param[out] pCert		буфер для сертификата или NULL, если сертификат не нужен 
+	\param[out] pCert		буфер для сертификата или NULL, если сертификат не нужен
 
 	\return UAC_ERROR_NO_KEY, если ключ не найден.
 	код ошибки или ::UAC_SUCCESS
@@ -1293,8 +1293,8 @@ UAC_API(DWORD) UAC_KeySelect (
 
 	\param[in] pKey			данные личного ключа, ссылающиеся на токен
 	\param[in] pCert		сертификат искомого ключа
-	
-	\note Поиск ключа производится по идентификатору ключа. 
+
+	\note Поиск ключа производится по идентификатору ключа.
 
 	\note Наличие сертификата в токене не проверяется.
 
@@ -1326,7 +1326,7 @@ UAC_API(DWORD) UAC_KeyAddCert (
 	если dwIndex == ::UAC_CURRENT_KEY_INDEX,
 	то будет прочитан сертификат, соответствующий текущему приватному ключу (выбранному функцией UAC_KeySelect);
 	если ключ не выбран, функция вернет ошибку UAC_ERROR_NO_KEY.
-	
+
 	Если сертификат не найден, функция вернет ошибку UAC_ERROR_NODATA.
 
 	\return код ошибки или ::UAC_SUCCESS
@@ -1351,9 +1351,9 @@ UAC_API(DWORD) UAC_KeyFindCert (
 
 
 /**
-	\brief	Удаление сертификата из токена 
+	\brief	Удаление сертификата из токена
 	\param[in] pKey			данные личного ключа, ссылающиеся на токен
-	\param[in] pCert		сертификат 
+	\param[in] pCert		сертификат
 
 	\return код ошибки или ::UAC_SUCCESS
 */
@@ -1361,11 +1361,11 @@ UAC_API(DWORD) UAC_KeyDelCert (
 	UAC_IN PUAC_PRIVATE_KEY	pKey,
 	UAC_IN	PUAC_BLOB		pCert );
 /**
-	\brief	Удаление активного личного ключа и сертификата из токена 
+	\brief	Удаление активного личного ключа и сертификата из токена
 	\param[in] pKey			данные личного ключа, ссылающиеся на токен
 
 	если ключ не выбран, функция вернет ошибку UAC_ERROR_NO_KEY.
-	
+
 	\return код ошибки или ::UAC_SUCCESS
 */
 UAC_API(DWORD) UAC_KeyDel (
@@ -1383,7 +1383,7 @@ UAC_API(DWORD) UAC_SetBlobAllocator (
 
 UAC_API(DWORD) UAC_Import1 (
 	UAC_IN PUAC_BLOB inkey,
-    UAC_IN CONST_PCHAR password, 
+    UAC_IN CONST_PCHAR password,
 	UAC_OUT PUAC_BLOB key1,
 	UAC_OUT PUAC_BLOB key2
     );

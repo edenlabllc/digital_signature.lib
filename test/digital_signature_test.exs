@@ -43,6 +43,23 @@ defmodule DigitalSignatureLibTest do
       assert result.signer == atomize_keys(data["signer"])
     end
 
+    test "can process signed legal entity 25 times in a row" do
+      data = get_data("test/fixtures/signed_le1.json")
+      signed_content = get_signed_content(data)
+      certs = get_certs()
+
+      expected_result = data["content"]
+      expected_signer = atomize_keys(data["signer"])
+
+      Enum.each(1..25, fn _ ->
+        assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, certs, true)
+
+        assert result.is_valid
+        assert decode_content(result) == expected_result
+        assert result.signer == expected_signer
+      end)
+    end
+
     test "can process second signed legal entity" do
       data = get_data("test/fixtures/signed_le2.json")
       signed_content = get_signed_content(data)

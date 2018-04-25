@@ -78,7 +78,7 @@ extern "C" {
 /** GOST 28147.89 parameter */
 typedef struct CK_GOST28147_PARAMS {
 	CK_BYTE synchro[8];
-} CK_GOST328147_PARAMS;
+} CK_GOST28147_PARAMS;
 
 /** Pointer for CK_GOST28147_PARAMS */
 typedef CK_GOST28147_PARAMS* CK_GOST28147_PARAMS_PTR;

@@ -4,42 +4,31 @@ _build
 # The directory Mix downloads your dependencies sources to.
 deps
 
-# If you run "mix test --cover", coverage assets end up here.
-cover
-
 # If the VM crashes, it generates a dump, let's ignore it too.
 erl_crash.dump
-
-# Ignore any node modules, as they should be fetched within container
-node_modules
-
-# Ignore Phoenix uploads in dev env
-uploads/*
 
 # Ignore git artifacts
 .git
 .gitignore
 .gitmodules
+.gitkeep
 
 # Ignore Docker artifacts
 Dockerfile
+Dockerfile.*
 .dockerignore
 
 # Ignore markdown description
 README.md
 LICENSE.md
 
-# Ignore docs
-*.apib
-
 # Ignore other CI configuration and scripts
-coveralls.json
-.env
 .travis.yml
-bin/ci
-bin/build.sh
-bin/install-git-hooks.sh
-bin/start.sh
 
 # Ignore Make artefacts
-priv/digital_signature_lib_nif.so
+c_src/*.o
+priv/digital_signature_lib_nif.so*
+
+# Ignore misc artefacts
+.elixir_ls
+.vscode
