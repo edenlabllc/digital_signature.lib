@@ -71,6 +71,32 @@ defmodule DigitalSignatureLibTest do
       assert result.signer == atomize_keys(data["signer"])
     end
 
+    test "can process double signed declaration" do
+      signed_content = File.read!("test/fixtures/double_hello.json.p7s.p7s")
+
+      {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), true)
+
+      assert result.is_valid
+      assert is_binary(result.content)
+
+      {:ok, second_result} = DigitalSignatureLib.processPKCS7Data(result.content, get_certs(), true)
+
+      assert second_result.is_valid
+      assert second_result.content == "{\n\"double\": \"hello world\"\n}\n"
+    end
+
+    test "can get data from signed declaration" do
+      data = File.read!("test/fixtures/hello.txt.sig")
+
+      {:ok, 1} = DigitalSignatureLib.checkPKCS7Data(data)
+    end
+
+    test "can return correct result for incorrect data" do
+      data = File.read!("test/fixtures/hello.txt")
+
+      {:error, :signed_data_load} = DigitalSignatureLib.checkPKCS7Data(data)
+    end
+
     test "processing signed declaration with outdated signature" do
       data = get_data("test/fixtures/outdated_cert.json")
       signed_content = get_signed_content(data)
