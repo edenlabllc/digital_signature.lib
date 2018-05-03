@@ -145,10 +145,11 @@ UAC_BLOB SendOCSPRequest(char *url, UAC_BLOB requestData)
     return emptyResult;
   }
 
-  // Set Socket timeout (3 sec)
+  // Set Socket timeout (1.5 sec)
   struct timeval tv;
-  tv.tv_sec = 3;
-  tv.tv_usec = 0;
+  tv.tv_sec = 1;
+  tv.tv_usec = 500000;
+  setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, (const char *)&tv, sizeof tv);
   setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char *)&tv, sizeof tv);
 
   server = gethostbyname(host);
@@ -168,17 +169,23 @@ UAC_BLOB SendOCSPRequest(char *url, UAC_BLOB requestData)
   }
 
   // Send request to socket
-  if (send(sockfd, message, messageLen, 0) < 0)
+  ssize_t sent = send(sockfd, message, messageLen, 0);
+  if (sent == -1)
   {
+    fprintf(stderr, "[error] OCSP Request (%s) - send failed with an error: %s (%d)\n", url, strerror(errno), errno);
+    return emptyResult;
+  }
+  if (sent < messageLen)
+  {
+    fprintf(stderr, "[error] OCSP Request (%s): partial content sent (timeout)\n", url);
     return emptyResult;
   }
 
   // Receive response from socket
-  ssize_t received;
-  received = recv(sockfd, response, sizeof(response), MSG_WAITALL);
+  ssize_t received = recv(sockfd, response, sizeof(response), MSG_WAITALL);
   if (received == -1)
   {
-    fprintf(stderr, "[error] OCSP Request - recv: %s (%d)\n", strerror(errno), errno);
+    fprintf(stderr, "[error] OCSP Request (%s) - recv failed with an error: %s (%d)\n", url, strerror(errno), errno);
     return emptyResult;
   }
 
@@ -187,7 +194,7 @@ UAC_BLOB SendOCSPRequest(char *url, UAC_BLOB requestData)
   // Validate response content type
   if (strstr(response, "application/ocsp-response") == NULL)
   {
-    fprintf(stderr, "[error] OCSP Request: incorrect response content type, url: %s\n", url);
+    fprintf(stderr, "[error] OCSP Request (%s): incorrect response content type\n", url);
     return emptyResult;
   }
 
@@ -196,7 +203,7 @@ UAC_BLOB SendOCSPRequest(char *url, UAC_BLOB requestData)
 
   if (contentLengthStart == NULL)
   {
-    fprintf(stderr, "[error] OCSP Request: incorrect response content length\n");
+    fprintf(stderr, "[error] OCSP Request (%s): incorrect response content length\n", url);
     return emptyResult;
   }
 
@@ -204,13 +211,13 @@ UAC_BLOB SendOCSPRequest(char *url, UAC_BLOB requestData)
 
   if (contentLength == 0)
   {
-    fprintf(stderr, "[error] OCSP Request: incorrect response content length\n");
+    fprintf(stderr, "[error] OCSP Request (%s): incorrect response content length\n", url);
     return emptyResult;
   }
 
   if (received <= contentLength)
   {
-    fprintf(stderr, "[error] OCSP Request: partial content received (timeout)\n");
+    fprintf(stderr, "[error] OCSP Request (%s): partial content received (timeout)\n", url);
     return emptyResult;
   }
 
