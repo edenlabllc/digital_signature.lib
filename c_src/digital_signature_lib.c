@@ -12,6 +12,7 @@
 #include "erl_nif.h"
 
 #include "digital_signature_lib.h"
+#include <unistd.h>
 
 struct GeneralCert FindMatchingRootCertificate(UAC_BLOB cert, struct GeneralCert *generalCerts,
                                                unsigned int generalLength)
@@ -119,10 +120,10 @@ UAC_BLOB SendOCSPRequest(char *url, UAC_BLOB requestData)
   struct sockaddr_in serv_addr;
   int sockfd;
 
-  char message[10240];
-  memset(message, 0, 10240);
-  char response[30720];
-  memset(response, 0, 30720);
+  char message[1024];
+  memset(message, 0, 1024);
+  char response[20480];
+  memset(response, 0, 20480);
 
   char *messageTemplate =
       "POST %s HTTP/1.0\r\n"
@@ -147,8 +148,8 @@ UAC_BLOB SendOCSPRequest(char *url, UAC_BLOB requestData)
 
   // Set Socket timeout (1.5 sec)
   struct timeval tv;
-  tv.tv_sec = 1;
-  tv.tv_usec = 500000;
+  tv.tv_sec = 0;
+  tv.tv_usec = 500;
   setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, (const char *)&tv, sizeof tv);
   setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char *)&tv, sizeof tv);
 
@@ -167,6 +168,9 @@ UAC_BLOB SendOCSPRequest(char *url, UAC_BLOB requestData)
   {
     return emptyResult;
   }
+
+  // Sleep 1.5 sec
+  usleep(1500000);
 
   // Send request to socket
   ssize_t sent = send(sockfd, message, messageLen, 0);
