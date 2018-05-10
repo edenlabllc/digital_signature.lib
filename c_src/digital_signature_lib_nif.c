@@ -25,12 +25,6 @@ static ERL_NIF_TERM CreateElixirString(ErlNifEnv *env, const char *str)
   return enif_make_binary(env, &elixirStr);
 }
 
-static ERL_NIF_TERM CreateErrorTuppe(ErlNifEnv *env, const char *errMessage)
-{
-  ERL_NIF_TERM errorTerm = CreateElixirString(env, errMessage);
-  return enif_make_tuple2(env, enif_make_atom(env, "error"), errorTerm);
-}
-
 struct Certs GetCertsFromArg(ErlNifEnv *env, const ERL_NIF_TERM arg)
 {
   struct Certs certs;
@@ -107,7 +101,43 @@ static bool GetCheckValue(ErlNifEnv *env, const ERL_NIF_TERM checkAtom)
   return check;
 }
 
+// Errors
+static ERL_NIF_TERM CreateErrorTupple(ErlNifEnv *env, const char *errMessage)
+{
+  ERL_NIF_TERM errorTerm = CreateElixirString(env, errMessage);
+  return enif_make_tuple2(env, enif_make_atom(env, "error"), errorTerm);
+}
+
+static ERL_NIF_TERM SignedDataLoadError(ErlNifEnv *env)
+{
+  return enif_make_tuple2(env, enif_make_atom(env, "error"), enif_make_atom(env, "signed_data_load"));
+}
+
+// Errors
+
 // ----- Helper functions
+
+static ERL_NIF_TERM
+CheckPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
+{
+  ErlNifBinary p7Data;
+  if (!enif_inspect_binary(env, argv[0], &p7Data))
+  {
+    return CreateErrorTupple(env, "signed data argument is of incorrect type: must be Elixir string (binary)");
+  }
+
+  UAC_BLOB signedData = {p7Data.data, p7Data.size};
+  UAC_SIGNED_DATA_INFO signedDataInfo = {0};
+
+  if (UAC_SignedDataLoad(&signedData, NULL, &signedDataInfo) == UAC_SUCCESS)
+  {
+    return enif_make_tuple2(env, enif_make_atom(env, "ok"), enif_make_int(env, signedDataInfo.dwSignatureCount));
+  }
+  else
+  {
+    return SignedDataLoadError(env);
+  }
+}
 
 static ERL_NIF_TERM
 ProcessPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
@@ -119,7 +149,7 @@ ProcessPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
   ErlNifBinary p7Data;
   if (!enif_inspect_binary(env, argv[0], &p7Data))
   {
-    return CreateErrorTuppe(env, "signed data argument is of incorrect type: must be Elixir string (binary)");
+    return CreateErrorTupple(env, "signed data argument is of incorrect type: must be Elixir string (binary)");
   }
 
   UAC_BLOB signedData = {p7Data.data, p7Data.size};
@@ -203,6 +233,7 @@ ProcessPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ErlNifFunc nif_funcs[] = {
+    {"checkPKCS7Data", 1, CheckPKCS7Data, 0},
     {"processPKCS7Data", 3, ProcessPKCS7Data, ERL_NIF_DIRTY_JOB_CPU_BOUND}};
 
 ERL_NIF_INIT(Elixir.DigitalSignatureLib, nif_funcs, NULL, NULL, NULL, NULL)
