@@ -282,7 +282,8 @@ bool CheckOCSP(UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB ocspCert, bool ve
 struct BaseValidationResult BaseCheck(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDataInfo, PUAC_SUBJECT_INFO subjectInfo,
                               struct Certs certs)
 {
-  struct CertificateCheckInfo* certificatesCheckInfo = malloc(sizeof(struct CertificateCheckInfo) * signedDataInfo.dwSignatureCount);
+  // TODO: make enif free
+  struct CertificateCheckInfo* certificatesCheckInfo = enif_alloc(sizeof(struct CertificateCheckInfo) * signedDataInfo.dwSignatureCount);
   struct BaseValidationResult validationResult = {false, "error validating signed data container", 0};
 
   char tsBuf[4000];

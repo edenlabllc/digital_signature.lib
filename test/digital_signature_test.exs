@@ -118,7 +118,6 @@ defmodule DigitalSignatureLibTest do
       data = File.read!("test/fixtures/hello.txt.sig")
 
       assert {:ok, result} = DigitalSignatureLib.oscpPKCS7Data(data, get_certs(), true)
-      IO.inspect(result)
     end
 
     test "can validate data signed with valid Privat personal key" do

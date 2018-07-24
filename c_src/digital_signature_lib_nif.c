@@ -171,16 +171,6 @@ InitPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 
       baseValidationResult = BaseCheck(signedData, signedDataInfo, &subjectInfo, certs);
 
-      printf("\naccessOCSP: %s\ncrlDistributionPoints: %s\ncrlDeltaDistributionPoints: %s\n%s : %d\nSize: %d\n",
-      baseValidationResult.certsCheckInfo[0].accessOCSP,
-      baseValidationResult.certsCheckInfo[0].crlDistributionPoints,
-      baseValidationResult.certsCheckInfo[0].crlDeltaDistributionPoints,
-      baseValidationResult.certsCheckInfo[0].data,
-      baseValidationResult.certsCheckInfo[0].dataLen,
-      baseValidationResult.checkSize
-    );
-
-
       // Free resources allocated for certs
       if (certs.general)
         enif_free(certs.general);
@@ -199,6 +189,26 @@ InitPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
   }
 
   // Result
+  ERL_NIF_TERM checkOscpList = enif_make_list(env, 0);
+  for(int i = 0; i < baseValidationResult.checkSize; i++)
+  {
+    printf("\naccessOCSP: %s\ncrlDistributionPoints: %s\ncrlDeltaDistributionPoints: %s\n%s\n%s\nDatalen: %d\nSize: %d\n",
+    baseValidationResult.certsCheckInfo[i].accessOCSP,
+    baseValidationResult.certsCheckInfo[i].crlDistributionPoints,
+    baseValidationResult.certsCheckInfo[i].crlDeltaDistributionPoints,
+    baseValidationResult.certsCheckInfo[i].data,
+    CreateElixirString(env, baseValidationResult.certsCheckInfo[i].data),
+    baseValidationResult.certsCheckInfo[i].dataLen,
+    baseValidationResult.checkSize
+    );
+    ERL_NIF_TERM osp = enif_make_new_map(env);
+    enif_make_map_put(env, osp, enif_make_atom(env, "access"), CreateElixirString(env, baseValidationResult.certsCheckInfo[i].accessOCSP),  &osp);
+    enif_make_map_put(env, osp, enif_make_atom(env, "crl"), CreateElixirString(env, baseValidationResult.certsCheckInfo[i].crlDistributionPoints),  &osp);
+    enif_make_map_put(env, osp, enif_make_atom(env, "delta_crl"), CreateElixirString(env, baseValidationResult.certsCheckInfo[i].crlDeltaDistributionPoints),  &osp);
+    enif_make_map_put(env, osp, enif_make_atom(env, "data"), CreateElixirString(env, baseValidationResult.certsCheckInfo[i].data),  &osp);
+    enif_make_map_put(env, osp, enif_make_atom(env, "dataLen"), enif_make_int(env, baseValidationResult.certsCheckInfo[i].dataLen),  &osp);
+    checkOscpList = enif_make_list_cell(env, osp, checkOscpList);
+  }
 
   ERL_NIF_TERM signer = enif_make_new_map(env);
 
@@ -236,8 +246,9 @@ InitPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
   if (dataBlob.data)
     enif_free(dataBlob.data);
 
+  printf("\nResult: %s\n", result);
   // Result tupple {:ok, ...}
-  return enif_make_tuple2(env, enif_make_atom(env, "ok"), result);
+  return enif_make_tuple3(env, enif_make_atom(env, "ok"), result, checkOscpList);
 }
 
 
