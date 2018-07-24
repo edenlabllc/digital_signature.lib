@@ -25,6 +25,18 @@ static ERL_NIF_TERM CreateElixirString(ErlNifEnv *env, const char *str)
   return enif_make_binary(env, &elixirStr);
 }
 
+static ERL_NIF_TERM CreateElixirBinary(ErlNifEnv *env, const char *str, int strLength)
+{
+  ERL_NIF_TERM databytes = enif_make_list(env, 0);
+
+  for (int i=0; i < strLength; i++)
+  {
+    databytes = enif_make_list_cell(env, enif_make_int(env, str[i]), databytes);
+  }
+
+  return databytes;
+}
+
 struct Certs GetCertsFromArg(ErlNifEnv *env, const ERL_NIF_TERM arg)
 {
   struct Certs certs;
@@ -192,21 +204,11 @@ InitPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
   ERL_NIF_TERM checkOscpList = enif_make_list(env, 0);
   for(int i = 0; i < baseValidationResult.checkSize; i++)
   {
-    printf("\naccessOCSP: %s\ncrlDistributionPoints: %s\ncrlDeltaDistributionPoints: %s\n%s\n%s\nDatalen: %d\nSize: %d\n",
-    baseValidationResult.certsCheckInfo[i].accessOCSP,
-    baseValidationResult.certsCheckInfo[i].crlDistributionPoints,
-    baseValidationResult.certsCheckInfo[i].crlDeltaDistributionPoints,
-    baseValidationResult.certsCheckInfo[i].data,
-    CreateElixirString(env, baseValidationResult.certsCheckInfo[i].data),
-    baseValidationResult.certsCheckInfo[i].dataLen,
-    baseValidationResult.checkSize
-    );
     ERL_NIF_TERM osp = enif_make_new_map(env);
     enif_make_map_put(env, osp, enif_make_atom(env, "access"), CreateElixirString(env, baseValidationResult.certsCheckInfo[i].accessOCSP),  &osp);
     enif_make_map_put(env, osp, enif_make_atom(env, "crl"), CreateElixirString(env, baseValidationResult.certsCheckInfo[i].crlDistributionPoints),  &osp);
     enif_make_map_put(env, osp, enif_make_atom(env, "delta_crl"), CreateElixirString(env, baseValidationResult.certsCheckInfo[i].crlDeltaDistributionPoints),  &osp);
-    enif_make_map_put(env, osp, enif_make_atom(env, "data"), CreateElixirString(env, baseValidationResult.certsCheckInfo[i].data),  &osp);
-    enif_make_map_put(env, osp, enif_make_atom(env, "dataLen"), enif_make_int(env, baseValidationResult.certsCheckInfo[i].dataLen),  &osp);
+    enif_make_map_put(env, osp, enif_make_atom(env, "data"), CreateElixirBinary(env, baseValidationResult.certsCheckInfo[i].data, baseValidationResult.certsCheckInfo[i].dataLen),  &osp);
     checkOscpList = enif_make_list_cell(env, osp, checkOscpList);
   }
 

@@ -31,7 +31,12 @@ defmodule DigitalSignatureLib do
   def oscpPKCS7Data(signed_content, certs_map, check_value) do
     {:ok, data, checklist} = initPKCS7Data(signed_content, certs_map, check_value)
     IO.inspect(data)
-    IO.inspect(checklist)
+
+    Enum.each(checklist, fn ch ->
+      IO.inspect(ch)
+      ch[:data] |> Enum.count() |> IO.inspect()
+    end)
+
     {:ok, data}
   end
 end
