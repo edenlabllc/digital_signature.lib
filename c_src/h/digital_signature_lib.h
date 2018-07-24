@@ -43,7 +43,7 @@ struct BaseValidationResult
 {
   bool isValid;
   char *validationErrorMessage;
-  struct CertificateCheckInfo certsCheckInfo[];
+  struct CertificateCheckInfo *certsCheckInfo;
 };
 
 struct BaseValidationResult BaseCheck(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDataInfo, PUAC_SUBJECT_INFO subjectInfo,

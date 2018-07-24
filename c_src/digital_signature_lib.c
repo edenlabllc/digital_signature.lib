@@ -278,31 +278,12 @@ bool CheckOCSP(UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB ocspCert, bool ve
   return validation_result && (ocspResponseInfo.certStatus == 0);
 }
 
-struct CertificateCheckInfo CheckOCSPInfo(UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB ocspCert, bool verify)
-{
-  struct CertificateCheckInfo oscpCertificateCheckInfo = {"", "", "", "", 0, true};
-  char *ocspRequestBuf[4960];
-  UAC_BLOB ocspRequest = {ocspRequestBuf, sizeof(ocspRequestBuf)};
-
-  DWORD ocspRequestCreateResult = UAC_OcspRequestCreate(&cert, NULL, 0, &ocspRequest);
-  if (ocspRequestCreateResult != UAC_SUCCESS)
-  {
-    oscpCertificateCheckInfo.isValid = false;
-  }
-
-  oscpCertificateCheckInfo.crlDistributionPoints = certInfo.crlDistributionPoints;
-  oscpCertificateCheckInfo.crlDeltaDistributionPoints = certInfo.crlDeltaDistributionPoints;
-  oscpCertificateCheckInfo.accessOCSP = certInfo.accessOCSP;
-  oscpCertificateCheckInfo.data = ocspRequest.data;
-  oscpCertificateCheckInfo.dataLen = ocspRequest.dataLen;
-  return oscpCertificateCheckInfo;
-}
-
 //Check signature without oscp
 struct BaseValidationResult BaseCheck(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDataInfo, PUAC_SUBJECT_INFO subjectInfo,
                               struct Certs certs)
 {
-  struct BaseValidationResult validationResult = {false, "error validating signed data container"};
+  struct CertificateCheckInfo* certificatesCheckInfo = malloc(sizeof(struct CertificateCheckInfo) * signedDataInfo.dwSignatureCount);
+  struct BaseValidationResult validationResult = {false, "error validating signed data container", 0};
 
   char tsBuf[4000];
   UAC_BLOB timeStamp = {tsBuf, sizeof(tsBuf)};
@@ -398,12 +379,22 @@ struct BaseValidationResult BaseCheck(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO 
       return validationResult;
     }
 
-    struct CertificateCheckInfo checkOSCP = CheckOCSPInfo(cert, certInfo, matchingCert.ocsp, !isHighestLevel);
+    char *ocspRequestBuf[4960];
+    UAC_BLOB ocspRequest = {ocspRequestBuf, sizeof(ocspRequestBuf)};
 
-    printf("\n%s\n%s\n%s\n\n\n\n%s\nN: %d\n\n",
-    checkOSCP.crlDistributionPoints,
-    checkOSCP.crlDeltaDistributionPoints,
-     checkOSCP.accessOCSP, checkOSCP.data, checkOSCP.dataLen);
+    DWORD ocspRequestCreateResult = UAC_OcspRequestCreate(&cert, NULL, 0, &ocspRequest);
+    struct CertificateCheckInfo oscpCertificateCheckInfo = 
+    {
+      certInfo.crlDistributionPoints,
+      certInfo.crlDeltaDistributionPoints,
+      certInfo.accessOCSP,
+      ocspRequest.data,
+      ocspRequest.dataLen,
+      ocspRequestCreateResult == UAC_SUCCESS
+    };
+
+
+    certificatesCheckInfo[i] = oscpCertificateCheckInfo;
 
 
     DWORD signedDataVerifyResult = UAC_SignedDataVerify(&signedData, &cert, NULL);
@@ -413,6 +404,17 @@ struct BaseValidationResult BaseCheck(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO 
       return validationResult;
     }
   }
+
+  validationResult.certsCheckInfo = certificatesCheckInfo;
+
+  printf("\naccessOCSP: %s\ncrlDistributionPoints: %s\ncrlDeltaDistributionPoints: %s\n%s : %d\n",
+  validationResult.certsCheckInfo[0].accessOCSP,
+  validationResult.certsCheckInfo[0].crlDistributionPoints,
+  validationResult.certsCheckInfo[0].crlDeltaDistributionPoints,
+  validationResult.certsCheckInfo[0].data,
+  validationResult.certsCheckInfo[0].dataLen
+);
+
 
   if (i > 0)
   {
