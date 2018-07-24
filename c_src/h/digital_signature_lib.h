@@ -36,6 +36,7 @@ struct CertificateCheckInfo
   char *accessOCSP;
   char *data;
   unsigned int dataLen;
+  bool isValid;
 };
 
 struct BaseValidationResult
