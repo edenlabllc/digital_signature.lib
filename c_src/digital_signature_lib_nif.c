@@ -141,7 +141,7 @@ CheckPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 static ERL_NIF_TERM
 InitPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-  struct BaseValidationResult validationResult = {true, ""};
+  struct BaseValidationResult baseValidationResult = {true, ""};
 
   bool check = GetCheckValue(env, argv[2]);
 
@@ -169,7 +169,17 @@ InitPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
     {
       certs = GetCertsFromArg(env, argv[1]);
 
-      validationResult = BaseCheck(signedData, signedDataInfo, &subjectInfo, certs);
+      baseValidationResult = BaseCheck(signedData, signedDataInfo, &subjectInfo, certs);
+
+      printf("\naccessOCSP: %s\ncrlDistributionPoints: %s\ncrlDeltaDistributionPoints: %s\n%s : %d\nSize: %d\n",
+      baseValidationResult.certsCheckInfo[0].accessOCSP,
+      baseValidationResult.certsCheckInfo[0].crlDistributionPoints,
+      baseValidationResult.certsCheckInfo[0].crlDeltaDistributionPoints,
+      baseValidationResult.certsCheckInfo[0].data,
+      baseValidationResult.certsCheckInfo[0].dataLen,
+      baseValidationResult.checkSize
+    );
+
 
       // Free resources allocated for certs
       if (certs.general)
@@ -184,8 +194,8 @@ InitPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
   }
   else
   {
-    validationResult.isValid = false;
-    validationResult.validationErrorMessage = "error processing signed data";
+    baseValidationResult.isValid = false;
+    baseValidationResult.validationErrorMessage = "error processing signed data";
   }
 
   // Result
@@ -215,10 +225,10 @@ InitPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 
   if (check)
   {
-    char *valRes = validationResult.isValid ? "true" : "false";
+    char *valRes = baseValidationResult.isValid ? "true" : "false";
     enif_make_map_put(env, result, enif_make_atom(env, "is_valid"), enif_make_atom(env, valRes), &result);
 
-    ERL_NIF_TERM valErrMes = CreateElixirString(env, validationResult.validationErrorMessage);
+    ERL_NIF_TERM valErrMes = CreateElixirString(env, baseValidationResult.validationErrorMessage);
     enif_make_map_put(env, result, enif_make_atom(env, "validation_error_message"), valErrMes, &result);
   }
 

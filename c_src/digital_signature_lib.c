@@ -383,7 +383,7 @@ struct BaseValidationResult BaseCheck(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO 
     UAC_BLOB ocspRequest = {ocspRequestBuf, sizeof(ocspRequestBuf)};
 
     DWORD ocspRequestCreateResult = UAC_OcspRequestCreate(&cert, NULL, 0, &ocspRequest);
-    struct CertificateCheckInfo oscpCertificateCheckInfo = 
+    struct CertificateCheckInfo oscpCertificateCheckInfo =
     {
       certInfo.crlDistributionPoints,
       certInfo.crlDeltaDistributionPoints,
@@ -406,15 +406,7 @@ struct BaseValidationResult BaseCheck(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO 
   }
 
   validationResult.certsCheckInfo = certificatesCheckInfo;
-
-  printf("\naccessOCSP: %s\ncrlDistributionPoints: %s\ncrlDeltaDistributionPoints: %s\n%s : %d\n",
-  validationResult.certsCheckInfo[0].accessOCSP,
-  validationResult.certsCheckInfo[0].crlDistributionPoints,
-  validationResult.certsCheckInfo[0].crlDeltaDistributionPoints,
-  validationResult.certsCheckInfo[0].data,
-  validationResult.certsCheckInfo[0].dataLen
-);
-
+  validationResult.checkSize = i;
 
   if (i > 0)
   {
