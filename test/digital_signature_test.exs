@@ -33,14 +33,13 @@ defmodule DigitalSignatureLibTest do
     end
 
     test "can process signed legal entity" do
-      data = get_data("test/fixtures/signed_le1.json")
-      signed_content = get_signed_content(data)
+      data = File.read!("test/fixtures/le11.json.p7s")
 
-      assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), true)
+      # data = File.read!("test/fixtures/hello.txt.sig")
 
-      assert result.is_valid
-      assert decode_content(result) == data["content"]
-      assert result.signer == atomize_keys(data["signer"])
+      {:ok, result} = DigitalSignatureLib.processPKCS7Data(data, get_certs(), true)
+
+      IO.inspect(result)
     end
 
     test "can process signed legal entity 25 times in a row" do

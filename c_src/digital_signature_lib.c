@@ -323,6 +323,12 @@ struct ValidationResult Check(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDa
       return validationResult;
     }
 
+    printf("\n KeyUsage: 0x%08x\n", certInfo.keyUsage);
+
+    printf("\n UAC_KU_EXTENDED: 0x%08x\n", certInfo.keyUsage & UAC_KU_EXTENDED);
+
+    // printf("\n IS SING: %d \n", certInfo.keyUsage && UAC_KU_DATA_SIGN);
+
     memcpy(subjectInfo, &certInfo.subject, sizeof(UAC_SUBJECT_INFO));
     struct GeneralCert matchingCert = FindMatchingRootCertificate(cert, certs.general,
                                                                   certs.generalLength);
