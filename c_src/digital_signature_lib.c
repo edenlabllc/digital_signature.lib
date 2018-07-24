@@ -278,26 +278,24 @@ bool CheckOCSP(UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB ocspCert, bool ve
   return validation_result && (ocspResponseInfo.certStatus == 0);
 }
 
-struct CertificateCheckInfo CheckOCSPInfo(UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB ocspCert, bool verify,
-                                      struct CertificateCheckInfo *oscpCheckInfo)
+struct CertificateCheckInfo CheckOCSPInfo(UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB ocspCert, bool verify)
 {
-  struct CertificateCheckInfo oscpCertificateCheckInfo = {"", "", "", "", 0, true}
-  // bool validation_result = true;
-  //
+  struct CertificateCheckInfo oscpCertificateCheckInfo = {"", "", "", "", 0, true};
   char *ocspRequestBuf[4960];
   UAC_BLOB ocspRequest = {ocspRequestBuf, sizeof(ocspRequestBuf)};
 
   DWORD ocspRequestCreateResult = UAC_OcspRequestCreate(&cert, NULL, 0, &ocspRequest);
   if (ocspRequestCreateResult != UAC_SUCCESS)
   {
-    oscpCertificateCheckInfo.isValid = false
+    oscpCertificateCheckInfo.isValid = false;
   }
+
   oscpCertificateCheckInfo.crlDistributionPoints = certInfo.crlDistributionPoints;
   oscpCertificateCheckInfo.crlDeltaDistributionPoints = certInfo.crlDeltaDistributionPoints;
   oscpCertificateCheckInfo.accessOCSP = certInfo.accessOCSP;
   oscpCertificateCheckInfo.data = ocspRequest.data;
   oscpCertificateCheckInfo.dataLen = ocspRequest.dataLen;
-  return oscpCertificateCheckInfo
+  return oscpCertificateCheckInfo;
 }
 
 //Check signature without oscp
