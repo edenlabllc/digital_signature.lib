@@ -116,7 +116,6 @@ static ERL_NIF_TERM SignedDataLoadError(ErlNifEnv *env)
 // Errors
 
 // ----- Helper functions
-
 static ERL_NIF_TERM
 CheckPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
@@ -138,6 +137,99 @@ CheckPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
     return SignedDataLoadError(env);
   }
 }
+
+static ERL_NIF_TERM
+InitPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
+{
+  struct ValidationResult validationResult = {true, ""};
+
+  bool check = GetCheckValue(env, argv[2]);
+
+  ErlNifBinary p7Data;
+  if (!enif_inspect_binary(env, argv[0], &p7Data))
+  {
+    return CreateErrorTupple(env, "signed data argument is of incorrect type: must be Elixir string (binary)");
+  }
+
+  UAC_BLOB signedData = {p7Data.data, p7Data.size};
+
+  struct Certs certs = {0};
+  UAC_BLOB dataBlob = {NULL, 0};
+  UAC_SIGNED_DATA_INFO signedDataInfo = {0};
+  UAC_SUBJECT_INFO subjectInfo = {"", "", "", "", "", "", "", "", "", "", "", ""};
+
+  if (UAC_SignedDataLoad(&signedData, NULL, &signedDataInfo) == UAC_SUCCESS)
+  {
+    signedDataInfo.pSignatures = enif_alloc(sizeof(UAC_SIGNATURE_INFO) * signedDataInfo.dwSignatureCount);
+    dataBlob.data = enif_alloc(signedDataInfo.dwDataLength);
+    dataBlob.dataLen = signedDataInfo.dwDataLength;
+    UAC_SignedDataLoad(&signedData, &dataBlob, &signedDataInfo);
+
+    if (check)
+    {
+      certs = GetCertsFromArg(env, argv[1]);
+
+      validationResult = BaseCheck(signedData, signedDataInfo, &subjectInfo, certs);
+
+      // Free resources allocated for certs
+      if (certs.general)
+        enif_free(certs.general);
+      if (certs.tsp)
+        enif_free(certs.tsp);
+    }
+
+    // Free resources allocated for signatures
+    if (signedDataInfo.pSignatures)
+      enif_free(signedDataInfo.pSignatures);
+  }
+  else
+  {
+    validationResult.isValid = false;
+    validationResult.validationErrorMessage = "error processing signed data";
+  }
+
+  // Result
+
+  ERL_NIF_TERM signer = enif_make_new_map(env);
+
+  enif_make_map_put(env, signer, enif_make_atom(env, "common_name"), CreateElixirString(env, subjectInfo.commonName), &signer);
+  enif_make_map_put(env, signer, enif_make_atom(env, "country_name"), CreateElixirString(env, subjectInfo.countryName), &signer);
+  enif_make_map_put(env, signer, enif_make_atom(env, "surname"), CreateElixirString(env, subjectInfo.surname), &signer);
+  enif_make_map_put(env, signer, enif_make_atom(env, "given_name"), CreateElixirString(env, subjectInfo.givenName), &signer);
+  enif_make_map_put(env, signer, enif_make_atom(env, "organization_name"), CreateElixirString(env, subjectInfo.organizationName), &signer);
+  enif_make_map_put(env, signer, enif_make_atom(env, "state_or_province_name"), CreateElixirString(env, subjectInfo.stateOrProvinceName), &signer);
+  enif_make_map_put(env, signer, enif_make_atom(env, "locality_name"), CreateElixirString(env, subjectInfo.localityName), &signer);
+  enif_make_map_put(env, signer, enif_make_atom(env, "organizational_unit_name"), CreateElixirString(env, subjectInfo.organizationalUnitName), &signer);
+  enif_make_map_put(env, signer, enif_make_atom(env, "title"), CreateElixirString(env, subjectInfo.title), &signer);
+  enif_make_map_put(env, signer, enif_make_atom(env, "edrpou"), CreateElixirString(env, subjectInfo.edrpou), &signer);
+  enif_make_map_put(env, signer, enif_make_atom(env, "drfo"), CreateElixirString(env, subjectInfo.drfo), &signer);
+
+  ErlNifBinary dataBin;
+  enif_alloc_binary(dataBlob.dataLen, &dataBin);
+  memcpy(dataBin.data, dataBlob.data, dataBlob.dataLen);
+  ERL_NIF_TERM content = enif_make_binary(env, &dataBin);
+
+  ERL_NIF_TERM result = enif_make_new_map(env);
+  enif_make_map_put(env, result, enif_make_atom(env, "content"), content, &result);
+  enif_make_map_put(env, result, enif_make_atom(env, "signer"), signer, &result);
+
+  if (check)
+  {
+    char *valRes = validationResult.isValid ? "true" : "false";
+    enif_make_map_put(env, result, enif_make_atom(env, "is_valid"), enif_make_atom(env, valRes), &result);
+
+    ERL_NIF_TERM valErrMes = CreateElixirString(env, validationResult.validationErrorMessage);
+    enif_make_map_put(env, result, enif_make_atom(env, "validation_error_message"), valErrMes, &result);
+  }
+
+  // Free resources allcoated for dataBlob
+  if (dataBlob.data)
+    enif_free(dataBlob.data);
+
+  // Result tupple {:ok, ...}
+  return enif_make_tuple2(env, enif_make_atom(env, "ok"), result);
+}
+
 
 static ERL_NIF_TERM
 ProcessPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
@@ -194,7 +286,6 @@ ProcessPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
   ERL_NIF_TERM signer = enif_make_new_map(env);
 
   enif_make_map_put(env, signer, enif_make_atom(env, "common_name"), CreateElixirString(env, subjectInfo.commonName), &signer);
-  enif_make_map_put(env, signer, enif_make_atom(env, "common_name"), CreateElixirString(env, subjectInfo.commonName), &signer);
   enif_make_map_put(env, signer, enif_make_atom(env, "country_name"), CreateElixirString(env, subjectInfo.countryName), &signer);
   enif_make_map_put(env, signer, enif_make_atom(env, "surname"), CreateElixirString(env, subjectInfo.surname), &signer);
   enif_make_map_put(env, signer, enif_make_atom(env, "given_name"), CreateElixirString(env, subjectInfo.givenName), &signer);
@@ -233,6 +324,7 @@ ProcessPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ErlNifFunc nif_funcs[] = {
+    {"initPKCS7Data", 3, InitPKCS7Data, ERL_NIF_DIRTY_JOB_CPU_BOUND},
     {"checkPKCS7Data", 1, CheckPKCS7Data, 0},
     {"processPKCS7Data", 3, ProcessPKCS7Data, ERL_NIF_DIRTY_JOB_CPU_BOUND}};
 

@@ -24,5 +24,13 @@ defmodule DigitalSignatureLib do
 
   def processPKCS7Data(_signed_content, _certs_map, _check_value), do: exit(:nif_not_loaded)
 
+  def initPKCS7Data(_signed_content, _certs_map, _check_value), do: exit(:nif_not_loaded)
+
   def checkPKCS7Data(_signed_content), do: exit(:nif_not_loaded)
+
+  def oscpPKCS7Data(signed_content, certs_map, check_value) do
+    {:ok, data} = initPKCS7Data(signed_content, certs_map, check_value)
+    IO.inspect(data)
+    {:ok, data}
+  end
 end

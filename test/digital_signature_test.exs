@@ -114,6 +114,13 @@ defmodule DigitalSignatureLibTest do
       assert result.validation_error_message == "OCSP certificate verificaton failed"
     end
 
+    test "new nif" do
+      data = File.read!("test/fixtures/hello.txt.sig")
+
+      assert {:ok, result} = DigitalSignatureLib.oscpPKCS7Data(data, get_certs(), true)
+      IO.inspect(result)
+    end
+
     test "can validate data signed with valid Privat personal key" do
       data = File.read!("test/fixtures/hello.txt.sig")
 
