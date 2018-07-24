@@ -278,18 +278,19 @@ bool CheckOCSP(UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB ocspCert, bool ve
   return validation_result && (ocspResponseInfo.certStatus == 0);
 }
 
-void CheckOCSPInfo(UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB ocspCert, bool verify, struct CertificateCheckInfo *oscpCheckInfo)
+void CheckOCSPInfo(UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB ocspCert, bool verify,
+                                      struct CertificateCheckInfo *oscpCheckInfo)
 {
-  bool validation_result = true;
-
-  char *ocspRequestBuf[4960];
-  UAC_BLOB ocspRequest = {ocspRequestBuf, sizeof(ocspRequestBuf)};
-
-  DWORD ocspRequestCreateResult = UAC_OcspRequestCreate(&cert, NULL, 0, &ocspRequest);
-  if (ocspRequestCreateResult != UAC_SUCCESS)
-  {
-    return false;
-  }
+  // bool validation_result = true;
+  //
+  // char *ocspRequestBuf[4960];
+  // UAC_BLOB ocspRequest = {ocspRequestBuf, sizeof(ocspRequestBuf)};
+  //
+  // DWORD ocspRequestCreateResult = UAC_OcspRequestCreate(&cert, NULL, 0, &ocspRequest);
+  // if (ocspRequestCreateResult != UAC_SUCCESS)
+  // {
+  //   return false;
+  // }
   // printf("\n%s\n%s\n%s\n\n\n\n%s\nN: %d\n\n", certInfo.crlDistributionPoints, certInfo.crlDeltaDistributionPoints, certInfo.accessOCSP, ocspRequest.data, ocspRequest.dataLen);
 
 
@@ -301,10 +302,10 @@ void CheckOCSPInfo(UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB ocspCert, boo
 }
 
 //Check signature without oscp
-struct ValidationResult BaseCheck(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDataInfo, PUAC_SUBJECT_INFO subjectInfo,
+struct BaseValidationResult BaseCheck(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDataInfo, PUAC_SUBJECT_INFO subjectInfo,
                               struct Certs certs)
 {
-  struct ValidationResult validationResult = {false, "error validating signed data container"};
+  struct BaseValidationResult validationResult = {false, "error validating signed data container"};
 
   char tsBuf[4000];
   UAC_BLOB timeStamp = {tsBuf, sizeof(tsBuf)};
@@ -446,6 +447,8 @@ struct ValidationResult Check(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDa
   UAC_TIME timeStampDateTime = timeStampInfo.genTime;
   UAC_BLOB tspCert = FindMatchingTspCertificate(timeStampInfo.signature.signerRef, certs.tsp,
                                                 certs.tspLength);
+
+ struct CertificateCheckInfo oscpCheckInfo[signedDataInfo.dwSignatureCount];
 
   DWORD i;
   for (i = 0; i < signedDataInfo.dwSignatureCount; i++)

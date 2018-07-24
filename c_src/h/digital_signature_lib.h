@@ -35,7 +35,15 @@ struct CertificateCheckInfo
   char *crlDeltaDistributionPoints;
   char *accessOCSP;
   char *data;
-  unsigned int dataLen
+  unsigned int dataLen;
 };
-struct ValidationResult BaseCheck(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDataInfo, PUAC_SUBJECT_INFO subjectInfo,
+
+struct BaseValidationResult
+{
+  bool isValid;
+  char *validationErrorMessage;
+  struct CertificateCheckInfo certsCheckInfo[];
+};
+
+struct BaseValidationResult BaseCheck(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDataInfo, PUAC_SUBJECT_INFO subjectInfo,
                               struct Certs certs);

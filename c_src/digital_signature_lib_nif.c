@@ -141,7 +141,7 @@ CheckPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 static ERL_NIF_TERM
 InitPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-  struct ValidationResult validationResult = {true, ""};
+  struct BaseValidationResult validationResult = {true, ""};
 
   bool check = GetCheckValue(env, argv[2]);
 
