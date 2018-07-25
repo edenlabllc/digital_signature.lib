@@ -22,7 +22,6 @@ defmodule DigitalSignatureLib.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:httpoison, "~> 1.1.0"},
       {:elixir_make, "~> 0.4", runtime: false},
       {:jason, "~> 1.0", only: [:dev, :test]}
     ]
