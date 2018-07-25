@@ -25,18 +25,6 @@ static ERL_NIF_TERM CreateElixirString(ErlNifEnv *env, const char *str)
   return enif_make_binary(env, &elixirStr);
 }
 
-static ERL_NIF_TERM CreateElixirBinary(ErlNifEnv *env, const char *str, int strLength)
-{
-  ERL_NIF_TERM databytes = enif_make_list(env, 0);
-
-  for (int i=0; i < strLength; i++)
-  {
-    databytes = enif_make_list_cell(env, enif_make_int(env, str[i]), databytes);
-  }
-
-  return databytes;
-}
-
 struct Certs GetCertsFromArg(ErlNifEnv *env, const ERL_NIF_TERM arg)
 {
   struct Certs certs;
@@ -208,7 +196,15 @@ InitPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
     enif_make_map_put(env, osp, enif_make_atom(env, "access"), CreateElixirString(env, baseValidationResult.certsCheckInfo[i].accessOCSP),  &osp);
     enif_make_map_put(env, osp, enif_make_atom(env, "crl"), CreateElixirString(env, baseValidationResult.certsCheckInfo[i].crlDistributionPoints),  &osp);
     enif_make_map_put(env, osp, enif_make_atom(env, "delta_crl"), CreateElixirString(env, baseValidationResult.certsCheckInfo[i].crlDeltaDistributionPoints),  &osp);
-    enif_make_map_put(env, osp, enif_make_atom(env, "data"), CreateElixirBinary(env, baseValidationResult.certsCheckInfo[i].data, baseValidationResult.certsCheckInfo[i].dataLen),  &osp);
+
+
+    ErlNifBinary derDataBin;
+    enif_alloc_binary(baseValidationResult.certsCheckInfo[i].dataLen, &derDataBin);
+    memcpy(derDataBin.data, baseValidationResult.certsCheckInfo[i].data, baseValidationResult.certsCheckInfo[i].dataLen);
+    ERL_NIF_TERM derData = enif_make_binary(env, &derDataBin);
+
+
+    enif_make_map_put(env, osp, enif_make_atom(env, "data"), derData, &osp);
     checkOscpList = enif_make_list_cell(env, osp, checkOscpList);
   }
 
@@ -248,7 +244,7 @@ InitPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
   if (dataBlob.data)
     enif_free(dataBlob.data);
 
-  printf("\nResult: %s\n", result);
+  enif_free_env(env);
   // Result tupple {:ok, ...}
   return enif_make_tuple3(env, enif_make_atom(env, "ok"), result, checkOscpList);
 }

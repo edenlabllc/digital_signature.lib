@@ -30,11 +30,17 @@ defmodule DigitalSignatureLib do
 
   def oscpPKCS7Data(signed_content, certs_map, check_value) do
     {:ok, data, checklist} = initPKCS7Data(signed_content, certs_map, check_value)
-    IO.inspect(data)
+    IO.inspect(checklist)
+    System.halt()
 
-    Enum.each(checklist, fn ch ->
-      IO.inspect(ch)
-      ch[:data] |> Enum.count() |> IO.inspect()
+    Enum.each(checklist, fn oscp_info ->
+      HTTPoison.post!(
+        oscp_info[:access],
+        oscp_info[:data],
+        [{"Content-Type", "application/ocsp-request"}],
+        timeout: 1000
+      )
+      |> IO.inspect()
     end)
 
     {:ok, data}

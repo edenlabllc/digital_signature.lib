@@ -117,6 +117,7 @@ defmodule DigitalSignatureLibTest do
     test "new nif" do
       data = File.read!("test/fixtures/hello.txt.sig")
 
+      # DigitalSignatureLib.processPKCS7Data(data, get_certs(), true)
       assert {:ok, result} = DigitalSignatureLib.oscpPKCS7Data(data, get_certs(), true)
     end
 
