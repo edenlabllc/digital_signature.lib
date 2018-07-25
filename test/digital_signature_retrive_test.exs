@@ -8,14 +8,14 @@ defmodule DigitalSignatureLibTest do
     end
 
     test "fail with empty data" do
-      {:ok, result} = DigitalSignatureLib.processPKCS7Data("", get_certs(), true)
+      {:ok, result, _} = DigitalSignatureLib.retrivePKCS7Data("", get_certs(), true)
 
       refute result.is_valid
       assert result.validation_error_message == "error processing signed data"
     end
 
     test "fails with incorrect signed data" do
-      {:ok, result} = DigitalSignatureLib.processPKCS7Data("123", get_certs(), true)
+      {:ok, result, _} = DigitalSignatureLib.retrivePKCS7Data("123", get_certs(), true)
 
       refute result.is_valid
       assert result.validation_error_message == "error processing signed data"
@@ -26,7 +26,7 @@ defmodule DigitalSignatureLibTest do
       data = get_data("test/fixtures/incorrect_signed_data.json")
       signed_content = get_signed_content(data)
 
-      assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), true)
+      assert {:ok, result, _} = DigitalSignatureLib.retrivePKCS7Data(signed_content, get_certs(), true)
 
       refute result.is_valid
       assert result.validation_error_message == "error processing signed data"
@@ -36,11 +36,20 @@ defmodule DigitalSignatureLibTest do
       data = get_data("test/fixtures/signed_le1.json")
       signed_content = get_signed_content(data)
 
-      assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), true)
+      assert {:ok, result, ocsp_checklist} = DigitalSignatureLib.retrivePKCS7Data(signed_content, get_certs(), true)
 
       assert result.is_valid
       assert decode_content(result) == data["content"]
       assert result.signer == atomize_keys(data["signer"])
+
+      assert [
+               %{
+                 access: "http://acskidd.gov.ua/services/ocsp/",
+                 crl: "http://acskidd.gov.ua/download/crls/ACSKIDDDFS-Full.crl",
+                 delta_crl: "http://acskidd.gov.ua/download/crls/ACSKIDDDFS-Delta.crl",
+                 data: _
+               }
+             ] = ocsp_checklist
     end
 
     test "can process signed legal entity 25 times in a row" do
@@ -52,11 +61,20 @@ defmodule DigitalSignatureLibTest do
       expected_signer = atomize_keys(data["signer"])
 
       Enum.each(1..25, fn _ ->
-        assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, certs, true)
+        assert {:ok, result, ocsp_checklist} = DigitalSignatureLib.retrivePKCS7Data(signed_content, certs, true)
 
         assert result.is_valid
         assert decode_content(result) == expected_result
         assert result.signer == expected_signer
+
+        assert [
+                 %{
+                   access: "http://acskidd.gov.ua/services/ocsp/",
+                   crl: "http://acskidd.gov.ua/download/crls/ACSKIDDDFS-Full.crl",
+                   delta_crl: "http://acskidd.gov.ua/download/crls/ACSKIDDDFS-Delta.crl",
+                   data: _
+                 }
+               ] = ocsp_checklist
       end)
     end
 
@@ -64,22 +82,50 @@ defmodule DigitalSignatureLibTest do
       data = get_data("test/fixtures/signed_le2.json")
       signed_content = get_signed_content(data)
 
-      assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), true)
+      assert {:ok, result, ocsp_checklist} = DigitalSignatureLib.retrivePKCS7Data(signed_content, get_certs(), true)
 
       assert result.is_valid
       assert decode_content(result) == data["content"]
       assert result.signer == atomize_keys(data["signer"])
+
+      assert [
+               %{
+                 access: "http://acskidd.gov.ua/services/ocsp/",
+                 crl: "http://acskidd.gov.ua/download/crls/ACSKIDDDFS-Full.crl",
+                 data: _,
+                 delta_crl: "http://acskidd.gov.ua/download/crls/ACSKIDDDFS-Delta.crl"
+               }
+             ] = ocsp_checklist
     end
 
     test "can process double signed declaration" do
       signed_content = File.read!("test/fixtures/double_hello.json.p7s.p7s")
 
-      {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), true)
+      {:ok, result, first_ocsp_checklist} = DigitalSignatureLib.retrivePKCS7Data(signed_content, get_certs(), true)
+
+      assert [
+               %{
+                 access: "http://acskidd.gov.ua/services/ocsp/",
+                 crl: "http://acskidd.gov.ua/download/crls/CA-20B4E4ED-Full.crl",
+                 data: _,
+                 delta_crl: "http://acskidd.gov.ua/download/crls/CA-20B4E4ED-Delta.crl"
+               }
+             ] = first_ocsp_checklist
 
       assert result.is_valid
       assert is_binary(result.content)
 
-      {:ok, second_result} = DigitalSignatureLib.processPKCS7Data(result.content, get_certs(), true)
+      {:ok, second_result, second_ocsp_checklist} =
+        DigitalSignatureLib.retrivePKCS7Data(result.content, get_certs(), true)
+
+      assert [
+               %{
+                 access: "http://acskidd.gov.ua/services/ocsp/",
+                 crl: "http://acskidd.gov.ua/download/crls/CA-20B4E4ED-Full.crl",
+                 data: _,
+                 delta_crl: "http://acskidd.gov.ua/download/crls/CA-20B4E4ED-Delta.crl"
+               }
+             ] = second_ocsp_checklist
 
       assert second_result.is_valid
       assert second_result.content == "{\n\"double\": \"hello world\"\n}\n"
@@ -101,9 +147,10 @@ defmodule DigitalSignatureLibTest do
       data = get_data("test/fixtures/outdated_cert.json")
       signed_content = get_signed_content(data)
 
-      assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), true)
+      assert {:ok, result, ocsp_checklist} = DigitalSignatureLib.retrivePKCS7Data(signed_content, get_certs(), true)
       refute result.is_valid
       assert result.validation_error_message == "certificate timestamp expired"
+      IO.inspect(ocsp_checklist)
     end
 
     test "can validate data signed with invalid Privat personal key" do
@@ -117,7 +164,7 @@ defmodule DigitalSignatureLibTest do
     test "can validate data signed with valid Privat personal key from elixir" do
       data = File.read!("test/fixtures/hello.txt.sig")
 
-      assert {:ok, result} = DigitalSignatureLib.oscpPKCS7Data(data, get_certs(), true)
+      assert {:ok, result, ocsp_checklist} = DigitalSignatureLib.retrivePKCS7Data(data, get_certs(), true)
       IO.inspect(result)
 
       # assert result.is_valid
