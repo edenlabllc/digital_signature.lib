@@ -244,7 +244,6 @@ InitPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
   if (dataBlob.data)
     enif_free(dataBlob.data);
 
-  enif_free_env(env);
   // Result tupple {:ok, ...}
   return enif_make_tuple3(env, enif_make_atom(env, "ok"), result, checkOscpList);
 }
