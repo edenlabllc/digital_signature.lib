@@ -342,7 +342,7 @@ ProcessPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 }
 
 static ErlNifFunc nif_funcs[] = {
-    {"retrivePKCS7Data", 3, RetrivePKCS7Data, ERL_NIF_DIRTY_JOB_CPU_BOUND},
+    {"retrivePKCS7Data", 3, RetrivePKCS7Data, 0},
     {"checkPKCS7Data", 1, CheckPKCS7Data, 0},
     {"processPKCS7Data", 3, ProcessPKCS7Data, ERL_NIF_DIRTY_JOB_CPU_BOUND}};
 
