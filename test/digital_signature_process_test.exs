@@ -1,4 +1,4 @@
-defmodule DigitalSignatureLibTest do
+defmodule DigitalSignatureProcessLibTest do
   use ExUnit.Case, async: false
 
   describe "Must process all data correctly with all certs provided" do

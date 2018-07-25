@@ -1,9 +1,9 @@
-defmodule DigitalSignatureLibTest do
+defmodule DigitalSignatureRetriveLibTest do
   use ExUnit.Case, async: false
 
   describe "Must process all data correctly with all certs provided" do
     test "fail with incorrect data" do
-      assert DigitalSignatureLib.processPKCS7Data([], get_certs(), true) ==
+      assert DigitalSignatureLib.retrivePKCS7Data([], get_certs(), true) ==
                {:error, "signed data argument is of incorrect type: must be Elixir string (binary)"}
     end
 
@@ -150,33 +150,23 @@ defmodule DigitalSignatureLibTest do
       assert {:ok, result, ocsp_checklist} = DigitalSignatureLib.retrivePKCS7Data(signed_content, get_certs(), true)
       refute result.is_valid
       assert result.validation_error_message == "certificate timestamp expired"
-      IO.inspect(ocsp_checklist)
-    end
-
-    test "can validate data signed with invalid Privat personal key" do
-      data = File.read!("test/fixtures/hello_invalid.txt.sig")
-
-      assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(data, get_certs(), true)
-      refute result.is_valid
-      assert result.validation_error_message == "OCSP certificate verificaton failed"
-    end
-
-    test "can validate data signed with valid Privat personal key from elixir" do
-      data = File.read!("test/fixtures/hello.txt.sig")
-
-      assert {:ok, result, ocsp_checklist} = DigitalSignatureLib.retrivePKCS7Data(data, get_certs(), true)
-      IO.inspect(result)
-
-      # assert result.is_valid
-      # assert result.content == "{\"hello\": \"world\"}"
+      assert [] == ocsp_checklist
     end
 
     test "can validate data signed with valid Privat personal key" do
       data = File.read!("test/fixtures/hello.txt.sig")
-
-      assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(data, get_certs(), true)
+      assert {:ok, result, ocsp_checklist} = DigitalSignatureLib.retrivePKCS7Data(data, get_certs(), true)
       assert result.is_valid
       assert result.content == "{\"hello\": \"world\"}"
+
+      assert [
+               %{
+                 access: "http://acsk.privatbank.ua/services/ocsp/",
+                 crl: "http://acsk.privatbank.ua/crl/PB-S9.crl",
+                 data: _,
+                 delta_crl: "http://acsk.privatbank.ua/crldelta/PB-Delta-S9.crl"
+               }
+             ] = ocsp_checklist
     end
   end
 
@@ -185,7 +175,7 @@ defmodule DigitalSignatureLibTest do
       data = get_data("test/fixtures/signed_le1.json")
       signed_content = get_signed_content(data)
 
-      {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, %{general: [], tsp: []}, true)
+      {:ok, result, _} = DigitalSignatureLib.retrivePKCS7Data(signed_content, %{general: [], tsp: []}, true)
 
       refute result.is_valid
       assert result.validation_error_message == "matching ROOT certificate not found"
@@ -197,7 +187,7 @@ defmodule DigitalSignatureLibTest do
 
       %{general: general, tsp: _tsp} = get_certs()
 
-      {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, %{general: general, tsp: []}, true)
+      {:ok, result, _} = DigitalSignatureLib.retrivePKCS7Data(signed_content, %{general: general, tsp: []}, true)
 
       refute result.is_valid
       assert result.validation_error_message == "matching TSP certificate not found"
@@ -209,7 +199,7 @@ defmodule DigitalSignatureLibTest do
 
       %{general: _general, tsp: tsp} = get_certs()
 
-      {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, %{general: [], tsp: tsp}, true)
+      {:ok, result, _} = DigitalSignatureLib.retrivePKCS7Data(signed_content, %{general: [], tsp: tsp}, true)
 
       refute result.is_valid
       assert result.validation_error_message == "matching ROOT certificate not found"
@@ -226,7 +216,7 @@ defmodule DigitalSignatureLibTest do
         }
       ]
 
-      {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, %{general: general, tsp: []}, true)
+      {:ok, result, _} = DigitalSignatureLib.retrivePKCS7Data(signed_content, %{general: general, tsp: []}, true)
 
       refute result.is_valid
       assert result.validation_error_message == "matching TSP certificate not found"
@@ -236,7 +226,7 @@ defmodule DigitalSignatureLibTest do
       data = get_data("test/fixtures/no_cert_and_invalid_signer.json")
       signed_content = get_signed_content(data)
 
-      assert {:ok, result} = DigitalSignatureLib.processPKCS7Data(signed_content, get_certs(), true)
+      assert {:ok, result, _} = DigitalSignatureLib.retrivePKCS7Data(signed_content, get_certs(), true)
       refute result.is_valid
       assert result.validation_error_message == "matching ROOT certificate not found"
 
