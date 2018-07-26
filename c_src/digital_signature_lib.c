@@ -280,10 +280,10 @@ bool CheckOCSP(UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB ocspCert, bool ve
 
 //Check signature without oscp
 struct BaseValidationResult BaseCheck(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDataInfo, PUAC_SUBJECT_INFO subjectInfo,
-                              struct Certs certs)
+                                      struct Certs certs)
 {
-  struct CertificateCheckInfo* certificatesCheckInfo = enif_alloc(sizeof(struct CertificateCheckInfo) * signedDataInfo.dwSignatureCount);
-  struct BaseValidationResult validationResult = {false, "error validating signed data container", 0};
+  struct CertificateCheckInfo *certificatesCheckInfo = enif_alloc(sizeof(struct CertificateCheckInfo) * signedDataInfo.dwSignatureCount);
+  struct BaseValidationResult validationResult = {false, "error validating signed data container", NULL, 0};
 
   char tsBuf[4000];
   UAC_BLOB timeStamp = {tsBuf, sizeof(tsBuf)};
@@ -384,18 +384,15 @@ struct BaseValidationResult BaseCheck(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO 
 
     DWORD ocspRequestCreateResult = UAC_OcspRequestCreate(&cert, NULL, 0, &ocspRequest);
     struct CertificateCheckInfo oscpCertificateCheckInfo =
-    {
-      certInfo.crlDistributionPoints,
-      certInfo.crlDeltaDistributionPoints,
-      certInfo.accessOCSP,
-      ocspRequest.data,
-      ocspRequest.dataLen,
-      ocspRequestCreateResult == UAC_SUCCESS
-    };
-
+        {
+            certInfo.crlDistributionPoints,
+            certInfo.crlDeltaDistributionPoints,
+            certInfo.accessOCSP,
+            ocspRequest.data,
+            ocspRequest.dataLen,
+            ocspRequestCreateResult == UAC_SUCCESS};
 
     certificatesCheckInfo[i] = oscpCertificateCheckInfo;
-
 
     DWORD signedDataVerifyResult = UAC_SignedDataVerify(&signedData, &cert, NULL);
     if (signedDataVerifyResult != UAC_SUCCESS)
@@ -407,7 +404,6 @@ struct BaseValidationResult BaseCheck(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO 
 
   validationResult.certsCheckInfo = certificatesCheckInfo;
   validationResult.checkSize = i;
-  enif_alloc(certificatesCheckInfo);
 
   if (i > 0)
   {
@@ -416,7 +412,6 @@ struct BaseValidationResult BaseCheck(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO 
   }
   return validationResult;
 }
-
 
 struct ValidationResult Check(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDataInfo, PUAC_SUBJECT_INFO subjectInfo,
                               struct Certs certs)
@@ -442,7 +437,7 @@ struct ValidationResult Check(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDa
   UAC_BLOB tspCert = FindMatchingTspCertificate(timeStampInfo.signature.signerRef, certs.tsp,
                                                 certs.tspLength);
 
- struct CertificateCheckInfo oscpCheckInfo[signedDataInfo.dwSignatureCount];
+  struct CertificateCheckInfo oscpCheckInfo[signedDataInfo.dwSignatureCount];
 
   DWORD i;
   for (i = 0; i < signedDataInfo.dwSignatureCount; i++)
