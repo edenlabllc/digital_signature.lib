@@ -47,7 +47,8 @@ defmodule DigitalSignatureRetriveLibTest do
                  access: "http://acskidd.gov.ua/services/ocsp/",
                  crl: "http://acskidd.gov.ua/download/crls/ACSKIDDDFS-Full.crl",
                  delta_crl: "http://acskidd.gov.ua/download/crls/ACSKIDDDFS-Delta.crl",
-                 data: _
+                 data: _,
+                 serial_number: "33b6cb7bf721b9ce0400000013732100dc684e00"
                }
              ] = ocsp_checklist
     end
@@ -72,7 +73,8 @@ defmodule DigitalSignatureRetriveLibTest do
                    access: "http://acskidd.gov.ua/services/ocsp/",
                    crl: "http://acskidd.gov.ua/download/crls/ACSKIDDDFS-Full.crl",
                    delta_crl: "http://acskidd.gov.ua/download/crls/ACSKIDDDFS-Delta.crl",
-                   data: _
+                   data: _,
+                   serial_number: "33b6cb7bf721b9ce0400000013732100dc684e00"
                  }
                ] = ocsp_checklist
       end)
@@ -92,8 +94,9 @@ defmodule DigitalSignatureRetriveLibTest do
                %{
                  access: "http://acskidd.gov.ua/services/ocsp/",
                  crl: "http://acskidd.gov.ua/download/crls/ACSKIDDDFS-Full.crl",
+                 delta_crl: "http://acskidd.gov.ua/download/crls/ACSKIDDDFS-Delta.crl",
                  data: _,
-                 delta_crl: "http://acskidd.gov.ua/download/crls/ACSKIDDDFS-Delta.crl"
+                 serial_number: "33b6cb7bf721b9ce040000000d1d2500aeb15800"
                }
              ] = ocsp_checklist
     end
@@ -107,8 +110,9 @@ defmodule DigitalSignatureRetriveLibTest do
                %{
                  access: "http://acskidd.gov.ua/services/ocsp/",
                  crl: "http://acskidd.gov.ua/download/crls/CA-20B4E4ED-Full.crl",
+                 delta_crl: "http://acskidd.gov.ua/download/crls/CA-20B4E4ED-Delta.crl",
                  data: _,
-                 delta_crl: "http://acskidd.gov.ua/download/crls/CA-20B4E4ED-Delta.crl"
+                 serial_number: "20b4e4ed0d30998c040000006e121e0069736000"
                }
              ] = first_ocsp_checklist
 
@@ -122,8 +126,9 @@ defmodule DigitalSignatureRetriveLibTest do
                %{
                  access: "http://acskidd.gov.ua/services/ocsp/",
                  crl: "http://acskidd.gov.ua/download/crls/CA-20B4E4ED-Full.crl",
+                 delta_crl: "http://acskidd.gov.ua/download/crls/CA-20B4E4ED-Delta.crl",
                  data: _,
-                 delta_crl: "http://acskidd.gov.ua/download/crls/CA-20B4E4ED-Delta.crl"
+                 serial_number: "20b4e4ed0d30998c040000006e121e0069736000"
                }
              ] = second_ocsp_checklist
 
@@ -163,8 +168,9 @@ defmodule DigitalSignatureRetriveLibTest do
                %{
                  access: "http://acsk.privatbank.ua/services/ocsp/",
                  crl: "http://acsk.privatbank.ua/crl/PB-S9.crl",
+                 delta_crl: "http://acsk.privatbank.ua/crldelta/PB-Delta-S9.crl",
                  data: _,
-                 delta_crl: "http://acsk.privatbank.ua/crldelta/PB-Delta-S9.crl"
+                 serial_number: "0d84eda1bb9381e804000000adbf220045cf7100"
                }
              ] = ocsp_checklist
     end

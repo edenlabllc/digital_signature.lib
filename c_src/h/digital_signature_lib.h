@@ -34,9 +34,9 @@ struct CertificateCheckInfo
   char *crlDistributionPoints;
   char *crlDeltaDistributionPoints;
   char *accessOCSP;
+  char *serialNumber;
   char *data;
   unsigned int dataLen;
-  bool isValid;
 };
 
 struct BaseValidationResult

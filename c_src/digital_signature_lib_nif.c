@@ -194,6 +194,7 @@ RetrivePKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
   {
     ERL_NIF_TERM osp = enif_make_new_map(env);
     enif_make_map_put(env, osp, enif_make_atom(env, "access"), CreateElixirString(env, baseValidationResult.certsCheckInfo[i].accessOCSP),  &osp);
+    enif_make_map_put(env, osp, enif_make_atom(env, "serial_number"), CreateElixirString(env, baseValidationResult.certsCheckInfo[i].serialNumber),  &osp);
     enif_make_map_put(env, osp, enif_make_atom(env, "crl"), CreateElixirString(env, baseValidationResult.certsCheckInfo[i].crlDistributionPoints),  &osp);
     enif_make_map_put(env, osp, enif_make_atom(env, "delta_crl"), CreateElixirString(env, baseValidationResult.certsCheckInfo[i].crlDeltaDistributionPoints),  &osp);
 

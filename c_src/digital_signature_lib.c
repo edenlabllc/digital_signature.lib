@@ -383,14 +383,20 @@ struct BaseValidationResult BaseCheck(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO 
     UAC_BLOB ocspRequest = {ocspRequestBuf, sizeof(ocspRequestBuf)};
 
     DWORD ocspRequestCreateResult = UAC_OcspRequestCreate(&cert, NULL, 0, &ocspRequest);
+    if (ocspRequestCreateResult != UAC_SUCCESS)
+    {
+      validationResult.validationErrorMessage = "OCSP certificate verificaton failed";
+      return validationResult;
+    }
+
     struct CertificateCheckInfo oscpCertificateCheckInfo =
     {
       certInfo.crlDistributionPoints,
       certInfo.crlDeltaDistributionPoints,
       certInfo.accessOCSP,
+      certInfo.serialNumber,
       ocspRequest.data,
-      ocspRequest.dataLen,
-      ocspRequestCreateResult == UAC_SUCCESS
+      ocspRequest.dataLen
     };
 
 
