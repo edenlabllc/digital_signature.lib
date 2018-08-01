@@ -141,7 +141,7 @@ CheckPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 static ERL_NIF_TERM
 RetrivePKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-  struct BaseValidationResult baseValidationResult = {true, ""};
+  struct BaseValidationResult baseValidationResult = {true, "", NULL, 0};
 
   bool check = GetCheckValue(env, argv[2]);
 
@@ -190,20 +190,18 @@ RetrivePKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 
   // Result
   ERL_NIF_TERM checkOscpList = enif_make_list(env, 0);
-  for(int i = 0; i < baseValidationResult.checkSize; i++)
+  for (int i = 0; i < baseValidationResult.checkSize; i++)
   {
     ERL_NIF_TERM osp = enif_make_new_map(env);
-    enif_make_map_put(env, osp, enif_make_atom(env, "access"), CreateElixirString(env, baseValidationResult.certsCheckInfo[i].accessOCSP),  &osp);
-    enif_make_map_put(env, osp, enif_make_atom(env, "serial_number"), CreateElixirString(env, baseValidationResult.certsCheckInfo[i].serialNumber),  &osp);
-    enif_make_map_put(env, osp, enif_make_atom(env, "crl"), CreateElixirString(env, baseValidationResult.certsCheckInfo[i].crlDistributionPoints),  &osp);
-    enif_make_map_put(env, osp, enif_make_atom(env, "delta_crl"), CreateElixirString(env, baseValidationResult.certsCheckInfo[i].crlDeltaDistributionPoints),  &osp);
-
+    enif_make_map_put(env, osp, enif_make_atom(env, "access"), CreateElixirString(env, baseValidationResult.certsCheckInfo[i].accessOCSP), &osp);
+    enif_make_map_put(env, osp, enif_make_atom(env, "serial_number"), CreateElixirString(env, baseValidationResult.certsCheckInfo[i].serialNumber), &osp);
+    enif_make_map_put(env, osp, enif_make_atom(env, "crl"), CreateElixirString(env, baseValidationResult.certsCheckInfo[i].crlDistributionPoints), &osp);
+    enif_make_map_put(env, osp, enif_make_atom(env, "delta_crl"), CreateElixirString(env, baseValidationResult.certsCheckInfo[i].crlDeltaDistributionPoints), &osp);
 
     ErlNifBinary derDataBin;
     enif_alloc_binary(baseValidationResult.certsCheckInfo[i].dataLen, &derDataBin);
     memcpy(derDataBin.data, baseValidationResult.certsCheckInfo[i].data, baseValidationResult.certsCheckInfo[i].dataLen);
     ERL_NIF_TERM derData = enif_make_binary(env, &derDataBin);
-
 
     enif_make_map_put(env, osp, enif_make_atom(env, "data"), derData, &osp);
     checkOscpList = enif_make_list_cell(env, osp, checkOscpList);
@@ -248,7 +246,6 @@ RetrivePKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
   // Result tupple {:ok, ...}
   return enif_make_tuple3(env, enif_make_atom(env, "ok"), result, checkOscpList);
 }
-
 
 static ERL_NIF_TERM
 ProcessPKCS7Data(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
