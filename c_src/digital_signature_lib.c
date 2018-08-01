@@ -278,6 +278,147 @@ bool CheckOCSP(UAC_BLOB cert, UAC_CERT_INFO certInfo, UAC_BLOB ocspCert, bool ve
   return validation_result && (ocspResponseInfo.certStatus == 0);
 }
 
+//Check signature without oscp
+struct BaseValidationResult BaseCheck(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDataInfo, PUAC_SUBJECT_INFO subjectInfo,
+                                      struct Certs certs)
+{
+  struct CertificateCheckInfo *certificatesCheckInfo = enif_alloc(sizeof(struct CertificateCheckInfo) * signedDataInfo.dwSignatureCount);
+  struct BaseValidationResult validationResult = {false, "error validating signed data container", NULL, 0};
+
+  char tsBuf[4000];
+  UAC_BLOB timeStamp = {tsBuf, sizeof(tsBuf)};
+  if (UAC_SignedDataGetTs(&signedData, 0, &timeStamp) != UAC_SUCCESS)
+  {
+    validationResult.validationErrorMessage = "retrieving a timestamp of data from an envelope with signed data failed";
+    return validationResult;
+  }
+
+  UAC_TIME_STAMP_INFO timeStampInfo = {0};
+  if (UAC_TsResponseLoad(&timeStamp, &timeStampInfo) != UAC_SUCCESS)
+  {
+    validationResult.validationErrorMessage = "loading information about the response with a timestamp failed";
+    return validationResult;
+  }
+
+  UAC_TIME timeStampDateTime = timeStampInfo.genTime;
+  UAC_BLOB tspCert = FindMatchingTspCertificate(timeStampInfo.signature.signerRef, certs.tsp,
+                                                certs.tspLength);
+
+  DWORD i;
+  for (i = 0; i < signedDataInfo.dwSignatureCount; i++)
+  {
+    char certBuf[3072]; // Certificate size is limited < 3 Kb
+    UAC_BLOB cert = {certBuf, sizeof(certBuf)};
+
+    //SignedDataFindCert(libHandler, &signedData, &signedDataInfo.pSignatures[i], &cert);
+
+    if (UAC_GetCert(UAC_CT_SIGNEDDATA, &signedData, i, &cert) != UAC_SUCCESS)
+    {
+      validationResult.validationErrorMessage = "retrieving certificate from signed data container failed";
+      return validationResult;
+    }
+
+    UAC_CERT_INFO certInfo = {};
+    if (UAC_CertLoad(&cert, &certInfo) != UAC_SUCCESS)
+    {
+      validationResult.validationErrorMessage = "processing certificate information from signed data failed";
+      return validationResult;
+    }
+
+    memcpy(subjectInfo, &certInfo.subject, sizeof(UAC_SUBJECT_INFO));
+    struct GeneralCert matchingCert = FindMatchingRootCertificate(cert, certs.general,
+                                                                  certs.generalLength);
+    if (matchingCert.root.data == NULL)
+    {
+      validationResult.validationErrorMessage = "matching ROOT certificate not found";
+      return validationResult;
+    }
+
+    UAC_BLOB rootCert = matchingCert.root;
+    DWORD certVerifyResult = UAC_CertVerify(&cert, &rootCert);
+    if (certVerifyResult != 0)
+    {
+      validationResult.validationErrorMessage = "ROOT certificate signature verification failed";
+      return validationResult;
+    }
+
+    UAC_CERT_INFO rootCertInfo = {};
+    DWORD getRootCertInfoResult = UAC_CertLoad(&rootCert, &rootCertInfo);
+    if (getRootCertInfoResult != 0)
+    {
+      validationResult.validationErrorMessage = "loading ROOT certificate information failed";
+      return validationResult;
+    }
+
+    bool isHighestLevel = IsHighestLevel(rootCertInfo);
+    if (!isHighestLevel)
+    {
+      if (tspCert.data == NULL)
+      {
+        validationResult.validationErrorMessage = "matching TSP certificate not found";
+        return validationResult;
+      }
+      bool isTimeStampCertValid = VerifyTimeStampCert(timeStamp, tspCert);
+      if (!isTimeStampCertValid)
+      {
+        validationResult.validationErrorMessage = "checking the signature of a response with a timestamp failed";
+        return validationResult;
+      }
+    }
+
+    bool isTimeStampValid = CheckTimeStamp(certInfo, timeStampDateTime);
+    if (!isTimeStampValid)
+    {
+      validationResult.validationErrorMessage = "signature timestamp verification failed";
+      return validationResult;
+    }
+    bool isCertNotExpired = CheckTimeStamp(certInfo, time(0));
+    if (!isCertNotExpired)
+    {
+      validationResult.validationErrorMessage = "certificate timestamp expired";
+      return validationResult;
+    }
+
+    char *ocspRequestBuf[4960];
+    UAC_BLOB ocspRequest = {ocspRequestBuf, sizeof(ocspRequestBuf)};
+
+    DWORD ocspRequestCreateResult = UAC_OcspRequestCreate(&cert, NULL, 0, &ocspRequest);
+    if (ocspRequestCreateResult != UAC_SUCCESS)
+    {
+      validationResult.validationErrorMessage = "OCSP certificate verificaton failed";
+      return validationResult;
+    }
+
+    struct CertificateCheckInfo oscpCertificateCheckInfo =
+        {
+            certInfo.crlDistributionPoints,
+            certInfo.crlDeltaDistributionPoints,
+            certInfo.accessOCSP,
+            certInfo.serialNumber,
+            ocspRequest.data,
+            ocspRequest.dataLen};
+
+    certificatesCheckInfo[i] = oscpCertificateCheckInfo;
+
+    DWORD signedDataVerifyResult = UAC_SignedDataVerify(&signedData, &cert, NULL);
+    if (signedDataVerifyResult != UAC_SUCCESS)
+    {
+      validationResult.validationErrorMessage = "verification of data siganture for a given subscriber failed";
+      return validationResult;
+    }
+  }
+
+  validationResult.certsCheckInfo = certificatesCheckInfo;
+  validationResult.checkSize = i;
+
+  if (i > 0)
+  {
+    validationResult.isValid = true;
+    validationResult.validationErrorMessage = "";
+  }
+  return validationResult;
+}
+
 struct ValidationResult Check(UAC_BLOB signedData, UAC_SIGNED_DATA_INFO signedDataInfo, PUAC_SUBJECT_INFO subjectInfo,
                               struct Certs certs)
 {
